@@ -1,0 +1,166 @@
+<extend name="Public/base" />
+<block name="body">
+    <div class="main-title">
+        <h2>发货申请单</h2>
+    </div>
+    <div class="search-form fr cf">
+        <form id="jq-search-form">
+            <div class="search-form fr cf">
+                <label id="msg" name="msg"></label>
+                <div class="sleft">
+                    <input type="text" name="s_date" class="text input-text search-input time" placeholder="请选择开始日期" />
+                    <input type="text" name="e_date" class="text input-text search-input time" placeholder="请选择结束日期" />
+                    <a id="jq-search-btn" class="sch-btn" href="javascript:void(0);"><i class="btn-search"></i></a>
+                </div>
+            </div>
+        </form>
+    </div>
+    <a id="jq-download" class="btn" href="javascript:void(0);">导出Excel</a>
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+                <tr>
+                    <th>序号</th>
+                    <th>申请单号</th>
+                    <th>申请日期</th>
+                    <th>申请种类</th>
+                    <th>申请数量</th>
+                    <th>申请人</th>
+                    <th>申请门店</th>
+                    <th>发货仓库</th>
+                    <th>售价金额</th>
+                    <th>申请结果</th>
+                    <th>备注</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="jq-list"></tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div id="jq-page" class="page"></div>
+    <script id="temp-list" type="text/html">
+        {{each items as list index}}
+        <tr>
+            <td>{{index+1}}</td>
+            <td>{{list.s_r_sn}}</td>
+            <td>{{list.ctime}}</td>
+            <td>{{list.g_type}}种</td>
+            <td>{{list.g_nums}}</td>
+            <td>{{list.nickname}}</td>
+            <td>{{list.store_name}}</td>
+            <td>{{list.warehouse_name}}</td>
+            <td>{{list.g_amounts}}</td>
+            <td class="wrap-highlight">{{list.s_r_status_name}}</td>
+            <td title="{{list.remark}}">
+                {{if list.remark != null}}
+                    {{if list.remark.length > 19 }}
+                        {{list.remark.slice(0,18) + '...'}}
+                    {{else}}
+                        {{list.remark}}
+                    {{/if}}
+                {{/if}}
+            </td>
+            <td>
+                <a href="/Admin/Addons/ex_Warehouse/_addons/Warehouse/_controller/StoreRequest/_action/view/id/{{list.s_r_id}}.html">查看</a>&nbsp;|&nbsp;
+                <a class="temp-request" href="javascript:void(0);" data-id="{{list.s_r_id}}">再次申请</a>
+            </td>
+        </tr>
+        {{/each}}
+    </script>
+</block>
+<block name="script">
+    <script type="text/javascript">
+    layui.use(['main'], function() {
+        var $ = layui.jquery,
+            layer = layui.layer;
+
+        var aId = parseInt(window.location.pathname.match(/\/(\w+).html/)[1]) || 1;
+        $.get('/Erp/StoreRequest/index?p=' + aId, function(res) {
+            if (res.code == 200) {
+                $('[name="s_date"]').val(res.content.s_date);
+                $('[name="e_date"]').val(res.content.e_date);
+                $('#jq-page').html(res.content.pager.replace(/\/Erp\/StoreRequest\/index/g, '/Admin/Addons/ex_Warehouse/_addons/Warehouse/_controller/StoreRequest/_action/index'));
+
+
+                $('#jq-list').html(template('temp-list', { items: res.content.data }));
+
+                $('#jq-list').find('tr').each(function() {
+                    var tLen = $(this).find('.temp-len').html();
+                    if (tLen.length >= 18) {
+                        $(this).find('.temp-len').html(tLen.substring(0, 18) + '...');
+                    }
+                });
+
+                $('#jq-loading').fadeOut();
+                $('#jq-content').fadeIn();
+
+                initEvent();
+                getFile();
+            } else {
+                layer.msg(res.content, {
+                    time: 1500
+                });
+            }
+        }, 'json');
+
+        function getFile(options) {
+            $.get('/Erp/StoreRequest/exportStoreRequestListExcel?' + options, function(res) {
+                if (res.code == 200) {
+                    $('#jq-download').attr('href', res.content.slice(1));
+                } else {
+                    layer.msg(res.content, {
+                        time: 1500
+                    });
+                }
+            }, 'json');
+        }
+
+        function initEvent() {
+            $('.temp-request').on({
+                click: function() {
+                    tempRequest($(this));
+                }
+            });
+        }
+        function tempRequest(options) {
+            layer.confirm('确认要执行该操作吗?', {
+                btn: ['确定', '取消']
+            }, function(index) {
+                var init = options,
+                    aId = parseInt(init.attr('data-id'));
+                $.post('/Erp/StoreRequest/submitAgain', {'s_r_id': aId}, function(res) {
+                    layer.msg(res.content, {
+                        time: 1500
+                    });
+                }, 'json');
+                layer.close(index);
+            });
+        }
+
+        $('#jq-search-btn').off().on({
+            click: function() {
+                var data = $('.search-form').find('input').serialize();
+                $.get('/Erp/StoreRequest/index?' + data, function(res) {
+                    if (res.code == 200) {
+                        console.log(res);
+                        $('#jq-list').html(template('temp-list', { items: res.content.data }));
+                        $('#jq-page').html(res.content.pager);
+
+                        getFile(data);
+                    } else {
+                        layer.msg(res.content, {
+                            time: 1500
+                        });
+                    }
+                }, 'json');
+            }
+        });
+        $(document).keydown(function(e) {
+            if (e.which == 13) {
+                $('#jq-search-btn').click();
+            }
+        });
+    });
+    </script>
+</block>

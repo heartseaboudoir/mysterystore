@@ -1,0 +1,55 @@
+<extend name="Public/base" />
+
+<block name="style">
+    <style>
+        /*body{padding: 0; padding-top:50px;}*/
+    </style>
+</block>
+<block name="body">
+        <script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+	<!-- 标题栏 -->
+	<div class="main-title">
+		<h2>{$meta_title}&nbsp;&nbsp;(门店总数：{$store_count})</h2>
+	</div>
+        <div class="tab-content">
+            <!-- 数据列表 -->
+            <form id="form" class="form-horizontal">
+                <div class="tab-pane in tab1">
+                    <volist name="shequ" id="lv">
+                        <notempty name="store[$lv[id]]">
+                        <div class="form-item cf">
+                            <label class="item-label">{$lv.title}&nbsp;&nbsp;(门店数：<?php echo count($store[$lv[id]])?>)</label>
+                            <div class="controls">
+                                <volist name="store[$lv[id]]" id="lc">
+                                    <a href="{:addons_url('Store://StoreAdmin:/change_store', array('store_id' => $lc['id']))}" style="margin:5px;" class="btn">{$lc.title}<eq name="lc.sell_type" value="2"><span class="check-tips" style="margin-left:0;">（线上商城）</span></eq></a>
+                                </volist>
+                            </div>
+                        </div>
+                        </notempty>
+                    </volist>
+                </div>
+                <div class="form-item cf">
+                </div>
+            </form>
+        </div>
+</block>
+<block name="script">
+	<script type="text/javascript">
+                /* 插件块关闭操作 */
+                $(".title-opt .wm-slide").each(function(){
+                    $(this).click(function(){
+                        $(this).closest(".columns-mod").find(".bd").toggle();
+                        $(this).find("i").toggleClass("mod-up");
+                    });
+                })
+		$(function(){
+                    highlight_subnav('{:U("Index/index")}');
+                    //全选节点
+                    $('.check-all').on('change',function(){
+                        $('.ids').prop('checked',this.checked);
+                    });
+                    $('.sidebar').remove();
+		});
+                
+	</script>
+</block>

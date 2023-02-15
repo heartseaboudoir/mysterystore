@@ -1,0 +1,161 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <a class="btn" href="{:addons_url('Warehouse://WarehouseStock:/view')}?v={$v}&goods_id={$goods_id}&isprint=1&value_id={$value_id}">导出Excel</a>
+        <!-- 数据列表 -->
+        <form id="form" action="{:addons_url('Warehouse://WarehouseStock:/updatewarehouse')}" method="post" class="form-horizontal">
+            <div class="tab-pane in tab1">
+                    <div class="form-item cf">
+                        <div class="controls goods_div">
+                            <label>商品ID：{$list.goods_id}</label>
+                            <label>商品名称：{$list.goods_name}</label>
+                            <label>商品类别：{$list.cate_name}</label>
+                            <label>商品属性：{$list.value_name}</label>
+                            <label>商品条码：{$list.bar_code}</label>
+                        </div>
+                        <div class="controls goods_div1">
+                            <!--<label>所有库存：{$list.all_nums}</label>-->
+                            <label>当前仓库库存数量：{$list.num}</label>
+                            <?php if($seeprice == 1){
+                    echo '<label>平均入库价：' .$list['stock_price'] .'</label>
+                            <label>库存总额：' .$list['this_stock_amout'] .'</label>';
+                            } ?>
+                            <label>系统售价：{$list.sell_price}</label>
+                            <label>售价总额：<?php echo number_format($list['sell_price']*$list['num'],2); ?></label>
+                        </div>
+                    </div>
+            </div>
+        <!-- 数据列表 -->
+        <div class="data-table table-striped">
+            <table>
+                <thead>
+                <tr>
+                    <th>出入库单号</th>
+                    <th>出入库时间</th>
+                    <th>类型</th>
+                    <th>来源</th>
+                    <th>入库仓库/门店</th>
+                    <th>出入库数量</th>
+                    <?php if($seeprice == 1){
+                    echo '<th>出入库价格</th>
+                    <th>出入库总额</th>';
+                    } ?>
+                    <th>系统售价</th>
+                    <th>售价总额</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <volist name="data" id="lv" key="vo">
+                    <tr class="data_list">
+                        <td>{$lv.this_sn}</td>
+                        <td>{$lv.ptime}</td>
+                        <td>
+                            <?php if($v == 'in'){
+                             if($lv['w_in_s_type'] == 0){
+                                echo '<font color="blue">采购单</font>';
+                                  }else{
+                                    if($lv['w_in_s_type'] == 1){
+                                        echo '<font color="blue">店铺退货</font>';
+                                    }else{
+                                        if($lv['w_in_s_type'] == 2){
+                                            echo '<font color="blue">仓库调拨</font>';
+                                        }else{
+                                            if($lv['w_in_s_type'] == 3){
+                                                echo '<font color="blue">盘盈入库</font>';
+                                            }else{
+                                                if($lv['w_in_s_type'] == 4){
+                                                    echo '<font color="blue">门店返仓</font>';
+                                                }else{
+                                                    if($lv['w_in_s_type'] == 5){
+                                                        echo '<font color="red">被退货</font>';
+                                                    }else{
+                                                        echo '<font color="red">其它</font>';
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                  }
+                            } ?>
+                            <?php if($v == 'out'){
+                           if($lv['w_out_s_type'] == 0){
+                                echo '<font color="blue">仓库调拨</font>';
+                                }else{
+                                    if($lv['w_out_s_type'] == 1){
+                                        echo '<font color="blue">门店申请</font>';
+                                    }else{
+                                        if($lv['w_out_s_type'] == 3){
+                                            echo '<font color="blue">盘亏出库</font>';
+                                        }else{
+                                            if($lv['w_out_s_type'] == 5){
+                                                echo '<font color="blue">直接发货</font>';
+                                            }else{
+                                                echo '<font color="red">其它</font>';
+                                            }
+                                        }
+                                    }
+                                }
+                            } ?>
+                        </td>
+                        <td>
+                            <?php if($v == 'in'){
+                            echo '<font color="blue">' .$lv['this_from1']. '/' .$lv['this_from2']. '</font>';
+                            } ?>
+                            <?php if($v == 'out'){
+                            echo '<font color="blue">' .$lv['w_name2']. '</font>';
+                            } ?>
+                        </td>
+                        <td>
+                            <?php if($v == 'in'){
+                            echo '<font color="blue">' .$lv['this_to1']. '</font>';
+                            } ?>
+                            <?php if($v == 'out'){
+                            echo '<font color="blue">' .$lv['w_name1']. '/' .$lv['store_name']. '</font>';
+                            } ?>
+                        </td>
+                        <td>{$lv.g_num}</td>
+                        <?php if($seeprice == 1){
+                    echo "<td>" .$lv['g_price'] ."</td>
+                        <td>" .number_format($lv['g_num']*$lv['g_price'],2) ."</td>";
+                        } ?>
+                        <td>{$lv.sell_price}</td>
+                        <td><?php echo number_format($lv['sell_price']*$lv['g_num'],2); ?></td>
+                        <td>
+                            <?php if($v == 'in'){
+                             if($lv['w_in_s_type'] == 5){ ?>
+                                    【<a class="" href="{:addons_url('Warehouse://WarehouseLoss:/view2?w_o_out_id='.$lv['this_id'])}" data-id="{$lv.this_id}">查看被退货单</a>】
+                                <?php }else{ ?>
+                                    【<a class="" href="{:addons_url('Warehouse://WarehouseInStock:/view?id='.$lv['this_id'])}" data-id="{$lv.this_id}">查看入库单</a>】
+                                <?php } ?>
+                            <?php } ?>
+                            <?php if($v == 'out'){ ?>
+                            【<a class="" href="{:addons_url('Warehouse://WarehouseOutStock:/view?id='.$lv['this_id'])}" data-id="{$lv.this_id}">查看出库单</a>】
+                            <?php } ?>
+                        </td>
+                    </tr>
+                </volist>
+                </tbody>
+            </table>
+        </div>
+    </form>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+
+    <script type="text/javascript" src="__STATIC__/artDialog/lib/sea.js"></script>
+    <script type="text/javascript">
+        var Global = {
+            jump: window.location.pathname.match(/(\D*)view/)[1],
+        }
+        $("a[href$='" + Global.jump + "index.html']").parent().addClass('layui-this');
+    </script>
+
+</block>

@@ -1,0 +1,101 @@
+<extend name="Public/base" />
+
+<block name="body">
+        <script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+	<!-- 标题栏 -->
+	<div class="main-title">
+		<h2>{$meta_title}</h2>
+	</div>
+        <ul class="tab-nav nav">
+            <li class="current" data-tab="tab1"><a href="javascript:void(0);">基础</a></li>
+        </ul>
+        <div class="tab-content">
+            <!-- 数据列表 -->
+            <form id="form" action="{:addons_url('Wallet://WithdrawAdmin/action_apply')}" method="post" class="form-horizontal">
+                <div class="tab-pane in tab1">
+                    <div class="form-item cf">
+                        <label class="item-label">流水号</label>
+                        <div class="controls">
+                            {$data.sn}
+                        </div>
+                    </div>
+                    <div class="form-item cf">
+                        <label class="item-label">申请的用户</label>
+                        <div class="controls">
+                            {$data.uid|get_nickname}
+                        </div>
+                    </div>
+                    <div class="form-item cf">
+                        <label class="item-label">提现金额</label>
+                        <div class="controls">
+                            {$data.money}
+                        </div>
+                    </div>
+                    <div class="form-item cf">
+                        <label class="item-label">申请时间</label>
+                        <div class="controls">
+                            {$data.create_time|time_format}
+                        </div>
+                    </div>
+                    <div class="form-item cf">
+                        <label class="item-label">状态</label>
+                        <div class="controls">
+                            <switch name="data.status">
+                                <case value="1">待提现</case>
+                                <case value="2">已提现</case>
+                                <case value="3">已拒绝</case>
+                                <case value="4">待确认</case>
+                            </switch>
+                        </div>
+                    </div>
+                    <div class="form-item cf">
+                        <label class="item-label">拒绝理由</label>
+                        <div class="controls">
+                            <textarea name="reply" class="textarea input-large">{$data.reply}</textarea>
+                        </div>
+                    </div>
+                    <div class="form-item cf">
+                        <eq name="data.status" value="1">
+                        <input type="hidden" name="act" value=""/>
+                        <input type="hidden" name="id" value="{$data.id}"/>
+                        <a href="javascript:;" class="btn submit-btn act_btn"  data-act="y">同意提现</a>
+                        <button id="submit" class="btn submit-btn ajax-post hidden" target-form="form-horizontal" type="submit" style="display:none;">确 定</button>
+                        <a href="javascript:;" class="btn submit-btn act_btn" data-act="n">拒绝提现</a>
+                        </eq>
+                        <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+</block>
+<block name="script">
+	<script type="text/javascript">
+		$(function(){
+                    //全选节点
+                    $('.check-all').on('change',function(){
+                        $('.ids').prop('checked',this.checked);
+                    });showTab();
+                    $('.act_btn').click(function(){
+                        if($(this).hasClass('disabled')){
+                            return false;
+                        }
+                        var act = $(this).data('act');
+                        $('[name="act"]').val(act);
+                        if(act == 'n' && $('[name="reply"]').val() == ''){
+                            alert('请填写拒绝理由');
+                            return false;
+                        }
+                        if(act == 'y' && !confirm('确认提现吗？')){
+                            return false;
+                        }
+                        if(act == 'n' && !confirm('确认拒绝提现吗？')){
+                            return false;
+                        }
+                        $('.act_btn').addClass('disabled');
+                        $('#submit').click();
+                        return false;
+                    });
+		})
+                
+	</script>
+</block>

@@ -1,0 +1,101 @@
+<extend name="Public/base" />
+<block name="body">
+    <div id="jq-content" class="site-content">
+        <div class="main-title">
+            <h2>全局订单</h2>
+        </div>
+        <a href="{:addons_url('Order://GoodsSwift:/index_order_situation',array('time_type'=>2))}" class="btn">周</a>
+        <a href="{:addons_url('Order://GoodsSwift:/index_order_situation',array('time_type'=>3))}" class="btn">月</a>
+        <div class="data-table table-striped">
+            <table>
+                <thead>
+                <tr>
+                    <th>序号</th>
+                    <th>标题</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody id="jq-list"></tbody>
+            </table>
+        </div>
+        <div id="jq-page" class="page"></div>
+    </div>
+    <script id="temp-list" type="text/html">
+        {{each items as list index}}
+        <tr data-id="{{list.s_time}}">
+            <td class="temp-id">{{index+1}}</td>
+            <td>{{list.s_time}}至{{list.e_time}} 订单统计 {{ list.remark }}</td>
+            <td>{{list.ctime}}</td>
+            <td>
+                <a class="temp-view" href="javascript:void(0);">查看</a>
+            </td>
+        </tr>
+        {{/each}}
+    </script>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        layui.use(['main'], function() {
+            var $ = layui.jquery,
+                layer = layui.layer;
+
+            var Global = {
+                listUrl: '/Erp/StoreGoodsSwift/index_order_situation',
+                jump: window.location.pathname.match(/(\D*)index_order_situation/)[1],
+                s_time: '',
+                time_type: '2',
+            }
+            $("a[href$='" + Global.jump + "index_order_situation.html']").parent().addClass('layui-this');
+            var parameter = window.location.pathname.replace(/\//g,'.').split('.');
+            $.each( parameter, function(i,items){
+                switch(items){
+                    case 'time_type':
+                        Global.time_type = decodeURIComponent(parameter[i+1]);
+                        break;
+                }
+            });
+            var passData = $.dataJson({
+                time_type: Global.time_type
+            });
+            var data = $.parseJson( passData );
+
+            $.getData({
+                url: Global.listUrl + '?' + data,
+                load: true
+            }, function(res){
+                dataShow(res);
+            });
+            function dataShow(res,callback){
+                var oList = $('#jq-list'),
+                    oPage = $('#jq-page');
+
+                if( res.content.data == null || res.content.data.length == 0 ){
+                    oList.html('<tr><td class="wrap-empty">暂无内容！</td></tr>');
+                }else{
+                    oList.html(template('temp-list', { items: res.content.data }));
+                    $.each( res.content.data,function(i,items){
+                        var url = Global.jump + 'ls_order_situation/s_time/'+items['s_time']+'/time_type/'+items['time_type']+'.html',
+                            oId = $('[data-id='+items['s_time']+']');
+                        oId.find('.temp-view').attr('href',url);
+                        if( passData.p > 1 && callback == undefined ){
+                            var id = parseInt( oId.find('.temp-id').html() ),
+                                sum = passData.p * passData.pageSize -  passData.pageSize;
+                            oId.find('.temp-id').html( id + sum );
+                        }else{
+                            oId.find('.temp-id').html( id );
+                        }
+                    });
+                }
+
+                if( res.content.recordCount > res.content.pageSize ){
+                    var total = '<span class="rows">共'+res.content.recordCount+'条记录</span>';
+                    oPage.html( res.content.pager.replace( new RegExp(Global.listUrl,'g'),Global.jump+'index_order_situation' ) + total );
+                }else{
+                    oPage.html( res.content.pager );
+                }
+            }
+
+        });
+    </script>
+</block>

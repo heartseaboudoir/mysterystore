@@ -1,0 +1,169 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <!-- 高级搜索 -->
+    <div class="cf">
+        <a href="{:addons_url('Order://Order:/download_order')}" class="btn" >订单下载</a>
+        <div class="search-form fr cf">
+            <label id="msg" name="msg"></label>
+            <label class="wrap-select fl" style="margin-right: 10px;">
+                <select name="keys" style="border-color: #eaeaea;">
+                    <option value="">请选择</option>
+                    <option value="order_sn" <?php if($_GET['keys']=='order_sn'){echo 'selected';} ?>>订单号</option>
+                    <option value="goods_name" <?php if($_GET['keys']=='goods_name'){echo 'selected';} ?>>商品名</option>
+                    <option value="mobile" <?php if($_GET['keys']=='mobile'){echo 'selected';} ?>>手机号</option>
+                </select>
+            </label>
+            <label class="wrap-select fl" style="margin-right: 10px;border: 1px solid #eaeaea;">
+                <input type="text" name="keyword" class="text input-text search-input" style="" value="{$_GET['keyword']}" placeholder="商品关键词或完整的订单号" />
+            </label>
+            <div class="sleft">
+                <input type="text" name="start_time" class="text search-input time" style="width:100px;" value="{$_GET['start_time']}" placeholder="起始时间" />
+                <input type="text" name="end_time" class="text search-input time" style="width:100px;" value="{$_GET['end_time']}" placeholder="结束时间" />
+                <a class="sch-btn" href="javascript:;" id="search" url="{:addons_url('Order://Order:/index')}"><i class="btn-search"></i></a>
+            </div>
+        </div>
+    </div>
+    <div style="clear:both;"></div>
+    <p style="margin-top:5px;" id="select_p">
+    <form id="select-form" onsubmit="return false;" style="display:none;">
+        筛选：
+        <php>$type_arr = array(array('val' => 'store', 'title' => '实体门店'), array('val' => 'online', 'title' => '线上商城'));</php>
+        <volist name="type_arr" id="lv">
+            <label style="margin:0 5px;"><input type="checkbox" name="type[]" value="{$lv.val}" <in name="lv.val" value="$_GET[type]">checked</in> /> {$lv.title} </label>
+        </volist>
+    </form>
+    </p>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+            <tr>
+                <th>订单号</th>
+                <th style="width:120px;">支付流水号</th>
+                <th style="width:60px;">类型</th>
+                <th style="width:100px;">用户</th>
+                <th style="width:80px;">实付金额</th>
+                <th style="width:80px;">成本价</th>
+                <th style="width:60px;">状态</th>
+                <th style="width:120px;">创建时间</th>
+                <th style="width:120px;">更新时间</th>
+                <th style="width:60px;">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="lv" key="vo">
+                <tr <eq name="lv.status" value="1">style="color:red;"</eq>>
+                <td>{$lv.order_sn}</td>
+                <td>{$lv.pay_sn}</td>
+                <td><switch name="lv.type"><case value="online">线上商城</case><case value="store">实体门店</case></switch></td>
+                <!--
+                <td><gt name="lv.uid" value="0">{$lv.uid|get_nickname}<else/>未绑定</gt></td>
+                -->
+
+                <td>
+                    <?php
+                    if (!empty($lv['uid'])) {
+                        echo get_nickname($lv['uid']);
+                    } else if (in_array($lv['pay_type'], array(3, 4))) {
+                        echo '锦江';
+                    } else {
+                        echo '未绑定';
+                    }
+                    ?>
+
+
+
+                </td>
+                <td>{$lv.pay_money}</td>
+                <td>{$lv.inout_price_all}</td>
+                <td>{$lv.status_text}</td>
+                <td>{$lv.create_time|time_format="Y-m-d H:i"}</td>
+                <td>{$lv.update_time|time_format="Y-m-d H:i"}</td>
+                <td>
+                    <a class="update" href="{:addons_url('Order://Order:/show?id='.$lv['id'])}" data-id="{$lv.id}">查看</a>
+                </td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <link href="__STATIC__/datetimepicker/css/datetimepicker.css" rel="stylesheet" type="text/css">
+    <link href="__STATIC__/datetimepicker/css/dropdown.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+    <script type="text/javascript">
+        $(function() {
+            highlight_subnav('{:addons_url('Order://Order:/index')}');
+                //全选节点
+                    $('.check-all').on('change', function() {
+                        $('.ids').prop('checked', this.checked);
+                    });
+            //搜索功能
+
+            $('.search-form input').focus(function(){
+                $(document).keypress(function (e) {
+                    // 回车键事件
+                    if (e.which == 13) {
+                        $("#search").click();
+                    }
+                });
+            });
+            $("#search").click(function() {
+                var url = $(this).attr('url');
+                var query = $('.search-form').find('input,select').serialize();
+                query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g, '');
+                query = query.replace(/^&/g, '');
+                if (url.indexOf('?') > 0) {
+                    url += '&' + query;
+                } else {
+                    url += '?' + query;
+                }
+                var query2 = $('#select-form').serialize();
+                if (url.indexOf('?') > 0) {
+                    url += '&' + query2;
+                } else {
+                    url += '?' + query2;
+                }
+                window.location.href = url;
+            });
+
+            /* 状态搜索子菜单 */
+            $(".search-form").find(".drop-down").hover(function() {
+                $("#sub-sch-menu").removeClass("hidden");
+            }, function() {
+                $("#sub-sch-menu").addClass("hidden");
+            });
+            $("#sub-sch-menu li").find("a").each(function() {
+                $(this).click(function() {
+                    var text = $(this).text();
+                    $("#sch-sort-txt").text(text).attr("data", $(this).attr("value"));
+                    $("#sub-sch-menu").addClass("hidden");
+                })
+            });
+            var _T;
+            $('#select-form input').change(function(){
+                clearTimeout(_T);
+                _T = setTimeout(function(){
+                    $("#search").click();
+                }, 1000);
+            });
+            $('.time').datetimepicker({
+                format: 'yyyy-mm-dd',
+                language: "zh-CN",
+                minView: 2,
+                autoclose: true
+            });
+        })
+    </script>
+</block>

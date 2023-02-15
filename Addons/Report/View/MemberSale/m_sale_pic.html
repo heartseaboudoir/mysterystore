@@ -1,0 +1,183 @@
+<extend name="Public/base" />
+<style>
+    .div-inline{ float:left;}
+</style>
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <a href="{:addons_url('Report://MemberSale:/m_sale')}?s_date={$s_date}&e_date={$e_date}&isprint=1" class="btn">导出Excel</a>
+    <a href="{:addons_url('Report://MemberSale:/m_sale')}?v=1&s_date={$s_date}&e_date={$e_date}" class="btn">切换成列表</a>
+    <!-- 高级搜索 -->
+    <div class="search-form fr cf">
+        <form id="search-form" onsubmit="return false;">
+            <div class="search-form fr cf">
+                <div class="sleft">
+                    <input type="text" name="s_date" class="text input-text search-input time" value="{$s_date}" placeholder="请选择开始日期" />
+                    <input type="text" name="e_date" class="text input-text search-input time" value="{$e_date}" placeholder="请选择结束日期" />
+                    <a class="sch-btn" href="javascript:;" id="search" url="{:addons_url('Report://MemberSale:/m_sale')}"><i class="btn-search"></i></a>
+                </div>
+            </div>
+            <form>
+    </div>
+    <!-- 第一个图表 -->
+    <div id="first" style="width: 90%;height:600px;float:left;" class="div-inline"></div>
+    <!-- 第二个图表 -->
+    <!--<div id="second" style="width: 30%;height:600px;float:left;" class="div-inline"></div>-->
+    <!-- 分页 -->
+    <div class="page" style="float:left;width: 100%;">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/echarts.js"></script>
+    <link href="__STATIC__/datetimepicker/css/datetimepicker.css" rel="stylesheet" type="text/css">
+    <link href="__STATIC__/datetimepicker/css/dropdown.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+    <script type="text/javascript">
+        highlight_subnav('{:addons_url('Report://MemberSale:/member_date')}');
+            //搜索功能
+
+                $('.search-form input').focus(function(){
+                    $(document).keypress(function (e) {
+                        // 回车键事件
+                        if (e.which == 13) {
+                            $("#search").click();
+                        }
+                    });
+                });
+        $("#search").click(function() {
+            var url = $(this).attr('url');
+            var query = $('.search-form').find('input').serialize();
+            query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g, '');
+            query = query.replace(/^&/g, '');
+            if (url.indexOf('?') > 0) {
+                url += '&' + query;
+            } else {
+                url += '?' + query;
+            }
+            var query2 = $('#select-form').serialize();
+            if (url.indexOf('?') > 0) {
+                url += '&' + query2;
+            } else {
+                url += '?' + query2;
+            }
+            window.location.href = url;
+        });
+
+        /* 状态搜索子菜单 */
+        $(".search-form").find(".drop-down").hover(function() {
+            $("#sub-sch-menu").removeClass("hidden");
+        }, function() {
+            $("#sub-sch-menu").addClass("hidden");
+        });
+        $("#sub-sch-menu li").find("a").each(function() {
+            $(this).click(function() {
+                var text = $(this).text();
+                $("#sch-sort-txt").text(text).attr("data", $(this).attr("value"));
+                $("#sub-sch-menu").addClass("hidden");
+            })
+        });
+        var _T;
+        $('#select-form input').change(function(){
+            clearTimeout(_T);
+            _T = setTimeout(function(){
+                $("#search").click();
+            }, 1000);
+        });
+        $('.time').datetimepicker({
+            format: 'yyyy-mm-dd',
+            language: "zh-CN",
+            minView: 2,
+            autoclose: true
+        });
+    </script>
+    <script type="text/javascript">
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('first'));
+        // 显示标题，图例和空的坐标轴
+        myChart.setOption({
+            title: {
+                text: '月活用户消费'
+            },
+            tooltip: {},
+            legend: {
+                data:['消费金额']
+            },
+            xAxis: {
+                data: []
+            },
+            yAxis: {},
+            series: [{
+                name: '消费金额',
+                type: 'bar',
+                data: []
+            }]
+        });
+        //var json_str = '{$jsondata}';
+        var nickary = '{$nickary}';
+        var p_mary = '{$p_mary}';
+        var uid_str = '{$uid_ary}';
+
+
+
+        //var data = $.parseJSON(json_str);
+        var nickary = $.parseJSON(nickary);
+        var p_mary = $.parseJSON(p_mary);
+        var uid_ary = $.parseJSON(uid_str);
+        // 填入数据
+        myChart.setOption({
+            /*grid: {
+                y2: 100
+            },*/
+            xAxis: {
+                data: nickary,
+                axisLabel:{
+                    interval:0,
+                    rotate:-30,
+                }
+            },
+            series: [{
+                // 根据名字对应到相应的系列
+                name: '消费金额',
+                type: 'bar',
+                id: uid_ary,
+                data: p_mary
+            }]
+        });
+        // 基于准备好的dom，初始化echarts实例
+        /*var myChart1 = echarts.init(document.getElementById('second'));
+        // 指定图表的配置项和数据
+        var option = {
+            title: {
+                text: '累计消费用户'
+            },
+            tooltip: {},
+            legend: {
+                data:['数量']
+            },
+            xAxis: {
+                data: ["累计用户数量"]
+            },
+            yAxis: {},
+            series: [{
+                name: '人数',
+                type: 'bar',
+                data: [{$usernum}]
+            }]
+        };
+        myChart1.setOption(option);*/
+        myChart.on('click', function (params) {
+            var ids = params.dataIndex;
+            var uidary = params.seriesId;
+            var uida = uidary.split(',');
+            var uid = uida[ids];
+            var str = '{:addons_url('Report://MemberSale:/s_sale')}?uid=' + uid + '&s_date={$s_date}&e_date={$e_date}';
+            //console.log(str);
+            window.location.href = str;
+        });
+
+    </script>
+</block>

@@ -1,0 +1,28 @@
+<table>
+	<thead>
+		<tr>
+			<th>序号</th>
+			<volist name="listKey" id="vo">
+				<th>{$vo}</th>
+			</volist>
+		</tr>
+	</thead>
+	<tbody>
+		<volist name="_list" id="lv" key="vo">
+		<tr>
+			<td>{$lv.id}</td>
+                            <volist name="listKey" id="lk">
+                                    <td>{$lv.$key}</td>
+                            </volist>
+		</tr>
+		</volist>
+	</tbody>
+</table>
+<script type="text/javascript">
+	$(function(){
+		$('.delete').click(function(){
+                    var id = $(this).attr('data-id');
+                    return confirm('确定要删除序号为['+id+']的数据吗？');
+                });
+	})
+</script>

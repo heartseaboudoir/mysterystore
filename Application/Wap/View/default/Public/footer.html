@@ -1,0 +1,27 @@
+<eq name="APP_TYPE" value="wechat">
+<php>
+    $_default_share = share_config('wechat_default_share');
+</php>
+<script>
+    var wx_appId = '{$js_api.appId}';
+    var wx_timestamp = '{$js_api.timestamp}';
+    var wx_nonceStr = '{$js_api.nonceStr}';
+    var wx_signature = '{$js_api.signature}';
+    
+    var shareTitle = "{$_default_share.title|default='蜜狗神秘商店'}",
+        shareDesc = "{$_default_share.desc|default=''}",
+        shareImg = "{$_default_share.cover|default=''}",
+        shareLink = "{$_default_share.url|default=''}";
+</script>
+<script src='https://res.wx.qq.com/open/js/jweixin-1.2.0.js'></script>
+<script src="__JS__/WxShare.js?={:date('ymdhi')}"></script>
+</eq>
+<if condition="APP_TYPE eq 'alipay'">
+<!--引入jsAPI的功能js-->
+<script src="https://as.alipayobjects.com/g/component/antbridge/1.1.1/antbridge.min.js"></script>
+<script src="__JS__/AlipayShare.js?={:date('ymdhi')}"></script>
+<script type="text/javascript">
+</script>
+<!--分享功能8.1以上钱包支持-->
+</if>
+<block name="script"></block>

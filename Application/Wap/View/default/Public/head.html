@@ -1,0 +1,27 @@
+<meta charset="utf-8">
+<meta content="yes" name="apple-mobile-web-app-capable">
+<meta content="yes" name="apple-touch-fullscreen">
+<meta content="telephone=no,email=no" name="format-detection">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+
+<link rel="stylesheet" href="__CSS__/main.css?t={:date('ymdHi')}">
+
+<title>{$meta_title|default="神秘商店"}</title>
+
+<script src="__JS__/vendor.js?t={:date('ymdHi')}"></script>
+<script src="__JS__/app.js?t={:date('ymdHi')}"></script>
+
+<eq name="APP_TYPE" value="alipay">
+<php>
+    $_default_share = share_config('alipay_default_share');
+</php>
+<script type="text/javascript">
+    var shareTitle = "{$_default_share.title|default='神秘商店'}",
+        shareDesc = "{$_default_share.desc|default=''}",
+        shareImg = "{$_default_share.cover_id|get_cover_url}",
+        shareLink = "{$_default_share.url|default=''}";
+</script>
+<meta name="Alipay:title" content="{$_default_share.title|default='神秘商店'}"/>
+<meta name="Alipay:imgUrl" content="{$_default_share.cover_id|get_cover_url}"/>
+<meta name="Alipay:desc" content="{$_default_share.desc}"/>
+</eq>

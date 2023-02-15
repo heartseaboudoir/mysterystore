@@ -1,0 +1,14 @@
+<php>
+    $coupon_bg_poster = D('Addons://Poster/PosterData')->where(array('name' => 'coupon_bg', 'status' => 1))->limit(1)->order('listorder desc')->field('url,cover_id')->find();
+    $coupon_bg = !empty($coupon_bg_poster['cover_id']) ? get_cover_url($coupon_bg_poster['cover_id']) : '';
+</php>
+<notempty name="coupon_bg">
+    <style>
+        .getCoupons-bd{
+            background-image:url({$coupon_bg});
+        }
+    </style>
+    <notempty name="coupon_bg_poster['url']">
+    <a href="{$coupon_bg_poster['url']|default='javascript:;'}" style="display:block; width:100%; padding-top:67.575%; position:absolute; top:0;left:0;">&nbsp;</a>
+    </notempty>
+</notempty>

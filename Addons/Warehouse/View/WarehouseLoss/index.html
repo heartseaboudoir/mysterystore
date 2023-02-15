@@ -1,0 +1,174 @@
+<extend name="Public/base" />
+<block name="body">
+    <div id="jq-content" class="site-content">
+        <div class="main-title">
+            <h2>退货单</h2>
+        </div>
+        <div class="search-form fr cf">
+            <form id="jq-search-form">
+                <div class="sleft">
+                    <input type="text" name="s_date" class="text input-text search-input time" placeholder="请选择开始日期" />
+                    <input type="text" name="e_date" class="text input-text search-input time" placeholder="请选择结束日期" />
+                    <a id="jq-search-btn" class="sch-btn" href="javascript:void(0);"><i class="btn-search"></i></a>
+                </div>
+            </form>
+        </div>
+        <a id="jq-download" class="btn" href="javascript:void(0);">导出Excel</a>
+        <div class="data-table table-striped">
+            <table>
+                <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>退货单号</th>
+                        <th>创建日期</th>
+                        <th>商品种类</th>
+                        <th>商品数量</th>
+                        <th>创建人</th>
+                        <th>退货仓库/门店</th>
+                        <th>发货门店</th>
+                        <th>售价金额</th>
+                        <!--<th>退货金额</th>-->
+                        <th>来源</th>
+                        <th>状态</th>
+                        <th>备注</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="jq-list"></tbody>
+            </table>
+        </div>
+        <div id="jq-page" class="page"></div>
+    </div>
+    <script id="temp-list" type="text/html">
+        {{each items as list index}}
+        <tr data-id="{{list.w_o_out_id}}">
+            <td class="temp-id">{{index+1}}</td>
+            <td>{{list.w_o_out_sn}}</td>
+            <td>{{list.ctime}}</td>
+            <td>{{list.g_type}}种</td>
+            <td>{{list.g_nums}}</td>
+            <td>{{list.admin_name}}</td>
+            <td>
+                {{if list.warehouse_name == '' || list.warehouse_name == null }}
+                    {{list.store_name}}
+                {{else}}
+                    {{list.warehouse_name}}
+                {{/if}}
+            </td>
+            <td>{{list.warehouse2_name}}</td>
+            <td>{{list.g_amounts}}</td>
+            <!--<td>{{list.p_amounts}}</td>-->
+            <td class="wrap-empty">{{list.w_o_out_type_name}}</td>
+            <td class="wrap-highlight">{{list.w_o_out_status_name}}</td>
+            <td title="{{list.remark}}">
+            {{if list.remark != null}}
+                {{if list.remark.length > 10 }}
+                    {{list.remark.slice(0,9) + '...'}}
+                {{else}}
+                    {{list.remark}}
+                {{/if}}
+            {{/if}}
+            </td>
+            <td>
+                <a class="temp-view" href="javascript:void(0);">查看</a>
+            </td>
+        </tr>
+        {{/each}}
+    </script>
+</block>
+<block name="script">
+    <script type="text/javascript">
+    layui.use(['main'], function() {
+        var $ = layui.jquery,
+            layer = layui.layer;
+
+        var Global = {
+            listUrl: '/Erp/WarehouseLoss/index',
+            fileUrl: '/Erp/WarehouseLoss/exportWarehouseLossListExcel',
+            verifyUrl: '/Erp/WarehouseLoss/check',
+            jump: window.location.pathname.match(/(\D*)index/)[1],
+            passId: 'w_o_out_id'
+        }
+        $("a[href$='" + Global.jump + "index.html']").parent().addClass('layui-this');
+
+        var passData = $.dataJson(); 
+        var data = $.parseJson( passData );
+        
+        $.getData({
+             url: Global.listUrl + '?' + data,
+            load: true
+        }, function(res){
+            dataShow(res);
+        });
+        function dataShow(res,callback){
+            var oDownload = $('#jq-download'),
+                    oList = $('#jq-list'),
+                    oPage = $('#jq-page');
+
+            oDownload.attr('href','javascript:void(0);').unbind();
+
+            if( res.content.data == null || res.content.data.length == 0 ){
+                oList.html('<tr><td class="wrap-empty">暂无内容！</td></tr>');
+                oDownload.css('cursor','default');
+            }else{
+                oList.html(template('temp-list', { items: res.content.data }));
+                $.each( res.content.data,function(i,items){
+                    console.log( items[Global.passId] );
+                    var url = Global.jump + 'view/'+Global.passId+'/'+items[Global.passId]+'.html',
+                        oId = $('[data-id='+items[Global.passId]+']');
+                    oId.find('.temp-view').attr('href',url);
+
+                    if( passData.p > 1 && callback == undefined ){
+                        var id = parseInt( oId.find('.temp-id').html() ),
+                           sum = passData.p * passData.pageSize -  passData.pageSize;
+                        oId.find('.temp-id').html( id + sum );
+                    }else{
+                        oId.find('.temp-id').html( id );
+                    }
+
+                });
+
+                var data = $('#jq-search-form').find('input').serialize();
+                oDownload.fileDown({
+                     url: Global.fileUrl + '?' + data
+                }).removeAttr('style');
+
+                $('.temp-verify').tempConfirm({
+                    url: Global.verifyUrl,
+                },function(self){
+                    var data = {};
+                    data[Global.passId] = parseInt( self.parents('tr').attr('data-id') );
+                    return data;
+                },function(res){
+                    window.location.reload();
+                });
+                
+            }
+
+            if( res.content.recordCount > res.content.pageSize ){
+                var total = '<span class="rows">共'+res.content.recordCount+'条记录</span>';
+                oPage.html( res.content.pager.replace( new RegExp(Global.listUrl,'g'),Global.jump+'index' ) + total );
+            }else{
+                oPage.html( res.content.pager );
+            }
+        }
+
+        $('#jq-search-btn').off().on({
+            click: function() {
+                var data = $('#jq-search-form').find('input').serialize() + '&pageSize='+passData.pageSize; 
+                $.getData({
+                    url: Global.listUrl + '?' + data
+                }, function(res){
+                    dataShow(res,true);
+                    window.history.pushState( {},'',Global.jump+'index.html' );
+                });
+            }
+        });
+        $(document).keydown(function(e) {
+            if (e.which == 13) {
+                $('#jq-search-btn').click();
+            }
+        });
+    });
+    </script>
+</block>

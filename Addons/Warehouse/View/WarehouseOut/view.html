@@ -1,0 +1,343 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <a class="btn" href="{:addons_url('Warehouse://WarehouseOut:/view')}?id={$id}&isprint=1">导出Excel</a>
+        <!-- 数据列表 -->
+        <form id="form" action="{:addons_url('Warehouse://WarehouseOut:/updatewarehouse')}" method="post" class="form-horizontal">
+            <div class="tab-pane in tab1">
+                    <div class="form-item cf">
+                        <div class="controls goods_div">
+                            <label>验货单号：{$list.w_out_sn}</label>
+                            <label>创建日期：{$list.ctime}</label>
+                            <label>商品种类：{$list.g_type}种</label>
+                            <label>商品数量：{$list.g_nums}</label>
+                            <label>售价金额：{$list.g_amounts}</label>
+                            <!--<label>采购金额：{$list.p_amounts}</label>-->
+                        </div>
+                        <div class="controls goods_div0">
+                            <?php if($list['w_out_type'] == 0){
+                            echo '<label>来源：仓库调拨单</label><label>调拨单号：' .$list['w_r_sn'] .'</label><label>申请仓库：' .$list['w_name1'] .'</label>';
+                            }else{
+                                if($list['w_out_type'] == 1){
+                                    echo '<label>来源：<font color="blue">门店申请单</font></label><label>申请单号：' .$list['s_r_sn'] .'</label><label>申请门店：' .$list['store_name'] .'</label>';
+                                }else{
+                                    if($list['w_out_type'] == 3){
+                                        echo '<label>来源：<font color="blue">直接发货</font></label><label>收货门店：' .$list['store_name'] .'</label>';
+                                    }else{
+                                        echo '<font color="green">其它</font>';
+                                    }
+                                }
+                            }?>
+                        </div>
+                        <div class="controls goods_div1">
+                            <label>发货地址：{$list.address}</label>
+                        </div>
+                        <div class="controls goods_div1">
+                            <label>管理员：{$list.nickname}</label>
+                            <label>验货仓库：{$list.w_name2}</label>
+                            <?php if($list['pnickname'] != ''){ ?>
+                            <label>处理人：{$list.pnickname}</label>
+                            <label>处理时间：{$list.ptime}</label>
+                            <?php } ?>
+                        </div>
+                        <div class="controls goods_div3">
+                            <label>单据状态：
+                                <?php
+                        switch ($list['w_out_status'])
+                        {
+                        case 0:
+                          echo '<font color="black">新增</font>';
+                                break;
+                                case 1:
+                                echo '<font color="blue">出库单：</font>/' .$list['w_out_s_sn'];
+                                break;
+                                case 2:
+                                echo '<font color="red">已拒绝</font>/';
+                                break;
+                                case 3:
+                                echo '<font color="red">部分拒绝、部分出库/' .$list['w_out_s_sn'] .'</font>';
+                                break;
+                                default:
+                                echo "其它";
+                                }
+                                ?></label>
+                        </div>
+                        <div class="controls goods_div4">
+                            <label>备注：
+                                <?php
+                            if($list['w_out_status'] == 0)
+                            {
+                                echo '<input type="text" class="text input-min remark" style="width: 200px;" name="remark" value="' .$list['remark']. '" />';
+                                }else{
+                                    echo $list['remark'];
+                                }
+                                ?>
+                            </label>
+                            <?php if($list['w_out_status'] == 0){ ?>
+                            <a id="jq-receiving" class="btn" href="javascript:void(0);">全部有货</a>
+                            <a id="jq-returns" class="btn" href="javascript:void(0);">全部缺货</a>
+                            <?php } ?>
+                        </div>
+                    </div>
+            </div>
+        <!-- 数据列表 -->
+        <div class="data-table table-striped">
+            <table>
+                <thead>
+                <tr>
+                    <th>商品id</th>
+                    <th>商品名称</th>
+                    <th>商品类别</th>
+                    <th>商品属性</th>
+                    <th>商品条码</th>
+                    <th>零售价</th>
+                    <th>库存数量</th>
+                    <th>申请数量</th>
+                    <th>有货数量</th>
+                    <th>缺货数量</th>
+                    <th>备注</th>
+                </tr>
+                </thead>
+                <tbody id="jq-child">
+                <volist name="data" id="lv" key="vo">
+                    <tr class="data_list">
+                        <td>{$lv.goods_id}</td>
+                        <td><a href="{:addons_url('Goods://GoodsInfo:/index?id='.$lv['goods_id'])}" target="_blank">{$lv.goods_name}</a></td>
+                        <td>{$lv.cate_name}</td>
+                        <td>{$lv.value_name}</td>
+                        <td>{$lv.bar_code|subtext=18}</td>
+                        <td>{$lv.sell_price}</td>
+                        <td>{$lv.stock_num}</td>
+                        <td><font color="blue">{$lv.g_num}</font><input type="hidden" class="text input-min g_num" name="g_num[]" value="{$lv['g_num']}" /></td>
+                        <td>
+                            <?php
+                        if($list['w_out_status'] == 0)
+                        {
+                                echo '<input type="text" class="text input-min in_num" style="width: 100px;" name="in_num[]" value="' .$lv['in_num'] .'" num/>';
+                            }else{
+                                echo '<font color="blue">' .$lv['in_num'] .'</font>';
+                            }
+                            ?>
+                        </td>
+                        <td>
+                            <?php
+                        if($list['w_out_status'] == 0)
+                        {
+                                echo '<input type="text" class="text input-min out_num" style="width: 100px;" name="out_num[]" value="' .$lv['out_num'] .'" num/>';
+                            }else{
+                                echo '<font color="red">' .$lv['out_num'] .'</font>';
+                            }
+                            ?>
+                        </td>
+                        <td><input type="hidden" class="text input-min w_out_d_id" style="width: 100px;" name="w_out_d_id[]" value="{$lv['w_out_d_id']}" />
+                            <?php
+                        if($list['w_out_status'] == 0)
+                        {
+                                echo '<input type="text" class="text input-min remark_detail" style="width: 100px;" name="remark_detail[]" value="' .$lv['remark'] .'"/>';
+                            }else{
+                                echo $lv['remark'];
+                            }
+                            ?>
+                            <div class="controls goods_message"></div>
+                        </td>
+                    </tr>
+                </volist>
+                <tr>
+                    <td colspan="12">
+                        <?php
+                    if($list['w_out_status'] == 0)
+                    {
+                        echo '<input type="hidden" class="text input-min w_out_id" style="width: 100px;" name="w_out_id" value="' .$list['w_out_id'] .'" />
+                            <button id="submit" class="btn submit-btn hidden" target-form="form-horizontal" name="submit" type="submit">修改出库验货单</button>';
+                        }else{
+                            echo '已处理后不能修改';
+                        }
+                        ?>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </form>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+    layui.use(['main'], function() {
+        var $ = layui.jquery,
+            layer = layui.layer;
+
+        var Global = {
+            jump: window.location.pathname.match(/(\D*)view/)[1],
+            submitFlag: true
+        }
+        $("a[href$='" + Global.jump + "index.html']").parent().addClass('layui-this');
+
+        dataShow();
+        function dataShow(){
+            
+            $('#jq-child').find('tr').each(function(){
+                var oIn = $(this).find('[name="in_num[]"]'),
+                   oOut = $(this).find('[name="out_num[]"]'),
+                   vSum = $(this).find('[name="g_num[]"]').val();
+                
+                $(this).verifyForm(); 
+                $(this).find(':input').keyup(function(){
+                    if( $(this).attr('num') == '' ){
+                        if( parseInt( $(this).val() ) > vSum ){
+                            $(this).val( vSum );
+                        }
+                    }
+                }).blur(function(){
+                    if( $(this).attr('num') == '' ){
+                        var oName = $(this).context.name == 'out_num[]' ? 'in_num[]' : 'out_num[]';
+                        $(this).parents('tr').find('[name="'+oName+'"]').val( vSum - $(this).val() );
+                    }
+                });
+
+                $('#jq-receiving').on({
+                    click:function(){
+                        oIn.val( vSum );
+                        oOut.val( 0 );
+                    }
+                });
+                $('#jq-returns').on({
+                    click:function(){
+                        oOut.val( vSum );
+                        oIn.val( 0 );
+                    }
+                });
+            });
+        }
+
+        $('#submit').on({
+            click: function() {
+                var verify = true;
+                $('#jq-child').find('tr').each(function(){
+                    var oIn = $(this).find('[name="in_num[]"]'),
+                       oOut = $(this).find('[name="out_num[]"]');
+
+                    if( oIn.val() == '' ){
+                        layer.msg( '请输入验收数量', {
+                            time: 1500
+                        });
+                        oIn.focus();
+                        verify = false;
+                        return false;
+                    }
+                    if( oOut.val() == '' ){
+                        layer.msg( '请输入退货数量', {
+                            time: 1500
+                        });
+                        oOut.focus();
+                        verify = false;
+                        return false;
+                    }
+                    if( oIn.val() == 0 && oOut.val() == 0 ){
+                        var test = '验收数量 + 退货数量 不等于 申请数量';
+                        layer.msg( test, {
+                            time: 1500
+                        });
+                        oIn.focus();
+                        verify = false;
+                        return false;
+                    }
+                });
+                if( !verify && Global.submitFlag ){
+                   return false;
+                }
+            }
+        });
+    });
+    </script>
+</block>
+<!--var Global = {
+    jump: window.location.pathname.match(/(\D*)view/)[1],
+}
+$("a[href$='" + Global.jump + "index.html']").parent().addClass('layui-this');
+function checkRate(input)
+{
+    return input%1 === 0;
+}
+function changevalue(obj,v){
+    var goods_message = $(obj).parents('.data_list').find('.goods_message');
+    var g_num = parseInt($(obj).parents('.data_list').find('.g_num').val());
+    var in_num = parseInt($(obj).parents('.data_list').find('.in_num').val());
+    var out_num = parseInt($(obj).parents('.data_list').find('.out_num').val());
+    var obj_in_num = $(obj).parents('.data_list').find('.in_num');
+    var obj_out_num = $(obj).parents('.data_list').find('.out_num');
+    if(checkRate(in_num)  == false || checkRate(out_num)  == false){
+        goods_message.html('<font color=red>必须正整数</font>');
+        obj_in_num.val(0);
+        obj_out_num.val(0);
+        return false;
+    }
+    if (parseFloat(in_num).toString() == "NaN") {
+        goods_message.html('<font color=red>必须数字</font>');
+        obj_in_num.val(0);
+        obj_out_num.val(0);
+
+        return false;
+    }
+    if(in_num < 0){
+        goods_message.html('<font color=red>不能输入负数</font>');
+        obj_in_num.val(0);
+        obj_out_num.val(0);
+        return false;
+    }
+    if(in_num > g_num){
+        goods_message.html('<font color=red>验货数量大于申请数量</font>');
+        obj_in_num.val(0);
+        obj_out_num.val(0);
+        return false;
+    }
+    if (parseFloat(out_num).toString() == "NaN") {
+        goods_message.html('<font color=red>必须数字</font>');
+        obj_in_num.val(0);
+        obj_out_num.val(0);
+        return false;
+    }
+    if(out_num < 0){
+        goods_message.html('<font color=red>不能输入负数</font>');
+        obj_in_num.val(0);
+        obj_out_num.val(0);
+        return false;
+    }
+    if(out_num > g_num){
+        goods_message.html('<font color=red>退货数量大于申请数量</font>');
+        obj_in_num.val(0);
+        obj_out_num.val(0);
+        return false;
+    }
+    if(v == 1){
+        obj_out_num.val(g_num - in_num);
+    }else{
+        obj_in_num.val(g_num - out_num);
+    }
+    goods_message.html('');
+}
+function allin(v){
+    var trList = $(".data_list");
+    for (var i=0;i<trList.length;i++) {
+        var tdArr = trList.eq(i).find("td");
+        var g_num = tdArr.eq(6).find('input').val();//申请数量
+        var in_num = tdArr.eq(7).find('input').val();//验收数量
+        var out_num = tdArr.eq(8).find('input').val();//缺货数量
+
+        if(v == 0){
+            tdArr.eq(7).find('input').val(g_num);
+            tdArr.eq(8).find('input').val(0);
+        }else{
+            tdArr.eq(7).find('input').val(0);
+            tdArr.eq(8).find('input').val(g_num);
+        }
+        //tdArr.eq(9).find('#qhsl').text((tdArr.eq(6).find('input').val()-tdArr.eq(7).find('input').val()-tdArr.eq(8).find('input').val()));
+    }
+}-->

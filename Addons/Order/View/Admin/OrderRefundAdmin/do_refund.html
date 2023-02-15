@@ -1,0 +1,51 @@
+<extend name="Public/base" />
+
+<block name="body">
+        <script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+	<!-- 标题栏 -->
+	<div class="main-title">
+		<h2>{$meta_title}</h2>
+	</div>
+        <div class="tab-content">
+            <!-- 数据列表 -->
+            <form id="form" action="" method="post" class="form-horizontal">
+                <div class="tab-pane in tab1">
+                        <div class="form-item cf">
+                            <label class="item-label">订单号</label>
+                            <div class="controls">
+                                <a href="{:addons_url('Order://ShopOrder:/show?', array('order_sn' => $order_info['order_sn']))}">{$order_info.order_sn}</a>
+                                <input type="hidden" name="order_sn" value="{$order_info.order_sn}" />
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">退款金额<span class="check-tips"></span></label>
+                            <div class="controls">
+                                <input type="text" class="text input-min" name="refund_money" placeholder="最多可退款￥{$order_info.pay_money}" />
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">退款理由<span class="check-tips"></span></label>
+                            <div class="controls">
+                                <textarea class="textarea input-large" name="reason"></textarea>
+                            </div>
+                        </div>
+                </div>
+                <div class="form-item cf">
+                <button id="submit" class="btn submit-btn ajax-post hidden" target-form="form-horizontal" type="submit">确 定</button>
+                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                </div>
+            </form>
+        </div>
+</block>
+<block name="script">
+	<script type="text/javascript">
+		$(function(){
+                    highlight_subnav('{:addons_url('Order://OrderRefundAdmin:/index')}');
+                    //全选节点
+                    $('.check-all').on('change',function(){
+                        $('.ids').prop('checked',this.checked);
+                    });showTab();
+		})
+                
+	</script>
+</block>

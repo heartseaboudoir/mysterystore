@@ -1,0 +1,471 @@
+<extend name="Public/base" />
+<block name="body">
+    <div id="jq-content" class="site-content site-report">
+        <div class="main-title">
+            <h2>采购报表</h2>
+        </div>
+        <form id="jq-search-form" class="wrap-form">
+            <dl class="wrap-dl checkmod">
+                <dt>选择区域供应商</dt>
+                <dl id="jq-check"></dl>
+            </dl>
+            <dl class="wrap-dl checkmod">
+                <dt>时间区间</dt>
+                <dd class="wrap-date">
+                    <input type="text" name="s_date" class="time" placeholder="请选择开始日期" />
+                    <input type="text" name="e_date" class="time" placeholder="请选择结束日期" />
+                </dd>
+            </dl>
+            <button id="jq-search-btn" class="wrap-search submit-btn">搜索</button>
+        </form>
+        <a id="jq-download" class="btn" href="javascript:void(0);">导出Excel</a>
+        <div id="jq-charts-default" class="wrap-charts"></div>
+        <div class="wrap-scroll-x">
+            <table id="jq-table-tree" class="wrap-table-tree">
+                <thead class="wrap-th">
+                    <tr class="wrap-big">
+                        <th colspan="3"></th>
+                        <th colspan="4">采购</th>
+                        <th colspan="6">仓库</th>
+                        <th colspan="6">门店</th>
+                        <th colspan="2">实际</th>
+                        <th colspan="1"></th>
+                    </tr>
+                    <tr>
+                        <th><i class="layui-icon"></i></th>
+                        <th>序号</th>
+                        <th>日期</th>
+                        <th>数量</th>
+                        <th>箱数</th>
+                        <th>金额</th>
+                        <th>售价金额</th>
+                        <th>验收数</th>
+                        <th>验收金额</th>
+                        <th>拒收数</th>
+                        <th>拒收金额</th>
+                        <th>入库数</th>
+                        <th>入库金额</th>
+                        <th>验收数</th>
+                        <th>验收金额</th>
+                        <th>拒收数</th>
+                        <th>拒收金额</th>
+                        <th>入库数</th>
+                        <th>入库金额</th>
+                        <th>退货数</th>
+                        <th>退货额</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="jq-list"></tbody>
+            </table>
+        </div>
+        <div id="jq-page" class="page"></div>
+    </div>
+    <script id="temp-check" type="text/html">
+        {{each items as list}}
+        <dd>
+            <div class="wrap-check-list">
+               <label class="checkbox"><input type="checkbox" name="selectAll" value="{{list.shequ_id}}" >{{list.shequ_name}}</label>
+            </div>
+            <div class="wrap-check-single">
+                <p class="wrap-more"></p>
+            </div>
+        </dd>
+        {{/each}}
+    </script>
+    <script id="temp-check-single" type="text/html">
+        {{each items as list}}
+        <label class="checkbox">
+            <input type="checkbox" name="selectActive" value="{{list.s_id}}">{{list.s_name}}
+        </label>
+        {{/each}}
+    </script>
+    <script id="temp-list" type="text/html">
+        {{each items as list index}}
+        <tr class="temp-a">
+            <td><i class="layui-icon"></i></td>
+            <td class="temp-id">{{index+1}}</td>
+            <td class="temp-date">{{list.ctime}}</td>
+            <td>{{list.g_nums}}</td>
+            <td>{{list.b_nums}}</td>
+            <td>{{list.g_amounts}}</td>
+            <td>{{list.sell_amounts}}</td>
+            <td>{{list.in_nums}}</td>
+            <td>{{list.in_amounts}}</td>
+            <td>{{list.out_nums}}</td>
+            <td>{{list.out_amounts}}</td>
+            <td>{{list.in_stock_nums}}</td>
+            <td>{{list.in_stock_amounts}}</td>
+            <td>{{list.s_in_nums}}</td>
+            <td>{{list.s_in_amounts}}</td>
+            <td>{{list.s_out_nums}}</td>
+            <td>{{list.s_out_amounts}}</td>
+            <td>{{list.s_in_stock_nums}}</td>
+            <td>{{list.s_in_stock_amounts}}</td>
+            <td>{{list.back_nums}}</td>
+            <td>{{list.back_amounts}}</td>
+            <td>
+                <a class="temp-view" href="javascript:void(0);">查看</a>
+            </td>
+        </tr>
+        <tr class="temp-b">
+            <td class="jq-child" colspan="22"></td>
+        </tr>
+        {{/each}}
+    </script>
+    <script id="temp-child" type="text/html">
+        <table>
+            <thead>
+                <tr class="wrap-big">
+                    <th colspan="3"></th>
+                    <th colspan="4">采购</th>
+                    <th colspan="6">仓库</th>
+                    <th colspan="6">门店</th>
+                    <th colspan="2">实际</th>
+                    <th colspan="1"></th>
+                </tr>
+                <tr>
+                    <th>序号</th>
+                    <th>日期</th>
+                    <th>供应商</th>
+                    <th>数量</th>
+                    <th>箱数</th>
+                    <th>金额</th>
+                    <th>售价金额</th>
+                    <th>验收数</th>
+                    <th>验收金额</th>
+                    <th>拒收数</th>
+                    <th>拒收金额</th>
+                    <th>入库数</th>
+                    <th>入库金额</th>
+                    <th>验收数</th>
+                    <th>验收金额</th>
+                    <th>拒收数</th>
+                    <th>拒收金额</th>
+                    <th>入库数</th>
+                    <th>入库金额</th>
+                    <th>退货数</th>
+                    <th>退货额</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{each items as list index}}
+                <tr>
+                    <input type="hidden" name="supply_id" value="{{list.supply_id}}">
+                    <td class="temp-id">{{index+1}}</td>
+                    <td>{{list.ctime}}</td>
+                    <td>{{list.s_name}}</td>
+                    <td>{{list.g_nums}}</td>
+                    <td>{{list.b_nums}}</td>
+                    <td>{{list.b_amounts}}</td>
+                    <td>{{list.sell_amounts}}</td>
+                    <td>{{list.in_nums}}</td>
+                    <td>{{list.in_amounts}}</td>
+                    <td>{{list.out_nums}}</td>
+                    <td>{{list.out_amounts}}</td>
+                    <td>{{list.in_stock_nums}}</td>
+                    <td>{{list.in_stock_amounts}}</td>
+                    <td>{{list.s_in_nums}}</td>
+                    <td>{{list.s_in_amounts}}</td>
+                    <td>{{list.s_out_nums}}</td>
+                    <td>{{list.s_out_amounts}}</td>
+                    <td>{{list.s_in_stock_nums}}</td>
+                    <td>{{list.s_in_stock_amounts}}</td>
+                    <td>{{list.back_nums}}</td>
+                    <td>{{list.back_amounts}}</td>
+                    <td>
+                        <a class="temp-view" href="javascript:void(0);">查看</a>
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </script>
+</block>
+<block name="script">
+    <script type="text/javascript">
+    layui.use(['main','highcharts'], function() {
+        var $ = layui.jquery,
+        layer = layui.layer,
+        highcharts = layui.highcharts;
+
+        var Global = {
+            listUrl: '/Erp/PurchaseReport/index',
+            jump: window.location.pathname.match(/(\D*)index/)[1]
+        }
+        $("a[href$='" + Global.jump + "index.html']").parent().addClass('layui-this');
+ 
+        var passData = $.dataJson({
+            supply_select: 0
+        }); 
+        var data = $.parseJson( passData );
+
+        $.postData({
+             url: Global.listUrl,
+            data: data,
+            load: true
+        }, function(res){
+            var oCheck = $('#jq-check'),
+               check_w = oCheck.actual('width');
+
+            oCheck.append(template('temp-check', { items: res.content.supply_list }));
+            oCheck.find('dd').each(function(){
+                var index = $(this).index();
+                $(this).find('.wrap-check-single').prepend(template('temp-check-single', { items: res.content.supply_list[index].supply }));
+                $(this).find('[name="selectAll"]').on({
+                    click:function(){
+                        $(this).parents('dd').find('[name="selectActive"]').prop('checked',this.checked);
+                    }
+                });
+                $(this).find('[name="selectActive"]').on({
+                    click:function(){
+                        var oForm = $(this).parents('dd'),
+                             oAll = oForm.find('[name="selectAll"]'),
+                          oActive = oForm.find('[name="selectActive"]');
+                        oAll.prop('checked',oActive.length == oActive.filter(':checked').length);
+                    }
+                });
+
+                var arr = 0,
+                  index = 0,
+                   show = '展开<i class="layui-icon">&#xe61a;</i>',
+                   hide = '收缩<i class="layui-icon">&#xe61a;</i>',
+                   that = $(this);
+                that.find('.wrap-check-single label').each(function(){
+                    if( passData.supply_select != 0 ){
+                        var oSelect = $(this).find('[name="selectActive"]'),
+                         select_val = oSelect.val();
+                        $.each( passData.supply_select,function(i,items){
+                            if( items == select_val ){
+                                oSelect.prop('checked',true);
+                            }
+                        });
+                        var oAll = that.find('[name="selectAll"]'),
+                         oActive = that.find('[name="selectActive"]');
+                        oAll.prop('checked',oActive.length == oActive.filter(':checked').length);
+                    }
+
+                    var self = $(this),
+                      aWidth = parseInt( self.outerWidth() ) + 20;
+                    arr += aWidth;
+                    if(arr > check_w){
+                        index = self.index() - 1;
+                        $(this).parents('.wrap-check-single').find('.wrap-more').html(show).attr('show',1);
+                        that.find('.wrap-check-single label:gt('+index+')').hide();
+                        that.parents('#jq-check').css('width',check_w);
+                        return false;
+                    }
+                });
+                that.find('.wrap-more').on({
+                    click:function(){
+                        if( $(this).attr('show') == 1 ){
+                            $(this).html(hide).removeAttr('show');
+                            $(this).parents('.wrap-check-single').find('label').show();
+                        }else{
+                            $(this).html(show).attr('show',1);
+                            $(this).parents('.wrap-check-single').find('label:gt('+index+')').hide();
+                        }
+                    }
+                });
+
+            });
+            $(window).resize(function() {
+                if( $(window).width() > 1560 ){
+                    oCheck.css('width',check_w);
+                }else{
+                    oCheck.removeAttr('style');
+                };
+            });
+            dataShow(res);
+        });
+        function dataShow(res,callback){
+            var oDownload = $('#jq-download'),
+                    oList = $('#jq-list'),
+                    oPage = $('#jq-page'),
+                  oCharts = $('#jq-charts-default');
+
+            oDownload.attr('href','javascript:void(0);').unbind();
+
+            if( res.content.list == null || res.content.list.length == 0 ){
+                oList.html('<tr class="temp-a"><td class="wrap-empty" colspan="14">暂无内容！</td></tr>');
+                oDownload.css('cursor','default');
+                oCharts.hide();
+            }else{
+                oList.html(template('temp-list', { items: res.content.list }));
+
+                oList.find('.temp-b').each(function(){
+                    var index = parseInt( $(this).index() / 2 );
+                    $(this).find('.jq-child').html(template('temp-child', { items: res.content.list[index].child }));
+                    if( res.content.list[index].child == null || res.content.list[index].child == 0 ){
+                        $(this).prev().removeClass('temp-show');
+                    }else{
+                        $(this).prev().addClass('temp-show').find('.layui-icon').html('&#xe602;');
+                    }
+                });
+                oList.find('.temp-show').on({
+                    click:function(){
+                        var oIcon = $(this).find('.layui-icon');
+                        if( oIcon.html() != '' ){
+                            if( oIcon.parents('tr').hasClass('temp-active') ){
+                                oIcon.html('&#xe602;').parents('tr').removeClass('temp-active');
+                                oIcon.parents('tr').next().hide();
+                                return false;
+                            }
+                            oIcon.html('&#xe619;').parents('tr').addClass('temp-active');
+                            oIcon.parents('tr').next().show();
+                        }
+                    }
+                });
+
+                $.each( res.content.list,function(i,items){
+                    var url = Global.jump + 'view/s_date/'+items.ctime+'/e_date/'+items.ctime+'.html',
+                        oId = oList.find('.temp-a').eq(i);
+                    //oId.find('.temp-view').attr('href',url);
+                    oId.find('.temp-view').on({
+                        click:function(){
+                            window.location.href = url;
+                            return false;
+                        }
+                    });
+
+                    $.each( items.child,function(n,items){
+                        var url = Global.jump + 'view/s_date/'+items.ctime+'/e_date/'+items.ctime+'/supply_select/'+items.supply_id+'.html',
+                            oId = oList.find('.temp-b').eq(i).find('tbody tr').eq(n);
+                        oId.find('.temp-view').attr('href',url);
+                    });
+
+                    if( passData.p > 1 && callback == undefined ){
+                        var id = parseInt( oId.find('.temp-id').html() ),
+                           sum = passData.p * passData.pageSize -  passData.pageSize;
+                        oId.find('.temp-id').html( id + sum );
+                    }else{
+                        oId.find('.temp-id').html( id );
+                    }
+
+                });
+
+                var arr = [];
+                $('#jq-search-form').find('[name="selectActive"]').each(function(){
+                    if(this.checked){
+                        arr.push( parseInt($(this).val()) );
+                    }
+                });
+                var data = $.parseJson( { supply_select: arr } ) + '&';
+                    data += $('#jq-search-form').find('[type="text"]').serialize() + '&isprint=1';
+                oDownload.fileDown({
+                    post: true,
+                     url: Global.listUrl,
+                    data: data
+                }).removeAttr('style');
+
+                 var ctime = [],
+                    g_nums = [],
+                 b_amounts = [];
+                $.each( res.content.list,function(i,items){
+                    ctime.push( items.ctime );
+                    g_nums.push( items.g_nums );
+                    b_amounts.push( items.b_amounts );
+                });
+                g_nums = g_nums.map(function(items){
+                    return parseInt(items);
+                });
+                b_amounts = b_amounts.map(function(items){
+                    return parseInt(items);
+                });
+                oCharts.show();
+                highcharts.default({
+                    chart : {
+                        renderTo : "jq-charts-default",
+                        type: 'column'
+                    },
+                    exporting: { 
+                        enabled: false 
+                    },
+                    credits: { 
+                        enabled: false
+                    },
+                    title: {
+                        text: null
+                    },
+                    xAxis: {
+                        categories: ctime
+                    },
+                    yAxis: {
+                        title: null
+                    },
+                    legend: {
+                        enabled: true
+                    },
+                    plotOptions: {
+                        series: {
+                            cursor: 'pointer',
+                            events: {
+                                click: function(e) {
+                                    oList.find('.temp-a').each(function(){
+                                        var vTitle = $.trim( $(this).find('.temp-date').html() );
+                                        var self = $(this);
+                                        if( e.point.category == vTitle ){
+                                            window.location.href = Global.jump + 'view/s_date/'+vTitle+'/e_date/'+vTitle+'.html';
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    },
+                    tooltip: {
+                        shared: true,
+                        crosshairs: true
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    series: [{
+                        name:'总数量',
+                        color: '#0099ff',
+                        data: g_nums
+                    },{
+                        name:'总金额',
+                        color: '#ff5100',
+                        data: b_amounts
+                    }]
+                });
+
+            }
+
+            if( res.content.recordCount > res.content.pageSize ){
+                var total = '<span class="rows">共'+res.content.recordCount+'条记录</span>';
+                oPage.html( res.content.pager.replace( new RegExp(Global.listUrl,'g'),Global.jump+'index' ) + total );
+            }else{
+                oPage.html( res.content.pager );
+            }
+        }
+
+        $('#jq-search-btn').off().on({
+            click: function() {
+                var arr = [];
+                $('#jq-search-form').find('[name="selectActive"]').each(function(){
+                    if(this.checked){
+                        arr.push( parseInt($(this).val()) );
+                    }
+                });
+                var data = $.parseJson( { supply_select: arr } ) + '&';
+                    data += $('#jq-search-form').find('[type="text"]').serialize() + '&pageSize='+passData.pageSize;
+                $.postData({
+                     url: Global.listUrl,
+                    data: data,
+                }, function(res){
+                    dataShow(res,true);
+                    window.history.pushState( {},'',Global.jump+'index.html' );
+                });
+                return false;
+            }
+        });
+        $(document).keydown(function(e) {
+            if (e.which == 13) {
+                $('#jq-search-btn').click();
+            }
+        });
+    });
+    </script>
+</block>

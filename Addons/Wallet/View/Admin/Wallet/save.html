@@ -1,0 +1,145 @@
+<extend name="Public/base" />
+
+<block name="body">
+        <script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+	<!-- 标题栏 -->
+	<div class="main-title">
+		<h2>{$meta_title}</h2>
+	</div>
+        <ul class="tab-nav nav">
+            <li class="current" data-tab="tab1"><a href="javascript:void(0);">基础</a></li>
+            <li data-tab="tab2"><a href="javascript:void(0);">支付宝授权信息</a></li>
+        </ul>
+        <div class="tab-content">
+            <!-- 数据列表 -->
+            <form id="form" action="" method="post" class="form-horizontal">
+                <div class="tab-pane in tab1">
+                    <div class="form-item cf">
+                        <label class="item-label">用户</label>
+                        <div class="controls">
+                            {$data.uid|get_nickname}
+                        </div>
+                    </div>
+                    <div class="form-item cf">
+                        <label class="item-label">充值金额</label>
+                        <div class="controls">
+                            {$data.recharge_money}
+                        </div>
+                    </div>                    
+                    <div class="form-item cf">
+                        <label class="item-label">总提现金额</label>
+                        <div class="controls">
+                            {$data.all_money}
+                        </div>
+                    </div>
+                    <div class="form-item cf">
+                        <label class="item-label">可提现金额</label>
+                        <div class="controls">
+                            {$data.money}
+                        </div>
+                    </div>
+                    <div class="form-item cf">
+                        <label class="item-label">锁定金额</label>
+                        <div class="controls">
+                            {$data.lock_money}
+                        </div>
+                    </div>
+                    <div class="form-item cf">
+                        <label class="item-label">冻结金额</label>
+                        <div class="controls">
+                            {$data.frozen_money}
+                        </div>
+                    </div>
+                    <div class="form-item cf">
+                        <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                    </div>
+                </div>
+                
+                <div class="tab-pane tab2">
+                    <notempty name="bind">
+                    <div class="form-item cf">
+                        <label class="item-label">授权时间</label>
+                        <div class="controls">
+                            {$bind.create_time|time_format}
+                        </div>
+                    </div>
+                    <div class="form-item cf">
+                        <label class="item-label">授权用户</label>
+                        <div class="controls">
+                            <img src="{$bind.bind_data.avatar}" style="width:80px; height:80px;" />
+                        </div>
+                    </div>
+                    <div class="form-item cf">
+                        <label class="item-label">性别</label>
+                        <div class="controls">
+                            <switch name="bind.bind_data.gender"><case value="F">女</case><case value="M">男</case><default/>未知</switch>
+                        </div>
+                    </div>
+                    <div class="form-item cf">
+                        <label class="item-label">认证信息</label>
+                        <div class="controls"> 
+                            <p>实名认证：<eq name="bind.bind_data.is_certified" value="T">是<else/>否</eq></p>
+                            <p>A类实名认证：<eq name="bind.bind_data.is_certify_grade_a" value="T">是<else/>否</eq></p>
+                            <p>身份证认证：<eq name="bind.bind_data.is_id_auth" value="T">是<else/>否</eq></p>
+                            <p>手机认证：<eq name="bind.bind_data.is_mobile_auth" value="T">是<else/>否</eq></p>
+                            <p>银行卡认证：<eq name="bind.bind_data.is_bank_auth" value="T">是<else/>否</eq></p>
+                        </div>
+                    </div>
+                    <else/>
+                    <div style="margin:20px 10px;">
+                    还未绑定
+                    </div>
+                    </notempty>
+                    <div class="form-item cf">
+                        <label class="item-label">授权记录</label>
+                        <div class="controls"> 
+                            <div class="data-table table-striped">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>用户</th>
+                                            <th>授权时间</th>
+                                            <th>状态</th>
+                                            <th>最后操作时间</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <empty name="bind_log">
+                                        <tr><td colspan="4">暂无数据~</td></tr>
+                                    <else/>
+                                    <volist name="bind_log" id="lv">
+                                        <tr>
+                                            <td><img src="{$lv.bind_data.avatar}" style="width:50px;height:50px;" /></td>
+                                            <td>{$lv.create_time|time_format}</td>
+                                            <td><eq name="lv.act" value="1">绑定中<else/>已解绑</eq></td>
+                                            <td>{$lv.update_time|time_format}</td>
+                                        </tr>
+                                    </volist>
+                                    </empty>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-item cf">
+                        <notempty name="bind">
+                        <a href="{:addons_url('Wallet://Admin/unbind_alipay', array('uid' => $data['uid']))}" class="ajax-get confirm btn submit-btn">解除绑定</a>
+                        </notempty>
+                        <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+</block>
+<block name="script">
+	<script type="text/javascript">
+		$(function(){
+            highlight_subnav('{:addons_url('Wallet://Admin:/index')}');
+                    //全选节点
+                    $('.check-all').on('change',function(){
+                        $('.ids').prop('checked',this.checked);
+                    });showTab();
+		})
+                
+	</script>
+</block>

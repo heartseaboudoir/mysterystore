@@ -1,0 +1,273 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <script type="text/javascript">
+        document.getElementById('jq-nav-left').style.display = 'none';
+        document.getElementById('jq-main-box').style.left = '0';
+    </script>
+    <style type="text/css">
+        .hidden_s{
+            display: none !important;
+        }
+    </style>
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <a class="btn" href="{:addons_url('MessageWarn://MessageWarn:/downloadMessageList', array('m_status' => $m_status , 'm_type' => $m_type , 'm_other_type' => $m_other_type , 's_date' => $s_date , 'e_date' => $e_date))}" id="download_num" class="btn">导出Excel</a>
+    <button class="btn ajax-post confirm" target-form="ids" url="{:addons_url('MessageWarn://MessageWarn:/changeStatus', array('m_status' => 0))}">更新为未读</button>
+    <button class="btn ajax-post confirm" target-form="ids" url="{:addons_url('MessageWarn://MessageWarn:/changeStatus', array('m_status' => 1))}">更新为已读</button>
+    <button class="btn ajax-post confirm" target-form="ids" url="{:addons_url('MessageWarn://MessageWarn:/changeIsDelete')}">删除</button>
+    <a class="btn" target-form="ids" href="{:addons_url('MessageWarn://MessageWarn:/messageWarnSet')}">读取设置</a>
+    <!-- 高级搜索 -->
+    <div class="search-form fr cf" style="margin-bottom: 10px;">
+        <div class="search-form fr cf">
+            <form id="search-form" onsubmit="return false;">
+                <div class="sleft">
+                    <span style="float: left;height: 28px;line-height: 28px;">来源： </span>
+                    <div class="drop-down" style="width: 111px;">
+                        <span id="sch-sort-txt" class="sort-txt" data="{$m_type}" style="display: initial;">
+                                <if condition="$m_type eq 0"> 商品过期提醒
+                                    <elseif condition="$m_type eq 1"/>内部消息
+                                    <elseif condition="$m_type eq 2"/>其它
+                                    <elseif condition="$m_type eq 3"/>日报汇总
+                                    <elseif condition="$m_type eq 4"/>单条提醒
+                                    <else /> 所有
+                                </if>
+                        </span>
+                        <i class="arrow arrow-down"></i>
+                        <ul id="sub-sch-menu" class="nav-list hidden" style="width: 111px;">
+                            <li><a href="javascript:;" value="100"  style="width: 91px;">所有</a></li>
+                            <li><a href="javascript:;" value="0"  style="width: 91px;" class="<?php if(!in_array(0 , $m_type_ruls))echo 'hidden_s';?>">商品过期提醒</a></li>
+                            <li><a href="javascript:;" value="1"  style="width: 91px;" class="<?php if(!in_array(1 , $m_type_ruls))echo 'hidden_s';?>">内部消息</a></li>
+                            <li><a href="javascript:;" value="2"  style="width: 91px;" class="<?php if(!in_array(2 , $m_type_ruls))echo 'hidden_s';?>">其它</a></li>
+                            <li><a href="javascript:;" value="3"  style="width: 91px;" class="<?php if(!in_array(3 , $m_type_ruls))echo 'hidden_s';?>">日报汇总</a></li>
+                            <li><a href="javascript:;" value="4"  style="width: 91px;" class="<?php if(!in_array(4 , $m_type_ruls))echo 'hidden_s';?>">单条提醒</a></li>
+                        </ul>
+                    </div>
+                    <!--子分类-->
+                    <span id="drop-down-child-nav" class="hidden" style="float: left;height: 28px;line-height: 28px;">子来源：</span>
+                    <div class="drop-down-child hidden" id="drop-down-child" style="width: 111px;">
+                        <span id="type-sort-txt" class="sort-txt" data="{$m_other_type}" style="display: initial;">
+                                <if condition="$m_other_type eq 1"> 门店汇总
+                                    <elseif condition="$m_other_type eq 2"/> 仓库汇总
+                                    <elseif condition="$m_other_type eq 3"/> 采购汇总
+                                    <elseif condition="$m_other_type eq 4"/> 门店入库提醒
+                                    <elseif condition="$m_other_type eq 5"/> 门店出库提醒
+                                    <elseif condition="$m_other_type eq 6"/> 仓库入库提醒
+                                    <elseif condition="$m_other_type eq 7"/> 仓库出库提醒
+                                    <elseif condition="$m_other_type eq 8"/> 采购申请提醒
+                                    <elseif condition="$m_other_type eq 9"/> 采购退货提醒
+                                    <elseif condition="$m_other_type eq 10"/> 仓库调拨提醒
+                                    <elseif condition="$m_other_type eq 11"/> 仓库返仓拒绝提醒
+                                    <elseif condition="$m_other_type eq 12"/> 门店调拨申请提醒
+                                    <elseif condition="$m_other_type eq 13"/> 门店退货申请提醒
+                                    <elseif condition="$m_other_type eq 14"/> 门店发货申请提醒
+                                    <elseif condition="$m_other_type eq 15"/> 门店调拨申请被拒提醒
+                                    <elseif condition="$m_other_type eq 16"/> 门店返仓申请提醒
+                                    <elseif condition="$m_other_type eq 17"/> 门店返仓申请被拒提醒
+                                    <else /> 所有
+                                </if>
+                        </span>
+                        <i class="arrow arrow-down"></i>
+                        <ul id="type-sch-menu" class="nav-list hidden" style="width: 166px;">
+                        <li><a href="javascript:;" value="100"  style="width: 146px;">所有</a></li>
+                        <li class="other_tpye_3 hidden <?php if(!in_array(1 , $m_other_type_ruls))echo 'hidden_s';?>"><a href="javascript:;" value="1"  style="width: 146px;">门店汇总</a></li>
+                        <li class="other_tpye_3 hidden <?php if(!in_array(2 , $m_other_type_ruls))echo 'hidden_s';?>"><a href="javascript:;" value="2"  style="width: 146px;">仓库汇总</a></li>
+                        <li class="other_tpye_3 hidden <?php if(!in_array(3 , $m_other_type_ruls))echo 'hidden_s';?>"><a href="javascript:;" value="3"  style="width: 146px;">采购汇总</a></li>
+                        <li class="other_tpye_4 hidden <?php if(!in_array(4 , $m_other_type_ruls))echo 'hidden_s';?>"><a href="javascript:;" value="4"  style="width: 146px;">门店入库提醒</a></li>
+                        <li class="other_tpye_4 hidden <?php if(!in_array(5 , $m_other_type_ruls))echo 'hidden_s';?>"><a href="javascript:;" value="5"  style="width: 146px;">门店出库提醒</a></li>
+                        <li class="other_tpye_4 hidden <?php if(!in_array(6 , $m_other_type_ruls))echo 'hidden_s';?>"><a href="javascript:;" value="6"  style="width: 146px;">仓库入库提醒</a></li>
+                        <li class="other_tpye_4 hidden <?php if(!in_array(7 , $m_other_type_ruls))echo 'hidden_s';?>"><a href="javascript:;" value="7"  style="width: 146px;">仓库出库提醒</a></li>
+                        <li class="other_tpye_4 hidden <?php if(!in_array(8 , $m_other_type_ruls))echo 'hidden_s';?>"><a href="javascript:;" value="8"  style="width: 146px;">采购申请提醒</a></li>
+                        <li class="other_tpye_4 hidden <?php if(!in_array(9 , $m_other_type_ruls))echo 'hidden_s';?>"><a href="javascript:;" value="9"  style="width: 146px;">采购退货提醒</a></li>
+                        <li class="other_tpye_4 hidden <?php if(!in_array(10 , $m_other_type_ruls))echo 'hidden_s';?>"><a href="javascript:;" value="10"  style="width: 146px;">仓库调拨提醒</a></li>
+                        <li class="other_tpye_4 hidden <?php if(!in_array(11 , $m_other_type_ruls))echo 'hidden_s';?>"><a href="javascript:;" value="11"  style="width: 146px;">仓库返仓拒绝提醒</a></li>
+                        <li class="other_tpye_4 hidden <?php if(!in_array(12 , $m_other_type_ruls))echo 'hidden_s';?>"><a href="javascript:;" value="12"  style="width: 146px;">门店调拨申请提醒</a></li>
+                        <li class="other_tpye_4 hidden <?php if(!in_array(13 , $m_other_type_ruls))echo 'hidden_s';?>"><a href="javascript:;" value="13"  style="width: 146px;">门店退货申请提醒</a></li>
+                        <li class="other_tpye_4 hidden <?php if(!in_array(14 , $m_other_type_ruls))echo 'hidden_s';?>"><a href="javascript:;" value="14"  style="width: 146px;">门店发货申请提醒</a></li>
+                        <li class="other_tpye_4 hidden <?php if(!in_array(15 , $m_other_type_ruls))echo 'hidden_s';?>"><a href="javascript:;" value="15"  style="width: 146px;">门店调拨申请被拒提醒</a></li>
+                        <li class="other_tpye_4 hidden <?php if(!in_array(16 , $m_other_type_ruls))echo 'hidden_s';?>"><a href="javascript:;" value="16"  style="width: 146px;">门店返仓申请提醒</a></li>
+                        <li class="other_tpye_4 hidden <?php if(!in_array(17 , $m_other_type_ruls))echo 'hidden_s';?>"><a href="javascript:;" value="17"  style="width: 146px;">门店返仓申请被拒提醒</a></li>
+                        </ul>
+                    </div>
+                    <!---读取状态-->
+                    <span style="float: left;height: 28px;line-height: 28px;">状态：</span>
+                    <div class="drop-down-status" style="width: 111px;">
+                        <span id="status-sort-txt" class="sort-txt" data="{$m_status}" style="display: initial;">
+                                <if condition="$m_status eq 0"> 未读
+                                    <elseif condition="$m_status eq 1"/>已读
+                                    <else /> 所有
+                                </if>
+                        </span>
+                        <i class="arrow arrow-down"></i>
+                        <ul id="status-sch-menu" class="nav-list hidden" style="width: 111px;">
+                            <li><a href="javascript:;" value="100"  style="width: 91px;">所有</a></li>
+                            <li><a href="javascript:;" value="0"  style="width: 91px;">未读</a></li>
+                            <li><a href="javascript:;" value="1"  style="width: 91px;">已读</a></li>
+                        </ul>
+                    </div>
+
+                    <input type="text" name="s_date" class="text input-text search-input time" value="{$_GET['s_date']}" placeholder="请选择开始日期" />
+                    <input type="text" name="e_date" class="text input-text search-input time" value="{$_GET['e_date']}" placeholder="请选择结束日期" />
+                    <input type="text" name="keyword" class="search-input" value="{$_GET['keyword']}" placeholder="请输入关键字">
+                    <a class="sch-btn" href="javascript:;" id="search" url="{:addons_url('MessageWarn://MessageWarn:/index')}"><i class="btn-search"></i></a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+            <tr>
+                <th class="row-selected row-selected"><input class="check-all" type="checkbox"/></th>
+                <th>序号</th>
+                <th>日期</th>
+                <th>标题</th>
+                <th style="display: none;">内容</th>
+                <th>来源</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+                <volist name="list" id="lv" key="vo">
+                    <tr data-id="{$lv.m_id}">
+                        <td><input class="ids" type="checkbox" name="ids[]" value="{$lv.m_id}" /></td>
+                        <td class="id">{$lv.id}</td>
+                        <td>{$lv.ctime}</td>
+                        <td>{$lv.message_title}</td>
+                        <td>{$lv.m_type_name}</td>
+                        <td>{$lv.m_status_name}</td>
+                        <td>
+                            <a class="temp-view" href="{:addons_url('MessageWarn://MessageWarn:/view', array('m_id' => $lv['m_id']))}">查看</a>
+                            <a class="confirm ajax-get" href="{:addons_url('MessageWarn://MessageWarn:/changeIsDelete', array('ids' => $lv['m_id']))}">删除</a>
+                        </td>
+                    </tr>
+                </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+
+<block name="script">
+    <link href="__STATIC__/datetimepicker/css/datetimepicker.css" rel="stylesheet" type="text/css">
+    <link href="__STATIC__/datetimepicker/css/dropdown.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+    <script type="text/javascript">
+        $(function () {
+            highlight_subnav('{:addons_url("MessageWarn://MessageWarn:/index")}');
+            //初始化
+            var start_my_type = $("#sch-sort-txt").attr("data");
+            if(start_my_type == 3 || start_my_type == 4){
+                $("#drop-down-child").removeClass("hidden");
+                $("#drop-down-child-nav").removeClass("hidden");
+            }
+            //搜索功能
+            $('.search-form input').focus(function(){
+                $(document).keypress(function (e) {
+                    // 回车键事件
+                    if (e.which == 13) {
+                        $("#search").click();
+                    }
+                });
+            });
+            $("#search").click(function () {
+                var url = $(this).attr('url');
+                var m_type = $("#sch-sort-txt").attr("data");
+                var m_other_type = $("#type-sort-txt").attr("data");
+                var m_status = $("#status-sort-txt").attr("data");
+                var query = $('#search-form').serialize();
+                query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g, '');
+                query = query.replace(/^&/g, '');
+                if (m_type != '') {
+                    query = 'm_status=' + m_status + "&" +'m_other_type=' + m_other_type + "&" + 'm_type=' + m_type + "&" + query;
+                }
+                if (url.indexOf('?') > 0) {
+                    url += '&' + query;
+                } else {
+                    url += '?' + query;
+                }
+                window.location.href = url;
+            });
+
+            /* 状态搜索子菜单 */
+            $(".search-form").find(".drop-down").hover(function () {
+                $("#sub-sch-menu").removeClass("hidden");
+            }, function () {
+                $("#sub-sch-menu").addClass("hidden");
+            });
+            $("#sub-sch-menu li").find("a").each(function () {
+                $(this).click(function () {
+                    var text = $(this).text();
+                    var value = $(this).attr('value');
+                    if(value == 3 || value == '3' || value == 4 || value == '4'){
+                        $("#drop-down-child").removeClass("hidden");
+                        $("#drop-down-child-nav").removeClass("hidden");
+                    }else{
+                        $("#drop-down-child").addClass("hidden");
+                        $("#drop-down-child-nav").addClass("hidden");
+                    }
+                    $("#sch-sort-txt").text(text).attr("data", $(this).attr("value"));
+                    $("#sub-sch-menu").addClass("hidden");
+                })
+            });
+
+            //状态的子状态显示
+            $(".search-form").find(".drop-down-child").hover(function () {
+                //获取父分类
+                var m_type = $("#sch-sort-txt").attr("data");
+                $(".other_tpye_"+m_type).removeClass("hidden");
+                $("#type-sch-menu").removeClass("hidden");
+            }, function () {
+                //获取父分类
+                var m_type = $("#sch-sort-txt").attr("data");
+                $(".other_tpye_"+m_type).addClass("hidden");
+                $("#type-sch-menu").addClass("hidden");
+            });
+
+            $("#type-sch-menu li").find("a").each(function () {
+                $(this).click(function () {
+                    var text = $(this).text();
+                    var value = $(this).attr('value');
+                    $("#type-sort-txt").text(text).attr("data", $(this).attr("value"));
+                    $("#type-sch-menu").addClass("hidden");
+                })
+            });
+
+            //读取状态显示
+            $(".search-form").find(".drop-down-status").hover(function () {
+                $("#status-sch-menu").removeClass("hidden");
+            }, function () {
+                $("#status-sch-menu").addClass("hidden");
+            });
+
+            $("#status-sch-menu li").find("a").each(function () {
+                $(this).click(function () {
+                    var text = $(this).text();
+                    var value = $(this).attr('value');
+                    $("#status-sort-txt").text(text).attr("data", $(this).attr("value"));
+                    $("#status-sch-menu").addClass("hidden");
+                })
+            });
+
+            //全选节点
+            $('.check-all').on('change', function () {
+                $('.ids').prop('checked', this.checked);
+            });
+
+            $('.time').datetimepicker({
+                format: 'yyyy-mm-dd',
+                language: "zh-CN",
+                minView: 2,
+                autoclose: true
+            });
+        })
+    </script>
+</block>

@@ -1,0 +1,62 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead> 
+                <tr>
+                    <th>登录名</th>
+                    <th>昵称</th>
+                    <th>正在登录的设备</th>
+                    <th>设备名</th>
+                    <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td>{$lv.uid|get_username}</td>
+                    <td>{$lv.nickname}</td>
+                    <td>{$lv.pos_id}</td>
+                    <td>{$lv.pos_title}</td>
+                    <td>
+                    </td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $(function() {
+            //全选节点
+            $('.check-all').on('change', function() {
+                $('.ids').prop('checked', this.checked);
+            });
+            $('.listorder').on('change', function(){
+                var id = $(this).attr('item_id'),
+                    value = $(this).val();
+                $.ajax({
+                    type: 'get',
+                    url : "{:addons_url('Store://MemberAdmin:/listorder')}",
+                    data: {listorder:value, id:id},
+                    success:function(msg){
+                        if(msg.status == 1){
+                            window.location.reload();
+                        }
+                    }
+                });
+            });
+        })
+    </script>
+</block>

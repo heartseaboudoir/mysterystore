@@ -1,0 +1,76 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>自定义菜单内容列表</h2>
+    </div>
+    
+    <div style="margin-bottom: 20px;">
+        注意：目前自定义菜单最多包括3个一级菜单，每个一级菜单最多包含5个二级菜单。一级菜单最多4个汉字，二级菜单最多7个汉字，多出来的部分将会以“...”代替。请注意，创建自定义菜单生成成功后，由于微信客户端缓存，需要24小时微信客户端才会展现出来。 
+    </div>
+    <a class="btn" href="{:addons_url('WechatMenu://WechatMenu:/save', array('pid' => 0))}">添加</a>
+    <a class="btn ajax-post confirm" href="{:addons_url('WechatMenu://WechatMenu:/delete')}" target-form="ids">批量删除</a>
+    <a class="btn ajax-get" href="{:addons_url('WechatMenu://WechatMenu:/send_menu')}" target-form="ids">同步至微信</a>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+                <tr>
+                    <th class="row-selected row-selected"><input class="check-all" type="checkbox"/></th>
+                    <th width="80">排序</th>
+                    <th width="150">标题</th>
+                    <th>关键字</th>
+                    <th>url</th>
+                    <th style="width:150px;">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td><input class="ids" type="checkbox" name="ids[]" value="{$lv.id}" /></td>
+                    <td><input type="text" class="input-mini text listorder" value="{$lv.sort}" item_id="{$lv.id}" maxlength="2"/></td>
+                    <td>{$lv.title}</td>
+                    <td>{$lv.keyword}</td>
+                    <td>{$lv.url}</td>
+                    <td>
+                        <eq name="lv[pid]" value="0">
+                        <a class="update" href="{:addons_url('WechatMenu://WechatMenu:/save', array('pid' => $lv['id']))}">添加子菜单</a>
+                        </eq>
+                        <a class="update" href="{:addons_url('WechatMenu://WechatMenu:/save?id='.$lv['id'])}" data-id="{$lv.id}">编辑</a>
+                        <a class="confirm ajax-get delete" href="{:addons_url('WechatMenu://WechatMenu:/delete?id='.$lv['id'])}" data-id="{$lv.id}">删除</a>
+                    </td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $(function() {
+            //全选节点
+            $('.check-all').on('change', function() {
+                $('.ids').prop('checked', this.checked);
+            });
+            $('.listorder').on('change', function(){
+                var id = $(this).attr('item_id'),
+                    value = $(this).val();
+                $.ajax({
+                    type: 'get',
+                    url : "{:addons_url('WechatMenu://WechatMenu:/listorder')}",
+                    data: {listorder:value, id:id},
+                    success:function(msg){
+                        if(msg.status == 1){
+                            window.location.reload();
+                        }
+                    }
+                });
+            });
+        })
+    </script>
+</block>

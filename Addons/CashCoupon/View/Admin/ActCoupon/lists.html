@@ -1,0 +1,147 @@
+<extend name="Public/base" />
+
+<block name="body">
+	<!-- 标题栏 -->
+	<div class="main-title">
+		<h2>{$meta_title}</h2>
+	</div>
+    <div class="cf">
+        <a href="{:addons_url('CashCoupon://ActCouponAdmin:/index')}" class="btn">配置管理</a>        
+        <!-- 高级搜索 -->
+        <div class="search-form fr cf">
+
+        </div>
+    </div>
+    <div style="padding:10px 0;">
+    <?php if ($is_open) { ?>
+        <table style="border:2px solid #f86442;text-align:center;">
+            <tr>
+                <td style="height:25px;color:#fff;width:100px;background:#f86442;text-align:center;">今日活动</td><td style="width:150px;"><?php echo $day_act['day']?></td>
+                <td style="color:#fff;width:100px;background:#f86442;text-align:center;">奖金额度</td><td style="width:150px;"><?php echo $day_act['money']?></td>
+                <td style="color:#fff;width:100px;background:#f86442;text-align:center;">奖池大小</td><td style="width:150px;"><?php echo $day_act['prize']?></td>
+                <td style="color:#fff;width:100px;background:#f86442;text-align:center;">参与人次</td><td style="width:150px;"><a style="color:blue;" href="<?php echo addons_url('CashCoupon://ActCouponAdmin:/logs_share')?>"> <?php echo $day_act['count'] ?> </a></td>
+            </tr>
+        </table>
+    <?php } else { ?>
+        今日无活动
+    <?php } ?>
+    </div>    
+    
+    <div style="clear:both;"></div>
+
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:100px;">活动时间</th>
+                    <th style="width:100px;">奖金额度</th>
+                    <th style="width:100px;">奖池大小</th>
+                    <th style="width:150px;">参与人次</th>
+                    <th style="width:100px;">中奖数量</th>
+
+                    <th style="">查看</th>
+                </tr>
+            </thead>
+            <tbody>
+                <empty name="list">
+                        <tr>
+                            <td colspan="6" class="text-center"> 没有数据~</td>
+                        </tr>
+                <else/>
+                    <volist name="list" id="lv" key="vo">
+                        <tr>
+                            <td>{$lv.act_time|time_format="Y-m-d"}</td>
+                            <td>{$lv.money}</td>
+                            <td>{$lv.act_val}</td>
+                            <td>{$lv.act_num}</td>
+                            <td>{$lv.act_select}</td>
+                            <td>
+                            <a href="{:addons_url('CashCoupon://ActCouponAdmin:/logs_share?id='.$lv['id'])}">分享记录</a>
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <a href="{:addons_url('CashCoupon://ActCouponAdmin:/logs_user?id='.$lv['id'])}">中奖情况</a>
+                            </td>
+                        </tr>
+                    </volist>
+                </empty>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <link href="__STATIC__/datetimepicker/css/datetimepicker.css" rel="stylesheet" type="text/css">
+    <link href="__STATIC__/datetimepicker/css/dropdown.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+    <script type="text/javascript">
+        $(function() {
+            highlight_subnav("{:addons_url('CashCoupon://ActCouponAdmin:/logs')}");
+            //全选节点
+            $('.check-all').on('change', function() {
+                $('.ids').prop('checked', this.checked);
+            });//搜索功能
+            $("#search").click(function () {
+                var url = $(this).attr('url');
+                var status = $("#sch-sort-txt").attr("data");
+                var query = $('#search-form').serialize();
+                query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g, '');
+                query = query.replace(/^&/g, '');
+                if (status != '') {
+                    query = 'status=' + status + "&" + query;
+                }
+                if (url.indexOf('?') > 0) {
+                    url += '&' + query;
+                } else {
+                    url += '?' + query;
+                }
+                window.location.href = url;
+            });
+            
+            
+            $("#download").click(function(){
+                var url = $(this).attr('url');
+                var uid = $(':input[name=uid]').val();
+                var start_time = $(':input[name=start_time]').val();
+                var end_time = $(':input[name=end_time]').val();
+                url = url +'?uid=' + uid  + '&start_time=' + start_time + '&end_time=' + end_time;
+                window.location.href = url;
+            })            
+            
+            
+
+            /* 状态搜索子菜单 */
+            $(".search-form").find(".drop-down").hover(function () {
+                $("#sub-sch-menu").removeClass("hidden");
+            }, function () {
+                $("#sub-sch-menu").addClass("hidden");
+            });
+            $("#sub-sch-menu li").find("a").each(function () {
+                $(this).click(function () {
+                    var text = $(this).text();
+                    $("#sch-sort-txt").text(text).attr("data", $(this).attr("value"));
+                    $("#sub-sch-menu").addClass("hidden");
+                })
+            });
+            
+            var _T;
+            $('#select-form input').change(function(){
+                clearTimeout(_T);
+                _T = setTimeout(function(){
+                    $("#search").click();
+                }, 1000);
+            });
+            $('.time').datetimepicker({
+                format: 'yyyy-mm-dd',
+                language: "zh-CN",
+                minView: 2,
+                autoclose: true
+            });            
+            
+        })
+    </script>
+</block>    
+    

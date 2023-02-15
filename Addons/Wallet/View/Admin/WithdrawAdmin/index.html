@@ -1,0 +1,52 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+                <tr>
+                    <th>流水号</th>
+                    <th>申请用户</th>
+                    <th>申请金额</th>
+                    <th>状态</th>
+                    <th>申请时间</th>
+                    <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td>{$lv.sn}</td>
+                    <td>{$lv.uid|get_nickname}</td>
+                    <td>{$lv.money}</td>
+                    <td><switch name="lv.status"><case value="1">待提现</case><case value="2">已提现</case><case value="3">已拒绝</case><case value="4">等待确认</case></switch></td>
+                    <td>{$lv.create_time|time_format}</td>
+                    <td>
+                        <a class="update" href="{:addons_url('Wallet://WithdrawAdmin:/save?id='.$lv['id'])}" data-id="{$lv.id}">操作</a>
+                    </td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $(function() {
+            highlight_subnav('{:addons_url('Wallet://WithdrawAdmin:/index')}');
+            //全选节点
+            $('.check-all').on('change', function() {
+                $('.ids').prop('checked', this.checked);
+            });
+        })
+    </script>
+</block>

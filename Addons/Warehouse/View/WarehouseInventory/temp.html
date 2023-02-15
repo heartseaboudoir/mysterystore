@@ -1,0 +1,383 @@
+<extend name="Public/base" />
+<block name="body">
+    <div id="jq-content" class="site-content">
+        <div class="main-title">
+            <h2>临时盘点单</h2>
+        </div>
+        <a id="jq-del" class="confirm btn" href="javascript:void(0);">清空临时申请表</a>
+        <form id="jq-form-add" class="wrap-form-add">
+            <div class="tab-pane in tab1">
+            <div class="form-item cf">
+                <div id="jq-verify" class="controls goods_div">
+                    <a href="javascript:void(0);" id="select_product" class="btn" data-url="">选择绑定的商品</a>
+                    <span id="jq-select-options">
+                        <label>条形码：<input type="text" class="text input-min bar_code" style="width: 100px;" name="bar_code" num></label>
+                        <label>商品ID：<input type="text" class="text input-min id_code wrap-data" style="width: 100px;" name="goods_id" num></label>
+                        <label>商品名：<input type="text" class="text input-min goods_title wrap-data" style="width: 100px;" name="goods_name" disabled=""></label>
+                        <label>申请数量：<input type="text" class="text input-mini g_num wrap-data" style="width: 100px;" name="g_num" num></label>
+                        <label>备注：<input type="text" class="text input-mini remark_add" style="width: 200px;" name="remark_add"></label>
+                        <!--<input type="hidden" class="text input-min goods_id" name="goods_id" value="0" />-->
+                        <input type="hidden" class="text input-min admin_id" name="admin_id" value="<?php echo(UID); ?>" />
+                        <input type="hidden" class="text input-min temp_type" name="temp_type" value="1" />
+                        <input type="hidden" class="text input-min ctime" name="ctime" value="<?php echo(time()); ?>" />
+                        <button id="jq-submit-add" class="btn submit-btn ajax-post hidden" target-form="form-horizontal">加入临时申请表</button>
+                        <div class="controls goods_message"></div>
+                        <input type="hidden" name="temp_id">
+                    </span>
+                </div>
+            </div>
+        </div>
+        </form>
+        <form id="jq-form-type">
+            <select id="jq-select-type" name="is_all">
+                <option value="0">全部商品</option>
+            </select>&nbsp;&nbsp;
+            <button id="jq-submit-type" class="btn submit-btn ajax-post confirm" target-form="form-horizontal">加入临时盘点单</button>
+        </form>
+        <div class="data-table table-striped">
+            <table>
+                <thead>
+                    <tr>
+                        <th>商品id</th>
+                        <th>商品名称</th>
+                        <th>商品类别</th>
+                        <th>商品属性</th>
+                        <th>商品条码</th>
+                        <th>系统售价</th>
+                        <th>库存数量</th>
+                        <th>申请数量</th>
+                        <th>添加时间</th>
+                        <th>备注</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="jq-list"></tbody>
+            </table>
+        </div>
+        <div id="jq-page" class="page"></div>
+        <form id="jq-form-ship" class="form-horizontal">
+            <div class="tab-pane in tab1">
+                <div class="form-item cf">
+                    <div class="controls goods_div">
+                        <label>备注：
+                            <input type="text" class="text input-min remark" style="width: 200px;" name="remark" />
+                        </label>
+                        <button id="jq-submit-ship" class="btn submit-btn confirm" target-form="form-horizontal">提交临时盘点单</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <script id="temp-select-type" type="text/html">
+        {{each items as list index}}
+        <option value="{{list.cate_id}}">{{list.cate_name}}</option>
+        {{/each}}
+    </script>
+    <script id="temp-list" type="text/html">
+        {{each items as list index}}
+        <tr data-id="{{list.id}}">
+            <td class="temp-goods_id">{{list.goods_id}}</td>
+            <td title="{{list.goods_name}}"><a href="{:addons_url('Goods://GoodsInfo:/index')}?id={{list.goods_id}}" target="_blank">
+                {{if list.goods_name.length > 19}}
+                    {{list.goods_name.slice(0,18) + '...'}}
+                {{else}}
+                    {{list.goods_name}}
+                {{/if}}
+                </a>
+            </td>
+            <td>{{list.cate_name}}</td>
+			<td>{{list.value_name}}</td>
+            <td title="{{list.bar_code}}">
+                {{if list.bar_code.length > 14}}
+                    {{list.bar_code.slice(0,13) + '...'}}
+                {{else}}
+                    {{list.bar_code}}
+                {{/if}}
+            </td>
+            <td>{{list.sell_price}}</td>
+            <td>{{list.stock_num}}</td>
+            <td class="temp-amount">{{list.g_num}}</td>
+            <td>{{list.ctime}}</td>
+            <td class="temp-remark" title="{{list.remark}}">
+            {{if list.remark != null}}
+                {{if list.remark.length > 10 }}
+                    {{list.remark.slice(0,9) + '...'}}
+                {{else}}
+                    {{list.remark}}
+                {{/if}}
+            {{/if}}
+            </td>
+            <td>
+                <a class="temp-edit" href="javascript:void(0);" data-id="{{list.goods_id}}" value-id="{{list.value_id}}">编辑</a>
+                <a class="temp-del" href="javascript:void(0);">删除</a>
+            </td>
+        </tr>
+        {{/each}}
+    </script>
+     <script id="temp-select-value" type="text/html">
+        <label><span>商品属性：</span>
+            <select id="jq-select-value" name="value_id">
+                {{each items as list index}}
+                <option value="{{list.value_id}}">{{list.value_name}}</option>
+                {{/each}}
+            </select>
+        </label>
+    </script>
+    <input type="hidden" id="temp_type" value="7">
+</block>
+<block name="script">
+    <script type="text/javascript">
+    layui.use(['main'], function() {
+        var $ = layui.jquery,
+            layer = layui.layer;
+
+        var Global = {
+              listUrl: '/Erp/WarehouseInventory/temp',
+               delUrl: '/Erp/WarehouseInventory/delete',
+              editUrl: '/Erp/WarehouseInventory/getgoods',
+             clearUrl: '/Erp/WarehouseInventory/cleantemp',
+               addUrl: '/Erp/WarehouseInventory/addRequestTemp',
+              typeUrl: '/Erp/WarehouseInventory/addCateRequestTemp',
+            submitUrl: '/Erp/WarehouseInventory/send_request_temp',
+                 jump: window.location.pathname.match(/(\D*)temp/)[1],
+              addFlag: true,
+           submitFlag: true
+        }
+
+        var passData = $.dataJson(); 
+        delete passData.s_date;
+        delete passData.e_date;
+        var data = $.parseJson( passData );
+  
+        $.postData({
+             url: Global.listUrl,
+            data: data,
+            load: true
+        }, function(res){
+            dataShow(res);
+        });
+        function dataShow(res){
+            var oSelect = $('#jq-select-type'),
+                  oList = $('#jq-list'),
+                  oPage = $('#jq-page');
+
+            oSelect.append(template('temp-select-type', { items: res.content.cate }));
+            oList.html( template('temp-list', { items: res.content.data.list }) );
+
+            if( res.content.data.recordCount > res.content.data.pageSize ){
+                var total = '<span class="rows">共'+res.content.data.recordCount+'条记录</span>';
+                oPage.html( res.content.data.pager.replace( new RegExp(Global.listUrl,'g'),Global.jump+'temp' ) + total );
+            }else{
+                oPage.html( res.content.data.pager );
+            }
+
+            $('.temp-edit').on({
+                click: function() {
+                    var aId = parseInt( $(this).attr('data-id') );
+                    var value_Id = parseInt( $(this).attr('value-id') );
+                    $.postData({
+                         url: Global.editUrl,
+                        data: { 'goods_id':aId,"value_id":value_Id }
+                    }, function(res){
+                    	$('#jq-select-options').attr('data-id',res.content.temp_id);
+                        $('[name="goods_id"]').val(res.content.goods_id);
+                        $('[name="goods_name"]').val(res.content.goods_name);
+                        $('[name="g_num"]').val(res.content.g_num).focus();
+                        $('#jq-form-add').find('[name="remark"]').val(res.content.remark);
+                        $('#jq-select-value').parents('label').remove();
+                        if( res.content.attr_value_array.length > 0 ){
+                           $('#jq-select-options').find('label').eq(2).after( template('temp-select-value', { items: res.content.attr_value_array }) );
+                           $('#jq-select-value option[value="'+ res.content.value_id +'"]').attr('selected',true);
+                        }
+                    });
+                }
+            });
+
+            delData();
+            $('.temp-del').tempConfirm({
+                url: Global.delUrl
+            },function(self){
+                var aId = parseInt( self.parents('tr').attr('data-id') );
+                return { 'id':aId };
+            },function(options){
+                $('[data-id='+options.id+']').remove();
+                if( $.trim( $('#jq-list').html() ) == '' &&  passData.p != 1 ){
+                    passData.p -= 1;
+                    data = $.parseJson( passData );
+                }
+                if( res.content.data.recordCount > res.content.data.pageSize ){
+                    $.postData({
+                         url: Global.listUrl,
+                        data: data
+                    }, function(res){
+                        dataShow(res);
+                        window.history.pushState( {},'',Global.jump+'temp/p/'+passData.p+'.html' );
+                    });
+                }else{
+                    delData();
+                }
+            });
+        }
+        function delData(){
+            if ( $.trim( $('#jq-list').html() ) != '' ) {
+                $('#jq-del').removeAttr('style').tempConfirm({
+                    url: Global.clearUrl
+                },function(options){
+                    defaultData();
+                    $('#jq-page').html('');
+                    window.history.pushState( {},'',Global.jump+'temp.html' );
+                })
+            }else{
+                defaultData();
+            }
+        }
+        function defaultData(){
+            $('#jq-list').html('<tr><td class="wrap-default wrap-empty">暂无内容！</td></tr>');
+            $('#jq-del').unbind().css('cursor','default');
+        }
+
+        $('#jq-form-add').verifyForm();
+        $('#jq-submit-add').on({
+            click: function() {
+                var oForm = $('#jq-form-add');
+                oForm.find('label').each(function(){
+                    var self = $(this),
+                       vData = self.find('.wrap-data').val(),
+                        text = $.trim( self.context.innerText );
+                     /*oAmount = $('[name="g_num"]'),
+                     vAmount = parseInt( oAmount.val() );
+                    if( vAmount <= 0 ){
+                        verifyShow({
+                             text: '申请数量须大于0',
+                               id: oAmount,
+                          default: true
+                        });
+                        return false;
+                    }*/
+                    if( vData == '' ){
+                        layer.msg( '请输入' + text.slice( 0,text.length-1 ), {
+                            time: 1500
+                        });
+                        self.focus().end().find('.wrap-data').removeAttr('verify');
+                        return false;
+                    }else{
+                        self.find('.wrap-data').attr('verify',true);
+                    }
+                });
+                var oData = oForm.find('.wrap-data');
+                if( oForm.find('[verify="true"]').length == oData.length && Global.addFlag ){
+                    Global.addFlag = false;
+                    var data = oForm.find('input,select').serialize(),
+                    vId = $('#jq-select-options').attr('data-id');
+	               if( vId != undefined ){
+	                   data += '&temp_id='+vId;
+	               }
+	         
+                    $.postData({
+                         url: Global.addUrl,
+                        data: data
+                    }, function(res){
+                    	$('#jq-select-value').parents('label').remove();
+                        $('#jq-select-options').removeAttr('data-id');
+                        oForm.find('input').val('').removeAttr('verify');
+                        layer.msg(res.content, {
+                            time: 1500
+                        });
+                        window.location.reload();
+                        window.history.pushState( {},'',Global.jump+'temp.html' );
+                    }, function(){
+                        Global.addFlag = true;
+                    });
+                }
+            }
+        });
+
+        $('#jq-submit-type').on({
+            click: function() {
+                var data = $('#jq-select-type').serialize(),
+                 vSelect = $('#jq-select-type').val();
+                if( vSelect > 0 ){
+                    data = 'is_all=2&cate_id=' + vSelect;
+                }else{
+                    data = 'is_all=1';
+                }
+                layer.load(2, {shade: [0.5,'#000']});
+                $.postData({
+                     url: Global.typeUrl,
+                    data: data
+                }, function(res){
+                    layer.msg(res.content, {
+                        time: 1500
+                    });
+                    window.location.reload();
+                });
+            }
+        });
+        $('#jq-submit-ship').on({
+            click: function() {
+                if ( $('#jq-list').find('.wrap-default').length > 0 ) {
+                    layer.msg('没有申请商品', {
+                        time: 1500
+                    });
+                    return false;
+                }
+                if( Global.submitFlag ){
+                    Global.submitFlag = false;
+                    var data = $('#jq-form-ship').find('input').serialize();
+                    $.postData({
+                         url: Global.submitUrl,
+                        data: data
+                    }, function(res){
+                        layer.msg('提交成功', {
+                            time: 1500
+                        });
+                        window.location.href = Global.jump + 'index.html';
+                    }, function(){
+                        Global.submitUrl = true;
+                    });
+                }
+                return false;
+            }
+        });
+
+        /*$('[name="bar_code"],[name="goods_id"]').enterLeave({
+            url: Global.editUrl,
+            temp_type: 7
+        });*/
+
+    });
+    </script>
+    <script type="text/javascript" src="__STATIC__/artDialog/lib/sea.js"></script>
+    <script type="text/javascript">
+    seajs.config({
+        alias: {
+            "jquery": "jquery-1.10.2.js"
+        }
+    });
+    seajs.use(['__STATIC__/artDialog/src/dialog-plus'], function(dialog) {
+        window.dialog = dialog;
+        $('#select_product').on('click', function() {
+            var url = "{:addons_url('Warehouse://AssignmentApplication:/get_goods_lists?temp_type=7')}";
+            top.dialog({
+                id: 'product_lists',
+                title: '可绑定商品列表',
+                url: url,
+                width: 500,
+                height: 430,
+                onclose: function() {
+                    if( this.returnValue != '' ){
+                        var data = this.returnValue;
+                        $('[name="goods_id"]').val(data.id);
+                        $('[name="goods_name"]').val(data.data[0].title);
+                        productShow( data.id );
+                        $('#jq-select-value').parents('label').remove();
+                        if( data.data[0].select.length > 0 ){
+                           $('#jq-select-options').find('label').eq(2).after( template('temp-select-value', { items: data.data[0].select }) );
+                        }
+                    }
+                },
+            }).showModal();
+        });
+    });
+    </script>
+</block>

@@ -1,0 +1,47 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead> 
+                <tr>
+                    <th>门店</th>
+                    <th>销售量</th>
+                    <th>销售金额</th>
+                    <th>最后一次销售时间</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td>{$lv.store_title}</td>
+                    <td>{$lv.num}</td>
+                    <td>{$lv.money}</td>
+                    <td>{$lv.update_time|time_format="Y-m-d H:i:s"}</td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        highlight_subnav('{:addons_url('Tongji://TongjiAdmin:/day_lists')}');
+        $(function() {
+            //全选节点
+            $('.check-all').on('change', function() {
+                $('.ids').prop('checked', this.checked);
+            });
+        })
+    </script>
+</block>

@@ -1,0 +1,673 @@
+/*******************************************
+ * 自定义配色css文件放在defaut_color的同级目录,然后在 "系统/配置管理" 中为"COLOR_STYLE"增加一行配置项
+ *********************************************/
+
+/********************************************
+ * base.css
+ * 描述：重置页面元素并设置布局样式
+ * 作用范围： 全局
+ *******************************************/
+html, body {
+  background-color: #fff;
+}
+.index-body {
+  background-color: #fff;
+}
+html,body,input,textarea,select,legend {
+	color: #635c73;
+	/*全局默认文字颜色*/
+}
+a {
+	color: #444;
+	/*全局默认链接颜色*/
+}
+a:hover{
+	color: #000;
+	/*全局默认链接悬停颜色*/
+}
+
+/*************************************************
+ * common.css 
+ * 描述：定义公共类名
+ * 作用范围: 公共，独立样式
+ *************************************************/
+
+/* 文章搜索/用户搜素 下拉弹出按钮 实心小箭头 */
+.arrow-down {
+	border-top-color: #3a2d44;
+}
+.arrow-up {
+	border-bottom-color: #3a2d44;
+}
+.arrow-left {
+	border-right-color: #3a2d44;
+}
+.arrow-right {
+	border-left-color: #3a2d44;
+}
+
+/********************************************** 
+ * module.css 
+ * 描述：定义常用组件样式
+ * 作用范围: 公共，组件模块
+ ***********************************************/
+
+/* 文章新增编辑页,权限授权页,分类编辑页 tab标签 */
+.tab-nav {
+	border-bottom-color: #e0e0e0;
+}
+.tab-nav .current a,
+.tab-nav .current a:hover {
+	border-color: #737373 #e0e0e0 #fff;
+}
+
+
+/* (暂未使用) 面包屑导航 */
+.breadcrumb {
+	color: #999;
+}
+.tags-crumb li {
+	background-color: #e0e0e0;
+}
+.tags-crumb .current {
+	background-color: #f60;
+}
+.tags-crumb .current a {
+	color: #fff;
+}
+.tags-crumb li i {
+	border-left-color: #fff
+}
+.tags-crumb li b {
+	border-left-color: #e0e0e0
+}
+.tags-crumb .current b {
+	border-left-color: #f60;
+}	
+
+/* 列表分页 */
+.page {
+    margin: 10px 0;
+    *zoom: 1;
+}
+.page a,
+.page span {
+    color: #fff;
+    /*background-color: #696969;*/
+}
+
+/* uploadify插件上传按钮 */
+.uploadify-button {
+	color: #fff;
+	background-color: #7963df;
+}
+
+/* 分类管理/分类授权 树形菜单（目前只支持3级）
+------------------------------------------ */
+.category .hd {
+	border-bottom-color: #d4d4d4;
+	color:#fff;
+	background-color: #4a4851;
+}
+.category .cate-item dt {
+	border-bottom-color: #E7E7E7;
+}
+.category .fold .icon-fold {
+	background-image: url(../images/blue_color/bg_icon.png) -100px 25px;
+}
+.category .fold .icon-unfold {
+	background-image: url(../images/blue_color/bg_icon.png) -125px 25px;
+}
+.category .tab-sign {
+	background-image: url(../images/tab_sign.png);
+}
+.category .name .error {
+	color: #B94A48;
+}
+.category .name .success {
+	color: #468847;
+}
+
+.icon-add {
+	background: url(../images/blue_color/bg_icon.png) no-repeat 0 0;
+}
+
+.close {
+    color: #000000;
+    text-shadow: 0 1px 0 #ffffff;
+    opacity: 0.2;
+    filter: alpha(opacity=20);
+}
+
+/******************************************** 
+ * form.css 
+ * 描述：定义表单样式
+ * 作用范围: 公共，表单模块，表单布局
+ *********************************************/
+
+/* 表单组件
+------------------------------------------ */
+.text {
+	border-color: #ddd;
+	background-color: #fff;
+}
+.textarea {
+	border-color: #ddd;
+	background-color: #fff;
+	padding:0px;
+}
+select {
+	border-color: #ccc;
+}
+.must {
+	color: #f00; /* 表单必填项标识字符*/
+}
+
+/* 多行两列表单
+------------------------------------------ */
+.form-horizontal .item-label .check-tips {
+	color: #aaa; /* 表单label后面的提示文字 */
+}
+.form-horizontal .controls .check-tips {
+	color: #999; /*表单ajax操作完成后返回的提示文字*/
+}
+
+/* 搜索表单
+------------------------------------------ */
+.search-form .sleft {/* 高级搜索左边的搜索框 */
+	border-color: #ebebeb;
+	background-color: #fff;
+}
+
+/* 状态搜索下拉选项 */
+.search-form .drop-down ul {
+	background-color: #fff;
+	border-color: #ebebeb;
+}
+.search-form .drop-down ul li {
+	border-top-color: #ebebeb;
+}
+.search-form .drop-down ul a {
+	color: #404040;
+}
+.search-form .drop-down ul a:hover {
+	background-color: #f0f0f0;
+}
+
+/* 状态子搜索下拉选项 */
+.search-form .drop-down-child ul {
+    background-color: #fff;
+    border-color: #ebebeb;
+}
+.search-form .drop-down-child ul li {
+    border-top-color: #ebebeb;
+}
+.search-form .drop-down-child ul a {
+    color: #404040;
+}
+.search-form .drop-down-child ul a:hover {
+    background-color: #f0f0f0;
+}
+
+.search-form .sch-btn:hover {
+	/* 搜索提交按钮 */
+	color: #fff;
+}
+.btn-search {
+	/* 搜索提交按钮图片 */
+	background: url(../images/blue_color/bg_icon.png) no-repeat -50px 0;
+}
+
+.focus{
+	  border-color: #4D90FE;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) inset;
+  outline: medium none;
+}
+/*********************************************
+ * table.css 
+ * 描述：定义数据表格样式
+ * 作用范围: 公共，表格模块
+ **********************************************/
+
+/* 内容区 行默认颜色*/
+.data-table tbody tr {
+	background-color: #ffffff;
+	color: #686868;
+}
+.data-table thead th,
+.data-table tbody td {
+	/*非隔行变色时 用于行区分的单元格底线颜色 */
+    border-bottom-color:  #f4f4f4;
+}
+/* 表头配色 */
+.data-table thead th {
+	color:#fff;
+    background-color: #4a4851;
+}
+/* 隔行变色 行默认颜色 */
+.table-striped tbody tr {
+	background-color: #fefefe;
+	color: #686868;
+}
+/* 隔行变色 偶数行配色 */
+.table-striped tbody tr:nth-child(even) {
+	background-color: rgba(243, 242, 255, 0.20);
+
+}
+.table-striped tbody tr:hover {
+	background-color: rgba(243, 242, 255, 0.80);
+}
+
+
+/************************************* 
+ * button.css 
+ * 描述：定义按钮样式
+ * 作用范围: 公共，按钮组，单独按钮
+ *************************************/
+
+/* 普通按钮 */
+.btn {
+  background-color: #F5F5F5;
+  background-image: -moz-linear-gradient(center top , #F5F5F5, #F1F1F1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: none;
+  color: #444444;
+  border-radius:5px;
+}
+.btn:hover {
+    color: #222;
+    background-color: #997eff;
+	  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: none;
+  color: #444444;
+}
+.submit-btn:hover {
+	  border: 1px solid #2f5bb7;
+}
+
+/* 表单提交按钮(确定,保存,提交) */
+.submit-btn {
+	color: #fff;
+   /* background-color: #7d61dd;
+	background-color: #df7003;*/
+
+  background-color: #4D90FE;
+  background-image: -moz-linear-gradient(center top , #4D90FE, #4787ED);
+  border: 1px solid #3079ED;
+  box-shadow: none;
+   border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: none;
+  border-radius: 2px;
+  cursor: hand;font-weight: bold;
+}
+.submit-btn:hover {
+    color: #fff;
+    background-color: #a285ff;
+	/*background-color: #f48a05;*/
+}
+.save-btn {
+	background-color: #3737BC; border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: none;
+}
+.save-btn:hover {
+	opacity: .9
+}
+
+/* 表单返回按钮 */
+.btn-return {
+	color: #444;
+	background-color: #8893ae;
+}
+.btn-return:hover {
+	border: 1px solid #c6c6c6
+}
+
+/* 表单导出按钮 */
+.btn-download {
+    color: #444;
+    background-color: #F5F5F5;
+}
+.btn-download:hover {
+    border: 1px solid #c6c6c6
+}
+
+/*高级搜索箭头*/
+.btn-arrowdown {
+    background: url("../images/hii_color/arrow_down.png") no-repeat;
+  margin-top: 0;
+  width: 17px;
+}
+.btn-arrowup {
+    background: url(../images/blue_color/bg_icon.png) no-repeat -25 -25;
+}
+
+/* 下拉弹出按钮 */
+.btn-group .dropdown,
+.btn-group-click .dropdown {
+	border-color: #ccc;
+	background-color: #fff;
+}
+.btn-group .dropdown a:hover,
+.btn-group-click .dropdown a:hover {
+    background-color: #eee;
+}
+
+/* 被禁用的按钮 */
+.btn.disabled {
+	background-color: #bbbbbb;
+	cursor: not-allowed;
+	color: #848484;
+	text-shadow: 0 1px 0 #f5f5f5;
+}
+
+
+/************************************* 
+ * style.css
+ *************************************/
+
+/* 头部Logo,主导航*/
+.header {
+    background-color: #F1F1F1; height: 50px;
+}
+.header:before {
+  background: none repeat scroll 0 0 #E5E5E5;
+  bottom: 0;
+  content: "";
+  display: block;
+  height: 1px;
+  left: 0;
+  position: absolute;
+  right: 0;
+}
+.header .logo {
+	background: rgba(0, 0, 0, 0.5) none repeat scroll 0 0;
+    border-radius: 10px;
+    box-shadow: 2px 3px 3px rgba(0, 0, 0, 0.3);
+    color: #f8f8f8;
+    font-size: 24px;
+    font-weight: bold;
+    margin: 5px 8px;
+    text-align: center;
+	height:40px;
+	line-height:40px;
+}
+/* 主导航 */
+.main-nav li {
+ margin: 0 18px; max-width: 180px;
+    min-width: 20px;width: auto;
+}
+.main-nav a {
+  color: #737373; font-weight: normal;
+}
+.main-nav a:hover {
+color: #000;
+    height: 44px;
+    background-color: #F1F1F1;
+	border-bottom: 2px solid #427FED;
+}
+.main-nav .current{
+  color: #262626;
+  font-weight: bold;
+  text-decoration: none;
+  transition: border-color 0.218s ease 0s;
+}
+.main-nav .current a {height: 44px;
+color: #222;
+    background-color: #F1F1F1;
+	border-bottom: 2px solid #427FED; font-weight: bold;
+}
+
+/* 顶部右侧 用户bar */
+.header .user-bar .user-entrance {
+    background: url(../images/hii_color/icon.png) no-repeat  0  -472px;
+}
+.header .user-menu {
+    background: none repeat scroll 0 0 #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 2px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+.header .user-menu li {
+    border-bottom-color: #ddd;
+}
+.header .user-menu a:hover {
+    color: #424242;
+    background-color: #f5f5f5;
+}
+
+/* 边栏导航样式
+------------------------------------------ */
+.sidebar {
+	/* 左侧栏背景 */
+	background: #E5E5E5;
+}
+/* 子导航Group标题栏 */
+.subnav h3 {
+  color: #222222;
+  height: 30px;
+  line-height: 30px;
+}
+.subnav h3 a {
+	color: #222;
+}
+
+/* 侧边图标 */
+.subnav h3 .icon {
+  background: url("../images/hii_color/arrow_down.png") no-repeat scroll 6px 8px rgba(0, 0, 0, 0);
+  height: 100%;
+   margin-top: 5px;
+  width: 17px;
+	/* 展开后图标  background: url(../images/blue_color/bg_icon.png) no-repeat -100px 0px;*/
+   
+}
+.subnav h3 .icon-fold {
+	/* 收起后图标   background: url(../images/blue_color/bg_icon.png) no-repeat -75px 0px;*/
+  background: url("../images/hii_color/arrow_right.png") no-repeat scroll 6px 8px rgba(0, 0, 0, 0);
+  height: 100%;
+  margin-top: 5px;
+  width: 17px;
+}
+.recycle {
+	/* 回收站图标 background: url(../images/blue_color/bg_icon.png) no-repeat -125px 0px;*/
+  background: url("../images/hii_color/icon.png") no-repeat  0 -411px;
+}
+.subnav h3 .icon, .subnav h3 .icon-fold, .subnav h3 .recycle {
+  height: 16px;
+  width: 16px;margin: 5px 6px 0 0;
+}
+/* 左侧二级菜单 */
+.side-sub-menu > li > .item {
+    color: #222222;
+}
+.side-sub-menu > li > .item:hover{
+	color: #ffffff;
+	background: #7c7c7c;
+}
+.side-sub-menu > li > .item:hover{
+	color: #ffffff;
+	background: #7c7c7c;
+}
+.side-sub-menu > .current > .item,
+.side-sub-menu > .hover > .item {
+    color: #414141;
+}
+.side-sub-menu > .current > .item,
+.side-sub-menu > .current > .item:hover {
+	/* 高亮导航 color: #414141;
+    background: url(../images/subnav_current.png) no-repeat 165px 12px #f6f6f6;*/
+  background-color: #D14836;
+  background-image: -moz-linear-gradient(center top , #DD4B39, #D14836);
+  border: 1px solid rgba(0, 0, 0, 0);
+  color: #FFFFFF;
+border-radius: 2px;
+    cursor: default;
+    font-size: 14px;
+    font-weight: bold;
+    height: 27px;
+    line-height: 27px;
+    margin-right: 16px;
+    min-width: 54px;
+    outline: 0 none;
+    padding: 0 8px;
+    text-align: center;
+    white-space: nowrap;
+	
+}
+
+/* windows开始菜单式子菜单 */
+.side-sub-menu li .subitem {
+    border-color: #ccc;
+    background-color: #fff;
+}
+.side-sub-menu .subitem .item:hover {
+    background: url(../images/subnav_current.png) no-repeat 130px 12px #f5f5f5;
+}
+
+/* 后台主内容区域
+------------------------------------------------- */
+.main {
+	background-color: #fff;
+}
+.main-title h2 {
+    color: #6e6b73;
+}
+.main-title .ca {
+	/* 内容列表 面包屑 */
+    background: url(../images/subnav_current.png) no-repeat center center;
+}
+
+/* 访问授权页面 大类区块 */
+.checkmod {
+    border-color: #ebebeb;
+}
+.checkmod dt {
+    border-bottom-color: #ebebeb;
+    background-color: #ECECEC;
+}
+
+/* 列表分页 */
+.page a,
+.page span {
+    color: #000;
+    border: 1px solid #ccc;
+    /*background-color: #7963df;*/
+}
+.page a:hover {
+    background-color: #E1E1E1;
+}
+.page .current {
+	border-top: 3px solid #7963DF;
+	height: 28px;
+	line-height: 26px;
+}
+
+/* 版权信息 */
+.cont-ft {
+    background-color: #fff;
+}
+.copyright {
+   border-top: 1px solid #E5E5E5;
+}
+
+
+/*************************************
+ *  登陆页面css
+ ***********************************/
+
+/* body 配色*/
+#login-page {
+    color: #000;
+    background-color: #fff;
+}
+#login-page .login-form {
+    background-color: #F7F7F7;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.3);
+    border-top: 0;width: 304px;
+}
+#login-page .login-form h3 {
+    color: #8D9CAA;
+}
+#login-page .login-form .check-tips {
+    color: #ff0000;
+}
+#login-page .login-form .item { background-color: #fff;
+    border-color:  #ececec;
+}
+#login-page .login-form .focus {
+    border-color: #4d90fe;
+     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) inset;
+  outline: medium none;
+}
+#login-page .login-form .icon-login-user,
+#login-page .login-form .icon-login-pwd,
+#login-page login-form .icon-login-verifycode {
+    background: url("../images/icon24_login.png") no-repeat;
+}
+#login-page .login-form .icon-login-user {
+    background-position: 0 0;
+}
+#login-page .login-form .icon-login-pwd {
+    background-position: -48px 0;
+}
+#login-page .login-form .icon-login-verifycode {
+    background-position: -24px 0;
+}
+#login-page .login-form input {
+    background-color: #fff;
+    color:#686868;
+}
+#login-page .login-form .login-btn {
+    color: #FFFFFF;
+    background-color: #4D90FE;
+	background-image: -moz-linear-gradient(center top , #4D90FE, #4787ED);
+  border: 1px solid #3079ED;
+  box-shadow: none;
+   border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: none;
+  border-radius: 2px;
+  cursor: hand;font-weight: bold;
+}
+#login-page .login-form .login-btn:hover {
+    background-color: #8460ec;
+}
+#login-page .login-form .login-btn[disabled] {
+    opacity: 0.6;
+    filter: alpha(opacity=60);
+    cursor: default;
+    box-shadow: none;
+}
+#login-page .icon-loading {
+    background: url(../images/loading_icon.gif) no-repeat 0 0;
+}
+
+
+#login-page input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0px 1000px white inset;
+}
+#login-page .logo-img {
+    background: url(../images/logo.png) no-repeat 0 center;
+}
+
+#login-page .welcome{
+    color:#ddd;
+}
+
+#login-page .reloadverify{
+    color: #cd9eff;
+}
+
+#login-page img.verifyimg{
+	border-color: #ececec;
+}
+.show_line {
+	/* 回收站图标 background: url(../images/blue_color/bg_icon.png) no-repeat -125px 0px;*/
+  background: url("../images/hii_color/icon.png") no-repeat  0 -255px;
+  height:20px;
+  width:20px;
+  vertical-align: middle;
+  display:inline-block;
+}
+.show_line:hover{
+	border-bottom:none;
+	text-decoration:none;
+}

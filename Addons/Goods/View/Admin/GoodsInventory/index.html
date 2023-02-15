@@ -1,0 +1,63 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+                <tr>
+                    <th>年份</th>
+                    <th>月份</th>
+                    <th>添加时间</th>
+                    <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td>{$lv.year}年</td>
+                    <td>{$lv.month}月</td>
+                    <td>{$lv.create_time|time_format="Y-m-d H:i"}</td>
+                    <td>
+                        <a class="update" href="{:addons_url('Goods://GoodsInventoryAdmin:/log', array('year' => $lv['year'], 'month' => $lv['month']))}" data-id="{$lv.id}">查看盘点记录</a>
+                        <a class="" href="{:addons_url('Goods://GoodsInventoryAdmin:/del', array('year' => $lv['year'], 'month' => $lv['month']))}" data-id="{$lv.id}">删除</a>
+                    </td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $(function() {
+            highlight_subnav('{:addons_url('Goods://GoodsInventoryAdmin:/index')}');
+            //全选节点
+            $('.check-all').on('change', function() {
+                $('.ids').prop('checked', this.checked);
+            });
+            $('.listorder').on('change', function(){
+                var id = $(this).attr('item_id'),
+                    value = $(this).val();
+                $.ajax({
+                    type: 'get',
+                    url : "{:addons_url('Goods://GoodsInventoryAdmin:/listorder')}",
+                    data: {listorder:value, id:id},
+                    success:function(msg){
+                        if(msg.status == 1){
+                            window.location.reload();
+                        }
+                    }
+                });
+            });
+        })
+    </script>
+</block>

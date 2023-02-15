@@ -1,0 +1,36 @@
+<extend name="Public/base"/>
+
+<block name="sidebar"></block>
+
+<block name="style">
+    <style>
+        body{padding: 0}
+    </style>
+</block>
+
+<block name="body">
+    <script type="text/javascript">
+    document.getElementById('jq-nav-left').style.display = 'none';
+    document.getElementById('jq-main-box').style.left = '0';
+    </script>
+    <!-- 主体 -->
+    <div id="indexMain" class="index-main">
+       <!-- 插件块 -->
+       <div class="container-span">{:hook('AdminIndex')}</div>
+    </div>
+</block>
+
+<block name="script">
+<script type="text/javascript">
+    /* 插件块关闭操作 */
+    $(".title-opt .wm-slide").each(function(){
+        $(this).click(function(){
+            $(this).closest(".columns-mod").find(".bd").toggle();
+            $(this).find("i").toggleClass("mod-up");
+        });
+    })
+    $(function(){
+        $('.sidebar').remove();
+    })
+</script>
+</block>

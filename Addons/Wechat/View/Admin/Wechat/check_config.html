@@ -1,0 +1,17 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <script>
+        $('.sidebar').remove();
+        $('body').css('padding-left', '10px');
+    </script>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <p style="font-size:18px; margin-bottom: 20px;">请选择要操作的公众号！</p>
+        <volist name="list" id="lv" key="vo">
+            <a style="margin-right:20px; display:block; float:left;" href="{:addons_url('Wechat://WechatConfig:/set_ukey?change=1&ukey='.$lv['ukey'])}" class="btn">{$lv.title}</a>
+        </volist>
+    </div>
+</block>
+<block name="script">
+</block>

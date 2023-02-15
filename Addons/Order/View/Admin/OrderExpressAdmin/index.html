@@ -1,0 +1,98 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <!-- 高级搜索 -->
+    <div class="cf">
+        <a href="{:addons_url('Order://OrderExpressAdmin:/save')}" class="btn">添 加</a>
+        <div class="search-form fr cf">
+            <div class="sleft">
+                <input type="text" name="keyword" class="text input-text search-input" style="" value="{$_GET['keyword']}" placeholder="快递名或标识" />
+                <a class="sch-btn" href="javascript:;" id="search" url="{:addons_url('Order://OrderExpressAdmin:/index')}"><i class="btn-search"></i></a>
+            </div>
+        </div>
+    </div>
+    <div style="clear:both;"></div>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+                <tr>
+                    <th>排序</th>
+                    <th>快递公司</th>
+                    <th>标识</th>
+                    <th>状态</th>
+                    <th style="width:120px">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <notempty name="list">
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td><input type="text" class="input-mini text listorder" value="{$lv.listorder}" item_id="{$lv.id}" maxlength="4"/></td>
+                    <td>{$lv.company}</td>
+                    <td>{$lv.name}</td>
+                    <td><switch name="lv.status"><case value="1">启用</case><case value="2">禁止</case></switch></td>
+                    <td>
+                        <a class="update" href="{:addons_url('Order://OrderExpressAdmin:/save?id='.$lv['id'])}" data-id="{$lv.id}">查看</a>
+                        <a class="update" href="{:addons_url('Order://OrderExpressAdmin:/remove?id='.$lv['id'])}" data-id="{$lv.id}">删除</a>
+                    </td>
+                </tr>
+            </volist>
+            <else/>
+            <tr><td colspan="4">暂无数据~</td></tr>
+            </notempty>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $(function() {
+            highlight_subnav('{:addons_url('Order://OrderExpressAdmin:/index')}');
+            $("#search").click(function() {
+                var url = $(this).attr('url');
+                var query = $('.search-form').find('input').serialize();
+                query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g, '');
+                query = query.replace(/^&/g, '');
+                if (url.indexOf('?') > 0) {
+                    url += '&' + query;
+                } else {
+                    url += '?' + query;
+                }
+                var query2 = $('#select-form').serialize();
+                if (url.indexOf('?') > 0) {
+                    url += '&' + query2;
+                } else {
+                    url += '?' + query2;
+                }
+                window.location.href = url;
+            });
+            //全选节点
+            $('.check-all').on('change', function() {
+                $('.ids').prop('checked', this.checked);
+            });
+            $('.listorder').on('change', function () {
+                var id = $(this).attr('item_id'),
+                    value = $(this).val();
+                $.ajax({
+                    type: 'get',
+                    url: "{:addons_url('Order://OrderExpressAdmin:/listorder')}",
+                    data: {listorder: value, id: id},
+                    success: function (msg) {
+                        if (msg.status == 1) {
+                            window.location.reload();
+                        }
+                    }
+                });
+            });
+        })
+    </script>
+</block>

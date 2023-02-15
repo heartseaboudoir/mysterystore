@@ -1,0 +1,65 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <a href="{:addons_url('Report://MemberSale:/s_sale')}?uid={$uid}&s_date={$s_date}&e_date={$e_date}&isprint=1" class="btn">导出Excel</a>
+    <a href="{:addons_url('Report://MemberSale:/s_sale')}?uid={$uid}&s_date={$s_date}&e_date={$e_date}" class="btn">切换到图片</a>
+    总累计消费金额：{$p_money}
+    <!-- 高级搜索 -->
+    <div class="search-form fr cf">
+        <form id="search-form" onsubmit="return false;">
+            <div class="search-form fr cf">
+                <div class="sleft">
+                    <input type="text" name="s_date" class="text input-text search-input time" value="{$s_date}" placeholder="请选择开始日期" />
+                    <input type="text" name="e_date" class="text input-text search-input time" value="{$e_date}" placeholder="请选择结束日期" />
+                    <input type="hidden" value="{$uid}" name="uid" />
+                    <a class="sch-btn" href="javascript:;" id="search" url="{:addons_url('Report://MemberSale:/s_sale')}"><i class="btn-search"></i></a>
+                </div>
+            </div>
+        <form>
+    </div>
+    <div style="clear:both;"></div>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead> 
+                <tr>
+                    <th>活跃用户</th>
+                    <th>订单号</th>
+                    <th>实付金额</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <notempty name="list">
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td>{$lv.uid|get_nickname}</td>
+                    <td>{$lv.order_sn}</td>
+                    <td>{$lv.pay_money}</td>
+                    <td>{$lv.create_time|time_format="Y-m-d H:i"}</td>
+                    <td><a href="{:addons_url('Order://Order:/show?id=' .$lv['id'])}">查看订单</a></td>
+                </tr>
+            </volist>
+            <else/>
+                <tr>
+                    <td colspan="8" align="center">没有消费记录</td>
+                </tr>
+            </notempty>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        highlight_subnav('{:addons_url('Report://MemberSale:/member_date')}');
+    </script>
+</block>

@@ -1,0 +1,80 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <ul class="tab-nav nav">
+        <li class="current" data-tab="tab1"><a href="javascript:void(0);">基础</a></li>
+    </ul>
+    <div class="tab-content">
+        <!-- 数据列表 -->
+        <form id="form" action="" method="post" class="form-horizontal">
+            <div class="tab-pane in tab1">
+                <div class="form-item cf">
+                    <label class="item-label">openid</label>
+                    <div class="controls">
+                        {$data.openid}
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">昵称<span class="check-tips"></span></label>
+                    <div class="controls">
+                        {$data.nickname}
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">头像<span class="check-tips"></span></label>
+                    <div class="controls">
+                        <img src="{$data.headimgurl}" style="height:100px;" />
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">性别<span class="check-tips"></span></label>
+                    <div class="controls">
+                        <switch name="data.data.sex">
+                            <case value="1">男</case>
+                            <case value="2">女</case>
+                            <default/>未知
+                        </switch>
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">国家<span class="check-tips"></span></label>
+                    <div class="controls">
+                        {$data.data.country}
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">省份<span class="check-tips"></span></label>
+                    <div class="controls">
+                        {$data.data.province}
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">城市<span class="check-tips"></span></label>
+                    <div class="controls">
+                        {$data.data.city}
+                    </div>
+                </div>
+            </div>
+            <div class="form-item cf">
+                <button class="btn btn-return" onclick="javascript:history.back(-1); return false;">返 回</button>
+            </div>
+        </form>
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $(function() {
+            highlight_subnav('{:addons_url('Wechat://WechatUserAdmin:/index')}');
+            //全选节点
+            $('.check-all').on('change', function() {
+                $('.ids').prop('checked', this.checked);
+            });
+            showTab();
+        });
+    </script>
+</block>

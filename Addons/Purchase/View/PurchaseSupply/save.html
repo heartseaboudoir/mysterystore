@@ -1,0 +1,162 @@
+<extend name="Public/base" />
+
+<block name="body">
+        <script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+	<!-- 标题栏 -->
+	<div class="main-title">
+		<h2>{$meta_title}</h2>
+	</div>
+        <ul class="tab-nav nav">
+            <li class="current" data-tab="tab1"><a href="javascript:void(0);">基础</a></li>
+        </ul>
+        <div class="tab-content">
+            <!-- 数据列表 -->
+            <form id="form" action="{:addons_url('Purchase://PurchaseSupply:/update')}" method="post" class="form-horizontal">
+                <div class="tab-pane in tab1">
+                        <div class="form-item cf">
+                            <label class="item-label">供应商名</label>
+                            <div class="controls">
+                                <input type="text" class="text input-large" name="s_name" value="{$data.s_name}" />
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">供应商详细地址</label>
+                            <div class="controls">
+                                <input type="text" class="text input-large" name="s_address" value="{$data.s_address}" />
+                            </div>
+                        </div>  
+                        <div class="form-item cf">
+                            <label class="item-label">所在门店区域</label>
+                            <div class="controls">
+                                <select name="shequ_id">
+                                    <option value="0">请选择区域</option>
+                                    <volist name="shequs" id="_lc">
+                                        <option value="{$_lc.id}"  <eq name="_lc[id]" value="$data['shequ_id']">selected=""</eq>>{$_lc.title}</option>
+                                    </volist>
+                                </select>
+                            </div>
+                        </div>
+                                               
+                        <div class="form-item cf">
+                            <label class="item-label">供应商LOGO<span class="check-tips"></span></label>
+                            <div class="controls">
+                                <input type="file" id="upload_picture_cover_id">
+                                <input type="hidden" name="s_cover" id="s_cover" value="{$data[logo]}"/>
+                                <div class="upload-img-box">
+                                    <notempty name="data[s_cover]">
+                                        <div class="upload-pre-item"><img src="{$data[s_cover]|get_cover='path'}"/></div>
+                                    </notempty>
+                                </div>
+                                <script type="text/javascript">
+                                //上传图片
+                                /* 初始化上传插件 */
+                                $("#upload_picture_cover_id").uploadify({
+                                    "height"          : 30,
+                                    "swf"             : "__STATIC__/uploadify/uploadify.swf",
+                                    "fileObjName"     : "download",
+                                    "buttonText"      : "上传图片",
+                                    "uploader"        : "{:U('File/uploadPicture',array('session_id'=>session_id()))}",
+                                    "width"           : 120,
+                                    'removeTimeout'	  : 1,
+                                    'fileTypeExts'	  : '*.jpg; *.png; *.gif;',
+                                    "onUploadSuccess" : uploadPicturecover_id,
+                                    'onFallback' : function() {
+                                        alert('未检测到兼容版本的Flash.');
+                                    }
+                                });
+                                function uploadPicturecover_id(file, data){
+                                    var data = $.parseJSON(data);
+                                    var src = '';
+                                    if(data.status){
+                                            $("#s_cover").val(data.id);
+                                            src = data.url || '__ROOT__' + data.path
+                                            $("#s_cover").parent().find('.upload-img-box').html(
+                                                    '<div class="upload-pre-item"><img src="__ROOT__' + src + '"/></div>'
+                                            );
+                                    } else {
+                                            updateAlert(data.info);
+                                            setTimeout(function(){
+                                            $('#top-alert').find('button').click();
+                                            $(that).removeClass('disabled').prop('disabled',false);
+                                        },1500);
+                                    }
+                                }
+                                </script>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">负责人<span class="check-tips">（供应商负责人姓名）</span></label>
+                            <div class="controls">
+                                <input type="text" class="text input-large" name="s_person" value="{$data.s_person}" />
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">负责人电话<span class="check-tips">（供应商负责人电话）</span></label>
+                            <div class="controls">
+                                <input type="text" class="text input-large" name="s_person_tel" value="{$data.s_person_tel}" />
+                            </div>
+                        </div>                        
+                        <div class="form-item cf">
+                            <label class="item-label">财务<span class="check-tips">（供应商财务姓名）</span></label>
+                            <div class="controls">
+                                <input type="text" class="text input-large" name="s_finance" value="{$data.s_finance}" />
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">财务电话<span class="check-tips">（供应商财务电话）</span></label>
+                            <div class="controls">
+                                <input type="text" class="text input-large" name="s_finance_tel" value="{$data.s_finance_tel}" />
+                            </div>
+                        </div>                         
+                        <div class="form-item cf">
+                            <label class="item-label">支付宝收款人<span class="check-tips">（支付宝认证的实名，确保在进行转账时对口正确）</span></label>
+                            <div class="controls">
+                                <input type="text" class="text input-large" name="s_alipay_name" value="{$data.s_alipay_name}" />
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">支付宝账号<span class="check-tips">（支付宝账号，一般为手机号码或邮箱）</span></label>
+                            <div class="controls">
+                                <input type="text" class="text input-large" name="s_alipay_no" value="{$data.s_alipay_no}" />
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">描述信息<span class="check-tips">（简单描述当前的供应商）</span></label>
+                            <div class="controls">
+                                <textarea name="s_description" class="textarea input-large">{$data.s_description}</textarea>
+                            </div>
+                        </div>                        
+                        
+                        <div class="form-item cf">
+                            <label class="item-label">内部信息<span class="check-tips">（用于记录其他信息，比如联系方式等，不对外公布）</span></label>
+                            <div class="controls">
+                                <textarea name="s_remark" class="textarea input-large">{$data.s_remark}</textarea>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">排序<span class="check-tips">（输入一个整数，用于列表中排序）</span></label>
+                            <div class="controls">
+                                <input type="text" class="text input-mini" name="s_sort" value="{$data.s_sort}" />
+                            </div>
+                        </div>
+                </div>
+                <div class="form-item cf">
+                    <button id="submit" class="btn submit-btn ajax-post hidden" target-form="form-horizontal" type="submit">确 定</button>
+                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                    <input type="hidden" value="{$data.s_id}" name="s_id" />
+                </div>
+            </form>
+        </div>
+</block>
+<block name="script">
+	<script type="text/javascript">
+		$(function(){
+                    highlight_subnav('{:addons_url('Purchase://PurchaseSupply:/index')}');
+                    //全选节点
+                    $('.check-all').on('change',function(){
+                        $('.ids').prop('checked',this.checked);
+                    });showTab();
+		})
+                
+	</script>
+</block>

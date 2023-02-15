@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <meta name="keywords" content="神秘商店" />
+    <meta name="description" content="神秘商店" />
+	<title>神秘商店</title>
+	<script type="text/javascript" src="/Public/res/Wap/base/js/rem.js"></script>
+	<link rel="stylesheet" href="/Public/res/Wap/base/css/base.css"/>
+	<link rel="stylesheet" href="/Public/res/Wap/smact/css/index.css?v=<?php echo time()?>"/>
+</head>
+<body>
+<div class="site-container">
+	<section class="site-winning">
+		<div class="wrap-box"><img class="wrap-img" src="/Public/res/Wap/smact/img/bg100.jpg"></div>
+		<div class="wrap-box"><img class="wrap-img" src="/Public/res/Wap/smact/img/bg200.jpg"></div>
+		<div class="wrap-box"><img class="wrap-img" src="/Public/res/Wap/smact/img/bg300.jpg"></div>
+		<div class="wrap-box"><img class="wrap-img" src="/Public/res/Wap/smact/img/bg400.jpg"></div>
+		<div class="wrap-box">
+			<img class="wrap-img" src="/Public/res/Wap/smact/img/bg5.jpg">
+			<ul id="jq-prize" class="wrap-block"></ul>
+		</div>
+		<div class="wrap-box">
+			<img class="wrap-img" src="/Public/res/Wap/smact/img/bg6.jpg">
+			<div id="jq-winning" class="wrap-pos wrap-title">
+				<h3 class="wrap-name"><span>昨日幸运商品：? ? ?</span></h3>
+				<p>距离下次开奖时间还剩：<span id="jq-time">00:00:00</span></p>
+			</div>
+			<div id="jq-start" class="wrap-pos wrap-defalut"></div>
+		</div>
+		<div class="wrap-box"><img class="wrap-img" src="/Public/res/Wap/smact/img/bg7.jpg"></div>
+		<div class="wrap-box">
+			<img class="wrap-img" src="/Public/res/Wap/smact/img/bg8.jpg">
+			<div id="jq-remark" class="wrap-pos wrap-des"></div>
+		</div>
+		<div class="wrap-box"><img class="wrap-img" src="/Public/res/Wap/smact/img/bg9.jpg"></div>
+		<div class="wrap-box"><img class="wrap-img" src="/Public/res/Wap/smact/img/bg10.jpg"></div>
+		<div class="wrap-box"><img class="wrap-img" src="/Public/res/Wap/smact/img/bg11.jpg">
+			<div class="wrap-pos wrap-list">
+				<ul id="jq-move"></ul>
+			</div>
+		</div>
+		<div class="wrap-box"><img class="wrap-img" src="/Public/res/Wap/smact/img/bg12.jpg"></div>
+		<div id="jq-mask" class="wrap-mask"></div>
+		<div id="jq-load" class="wrap-load"></div>
+		<div id="jq-layer" class="wrap-layer wrap-start">
+			<a href="javascript:void(0);"><img src="/Public/res/Wap/smact/img/close.png"></a>
+			<img class="wrap-img" src="/Public/res/Wap/smact/img/load.gif">
+			<div>
+				<h1></h1>
+				<p>分类：<span></span></p>
+			</div>
+		</div>
+	</section>
+</div>
+<script id="temp-prize" type="text/html">
+    {{each items as list index}}
+    <li data-title="{{list.title}}" data-id="{{list.id}}" data-type="{{list.ctitle}}"><em></em>
+		<img src="{{list.pic_url}}">
+	</li>
+    {{/each}}
+</script>
+<script id="temp-winning" type="text/html">
+    <h3><span>昨日幸运商品：{{items.act_product_name}}</span></h3>
+	<p>共 {{items.act_num}} 位幸运儿走狗屎运<br/>距离下次开奖时间还剩：<span id="jq-time">00:00:00</span></p>
+</script>
+<script id="temp-move" type="text/html">
+    {{each items as list index}}
+    <li><em>{{list.act_day}}</em><span>{{list.title}}</span></li>
+    {{/each}}
+</script>
+<script type="text/javascript" src="/Public/res/Wap/base/js/zepto.min.js"></script>
+<script type="text/javascript" src="/Public/res/Wap/base/js/template.js"></script>
+<script type="text/javascript">
+	var data_json = <?php echo $data_json; ?>;
+</script>
+<script type="text/javascript" src="/Public/res/Wap/dist/smact.min.js?v=<?php echo time()?>"></script>
+</body>
+</html>
+<!--
+<script type="text/javascript" src="/Public/res/Wap/dist/smact.min.js?v=<?php echo time()?>"></script>
+<script type="text/javascript" src="/Public/res/Wap/smact/js/index.js?v=<?php echo time()?>"></script>
+-->

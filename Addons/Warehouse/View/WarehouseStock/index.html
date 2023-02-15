@@ -1,0 +1,127 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <!-- 高级搜索 -->
+    <div class="search-form fr cf">
+        <form id="search-form" onsubmit="return false;">
+            <div class="search-form fr cf">
+                <label id="msg" name="msg"></label>
+                <div class="sleft">
+                    <input type="text" name="goods_id" class="text input-text search-input" style="" value="{$goods_id}" placeholder="请输入商品ID查找" />
+                    <input type="text" name="goods_name" class="text input-text search-input" style="" value="{$goods_name}" placeholder="请输入商品名查找" />
+                    <a class="sch-btn" href="javascript:;" id="search" url="{:addons_url('Warehouse://WarehouseStock:/indexgoods')}?v=search"><i class="btn-search"></i></a>
+                </div>
+            </div>
+        </form>
+    </div>
+    <a class="btn" href="{:addons_url('Warehouse://WarehouseStock:/index')}?isprint=1">导出Excel</a>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+                <tr>
+                    <th>序号</th>
+                    <th>类别</th>
+                    <th>所属仓库</th>
+                    <th>当前仓库库存</th>
+                    <?php if($seeprice == 1){
+                    echo '<th>库存金额</th>';
+                    } ?>
+                    <th>售价金额</th>
+                    <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php $i=0; ?>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <?php $i++; ?>
+                    <td>{$i}</td>
+                    <td>{$lv.cate_name}</td>
+                    <td>{$lv.w_name}</td>
+                    <td><font color="blue">{$lv.nums}</font></td>
+                    <?php if($seeprice == 1){
+                    echo '<td>' .$lv['stock_amount'] .'</td>';
+                    } ?>
+                    <td>{$lv.sell_amount}</td>
+                    <td>
+                        【<a class="" href="{:addons_url('Warehouse://WarehouseStock:/indexgoods?cate_id='.$lv['cate_id'])}" data-id="{$lv.cate_id}">查看类别记录</a>】
+                    </td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <link href="__STATIC__/datetimepicker/css/datetimepicker.css" rel="stylesheet" type="text/css">
+    <link href="__STATIC__/datetimepicker/css/dropdown.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+    <script type="text/javascript">
+        highlight_subnav('{:addons_url('Warehouse://WarehouseStock:/index')}');
+            //搜索功能
+                $('.search-form input').focus(function(){
+                    $(document).keypress(function (e) {
+                        // 回车键事件
+                        if (e.which == 13) {
+                            $("#search").click();
+                        }
+                    });
+                });
+        $("#search").click(function() {
+            var url = $(this).attr('url');
+            var query = $('.search-form').find('input').serialize();
+            query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g, '');
+            query = query.replace(/^&/g, '');
+            if (url.indexOf('?') > 0) {
+                url += '&' + query;
+            } else {
+                url += '?' + query;
+            }
+            var query2 = $('#select-form').serialize();
+            if (url.indexOf('?') > 0) {
+                url += '&' + query2;
+            } else {
+                url += '?' + query2;
+            }
+            window.location.href = url;
+        });
+
+        // 状态搜索子菜单
+        $(".search-form").find(".drop-down").hover(function() {
+            $("#sub-sch-menu").removeClass("hidden");
+        }, function() {
+            $("#sub-sch-menu").addClass("hidden");
+        });
+        $("#sub-sch-menu li").find("a").each(function() {
+            $(this).click(function() {
+                var text = $(this).text();
+                $("#sch-sort-txt").text(text).attr("data", $(this).attr("value"));
+                $("#sub-sch-menu").addClass("hidden");
+            })
+        });
+        var _T;
+        $('#select-form input').change(function(){
+            clearTimeout(_T);
+            _T = setTimeout(function(){
+                $("#search").click();
+            }, 1000);
+        });
+        $('.time').datetimepicker({
+            format: 'yyyy-mm-dd',
+            language: "zh-CN",
+            minView: 2,
+            autoclose: true
+        });
+    </script>
+
+</block>

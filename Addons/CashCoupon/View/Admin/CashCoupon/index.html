@@ -1,0 +1,88 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <style>
+        .in_cur{background:#170; color:#fff;}
+    </style>
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <div style="margin-bottom:10px;">
+        <a href="{:addons_url('CashCoupon://CashCouponAdmin:/save')}" class="btn">添加优惠券</a>
+    </div>
+    <!-- 数据列表 -->
+    <div style="width:460px; text-align: center; position: fixed; left: 50%; top: 100px; margin-left: -230px; border-radius: 10px; background: #eee none repeat scroll 0px 0px; padding: 60px 20px 20px;box-shadow:0 0 5px rgba(0,0,0,0.3);display:none;" id="show_line_div">
+        <p style="background:rgb(202,22,32);color:#fff;position:absolute;padding: 0 20px;width: calc(100% - 40px);text-overflow: ellipsis;white-space: nowrap;overflow: hidden;height:35px;line-height: 35px; top:0;left:0;border-radius:10px 10px 0 0;" class="title">访问地址</p>
+        <p style="margin-bottom: 5px;"><input type="text input-large" id="biao1" readonly value="" style="width: 388px;border:none;height:30px;line-height: 30px;border-radius: 5px;padding:0 5px;" /> <a href="javascript:;" class="cp_btn">复制链接</a></p>
+        <p style="margin-bottom: 10px; text-align:left;">注：若复制不成功，请手动复制</p>
+        <a href="javascript:;" class="btn" onclick="$('#show_line_div').hide();">关闭</a>
+    </div>
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+                <tr>
+                    <th>优惠券名</th>
+                    <th width="50">类型</th>
+                    <th width="80">领取码</th>
+                    <th width="80">金额/折扣</th>
+                    <th width="60">最多领取</th>
+                    <th width="60">已被领取</th>
+                    <th width="80">最晚使用</th>
+                    <th width="50">状态</th>
+                    <th width="120">更新时间</th>
+                    <th width="150">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td><a href="javascript:;" class="show_line" data-url="{$lv.show_url}" data-title="{$lv.title}"></a>{$lv.title}</td>
+                    <td><switch name="lv.type"><case value="1">满减券</case><case value="2">折扣券</case></switch></td>
+                    <td>{$lv.code}</td>
+                    <td><switch name="lv.type"><case value="1">{$lv.money}元</case><case value="2">{$lv.discount}折</case></switch></td>
+                    <td><eq name="lv.is_max" value="0">不限<else/>{$lv.num}</eq></td>
+                    <td>{$lv.get_num}</td>
+                    <td><gt name="lv.last_time" value="0"><span>{$lv.last_time|time_format="Y-m-d"}</span><else/>不限</gt></td>
+                    <td><switch name="lv.status"><case value="1">正常</case><case value="2">已过期</case><case value="3">已领取完</case><case value="4">已作废</case></switch></td>
+                    <td><span>{$lv.update_time|time_format="Y-m-d H:i"}</span></td>
+                    <td>
+                        <a class="" href="{:addons_url('CashCoupon://CashCouponAdmin:/user_lists',array('pid' => $lv['id']))}" data-id="{$lv.id}">领取记录</a>
+                        <a class="update" href="{:addons_url('CashCoupon://CashCouponAdmin:/save',array('id' => $lv['id']))}" data-id="{$lv.id}">编辑</a>
+                        <empty name="lv.name">
+                        <a class="ajax-get delete confirm" href="{:addons_url('CashCoupon://CashCouponAdmin:/remove',array('id' => $lv['id']))}" data-id="{$lv.id}">删除</a>
+                        </empty>
+                    </td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $(function() {
+            highlight_subnav('{:addons_url('CashCoupon://CashCouponAdmin:/index')}');
+            $('.show_line').click(function(){
+                var obj = $('#show_line_div');
+                var title = $(this).data('title') || '访问地址';
+                obj.find('input').val($(this).data('url'));
+                obj.find('.title').text(title);
+                obj.show();
+            });
+            $('#show_line_div .cp_btn').click(function(){
+                var Url2=document.getElementById("biao1");
+                Url2.select(); // 选择对象
+                document.execCommand("Copy"); // 执行浏览器复制命令
+                alert("已复制");
+            });
+            $('#show_line_div input').click(function(){
+                $(this).select();
+            });
+        })
+    </script>
+</block>

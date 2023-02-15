@@ -1,0 +1,197 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <?php
+     if($uid != ''){
+        $strhref .= '&uid=' .$uid;
+     }
+     ?>
+    <a href="{:addons_url('Report://Sale:/newuserlist')}?v={$v}&s_date={$s_date}&e_date={$e_date}&isprint=1{$strhref}" class="btn">导出Excel</a>
+    <!-- 高级搜索 -->
+    <div class="search-form fr cf">
+        <form id="search-form" onsubmit="return false;">
+            <div class="search-form fr cf">
+                <div class="sleft">
+                    <input type="text" name="s_date" class="text input-text search-input time" value="{$s_date}" placeholder="请选择开始日期" />
+                    <input type="text" name="e_date" class="text input-text search-input time" value="{$e_date}" placeholder="请选择结束日期" />
+                    <a class="sch-btn" href="javascript:;" id="search" url="{:addons_url('Report://Sale:/newuserlist')}?v={$v}"><i class="btn-search"></i></a>
+                </div>
+            </div>
+        <form>
+    </div>
+    <div style="clear:both;"></div>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+            <?php if($v == 1 || $v == 2){ ?>
+                <tr>
+                    <th>日期</th>
+                    <th>用户</th>
+                    <th>操作</th>
+                </tr>
+            <?php } ?>
+            <?php if($v == 3 || $v == 4){ ?>
+            <tr>
+                <th>日期</th>
+                <th>消费次数</th>
+                <th>消费金额</th>
+                <th>操作</th>
+            </tr>
+            <?php } ?>
+            <?php if($v == 44){ ?>
+            <tr>
+                <th>订单单号</th>
+                <th>用户</th>
+                <th>日期</th>
+                <th>订单金额</th>
+                <th>操作</th>
+            </tr>
+            <?php } ?>
+            <?php if($v == 5){ ?>
+            <tr>
+                <th>用户</th>
+                <th>最后消费日期</th>
+                <th>操作</th>
+            </tr>
+            <?php } ?>
+            <?php if($v == 6){ ?>
+            <tr>
+                <th>日期</th>
+                <th>日客单价</th>
+            </tr>
+            <?php } ?>
+            <?php if($v == 7){ ?>
+            <tr>
+                <th>日期</th>
+                <th>日均消费次数</th>
+            </tr>
+            <?php } ?>
+            </thead>
+            <tbody>
+            <notempty name="list">
+            <volist name="list" id="lv" key="vo">
+                <?php if($v == 1 || $v == 2){ ?>
+                    <tr>
+                        <td>{$lv.ctime}</td>
+                        <td>{$lv.uid|get_nickname}</td>
+                        <td><a href = "/Admin/Member/show/id/{$lv.uid}">查看</a></td>
+                    </tr>
+                <?php } ?>
+                <?php if($v == 3 || $v == 4){ ?>
+                <tr>
+                    <td>{$lv.ctime}</td>
+                    <td>{$lv.showdata1}</td>
+                    <td>{$lv.showdata2}</td>
+                    <td><a href = "{:addons_url('Order://Order:/index')}?start_time={$lv.ctime}&end_time={$lv.ctime}">查看</a></td>
+                </tr>
+                <?php } ?>
+                <?php if($v == 44){ ?>
+                <tr>
+                    <td>{$lv.order_sn}</td>
+                    <td>{$lv.uid|get_nickname}</td>
+                    <td>{$lv.ctime}</td>
+                    <td>{$lv.pay_money}</td>
+                    <td><a href = "{:addons_url('Order://Order:/show')}?id={$lv.id}">查看</a></td>
+                </tr>
+                <?php } ?>
+                <?php if($v == 5){ ?>
+                <tr>
+                    <td>{$lv.uid|get_nickname}</td>
+                    <td>{$lv.ctime}</td>
+                    <td><a href = "/Admin/Member/show/id/{$lv.uid}">查看</a></td>
+                </tr>
+                <?php } ?>
+                <?php if($v == 6){ ?>
+                <tr>
+                    <td>{$lv.ctime}</td>
+                    <td>{$lv.showdata}</td>
+                </tr>
+                <?php } ?>
+                <?php if($v == 7){ ?>
+                <tr>
+                    <td>{$lv.ctime}</td>
+                    <td>{$lv.showdata}</td>
+                </tr>
+                <?php } ?>
+            </volist>
+            <else/>
+                <tr>
+                    <td colspan="8" align="center">没有数据</td>
+                </tr>
+            </notempty>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <link href="__STATIC__/datetimepicker/css/datetimepicker.css" rel="stylesheet" type="text/css">
+    <link href="__STATIC__/datetimepicker/css/dropdown.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+    <script type="text/javascript">
+        highlight_subnav('{:addons_url('Report://Sale:/general')}');
+            //搜索功能
+                $('.search-form input').focus(function(){
+                    $(document).keypress(function (e) {
+                        // 回车键事件
+                        if (e.which == 13) {
+                            $("#search").click();
+                        }
+                    });
+                });
+        $("#search").click(function() {
+            var url = $(this).attr('url');
+            var query = $('.search-form').find('input').serialize();
+            query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g, '');
+            query = query.replace(/^&/g, '');
+            if (url.indexOf('?') > 0) {
+                url += '&' + query;
+            } else {
+                url += '?' + query;
+            }
+            var query2 = $('#select-form').serialize();
+            if (url.indexOf('?') > 0) {
+                url += '&' + query2;
+            } else {
+                url += '?' + query2;
+            }
+            window.location.href = url;
+        });
+
+        // 状态搜索子菜单
+        $(".search-form").find(".drop-down").hover(function() {
+            $("#sub-sch-menu").removeClass("hidden");
+        }, function() {
+            $("#sub-sch-menu").addClass("hidden");
+        });
+        $("#sub-sch-menu li").find("a").each(function() {
+            $(this).click(function() {
+                var text = $(this).text();
+                $("#sch-sort-txt").text(text).attr("data", $(this).attr("value"));
+                $("#sub-sch-menu").addClass("hidden");
+            })
+        });
+        var _T;
+        $('#select-form input').change(function(){
+            clearTimeout(_T);
+            _T = setTimeout(function(){
+                $("#search").click();
+            }, 1000);
+        });
+        $('.time').datetimepicker({
+            format: 'yyyy-mm-dd',
+            language: "zh-CN",
+            minView: 2,
+            autoclose: true
+        });
+    </script>
+</block>

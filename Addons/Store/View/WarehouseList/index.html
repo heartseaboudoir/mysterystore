@@ -1,0 +1,41 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <a class="btn" href="{:addons_url('Store://Warehouse:/save')}">添加</a>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+                <tr>
+                    <th>仓库</th>
+                    <th>所属区域</th>
+                    <th>负责人</th>
+                    <th>负责人电话</th>
+                    <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td>{$lv.w_name}</td>
+                    <td>{$lv.title}</td>
+                    <td>{$lv.w_person}</td>
+                    <td>{$lv.w_person_tel}</td>
+                    <td>
+                        <a class="update" href="{:addons_url('Store://Warehouse:/save?id='.$lv['w_id'])}" data-id="{$lv.w_id}">编辑</a>
+                        <a class="jq-confirm" href="{:addons_url('Store://Warehouse:/delete?id='.$lv['w_id'])}" data-id="{$lv.w_id}">删除</a>
+                    </td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>

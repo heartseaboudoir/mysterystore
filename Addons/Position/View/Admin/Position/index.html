@@ -1,0 +1,49 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+                <tr>
+                    <th>标题</th>
+                    <th>标识</th>
+                    <th>最多调用条数</th>
+                    <th>备注说明</th>
+                    <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td>{$lv.title}</td>
+                    <td>{$lv.name}</td>
+                    <td>{$lv.show_num}</td>
+                    <td>{$lv.remark}</td>
+                    <td>
+                        <a class="update" href="{:addons_url('Position://PositionDataAdmin:/index?pos_id='.$lv['id'])}" data-id="{$lv.id}">查看数据</a>
+                    </td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $(function() {
+            //全选节点
+            $('.check-all').on('change', function() {
+                $('.ids').prop('checked', this.checked);
+            });
+        })
+    </script>
+</block>

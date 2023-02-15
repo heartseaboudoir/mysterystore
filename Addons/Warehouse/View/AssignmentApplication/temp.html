@@ -1,0 +1,328 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <a id="jq-clear" class="btn" href="{:addons_url('Warehouse://AssignmentApplication:/cleantemp')}">清空临时申请表</a>
+    <!-- 数据列表 -->
+    <form id="jq-form-add" action="{:addons_url('Warehouse://AssignmentApplication:/update')}" method="post" class="form-horizontal">
+        <div class="tab-pane in tab1">
+            <div class="form-item cf">
+                <div id="jq-verify" class="controls goods_div">
+                    <a href="javascript:void(0);" id="select_product" class="btn" data-url="">选择绑定的商品</a>
+                    <span id="jq-select-options">
+                        <label>条形码：<input type="text" class="text input-min bar_code" style="width: 100px;" name="bar_code" num></label>
+                        <label>商品ID：<input type="text" class="text input-min id_code wrap-data" style="width: 100px;" name="goods_id" num></label>
+                        <label>商品名：<input type="text" class="text input-min goods_title wrap-data" style="width: 100px;" name="goods_name" disabled=""></label>
+                        <label>申请数量：<input type="text" class="text input-mini g_num wrap-data" style="width: 100px;" name="g_num" num></label>
+                        <label>备注：<input type="text" class="text input-mini remark_add" style="width: 200px;" name="request_temp_remark"></label>
+                        <!--<input type="hidden" class="text input-min goods_id" name="goods_id" value="0" />-->
+                        <input type="hidden" class="text input-min admin_id" name="admin_id" value="<?php echo(UID); ?>" />
+                        <input type="hidden" class="text input-min temp_type" name="temp_type" value="3" />
+                        <input type="hidden" class="text input-min ctime" name="ctime" value="<?php echo(time()); ?>" />
+                        <button id="jq-submit-verify" class="btn submit-btn hidden" target-form="form-horizontal" type="submit">加入临时申请表</button>
+                         <div class="controls goods_message"></div>
+                        <input type="hidden" name="temp_id">
+                    </span>
+                </div>
+            </div>
+        </div>
+    </form>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+            <tr>
+                <th>商品id</th>
+                <th>商品名称</th>
+                <th>商品类别</th>
+                <th>商品属性</th>
+                <th>商品条码</th>
+                <th>售价</th>
+                <th>调拨仓库库存</th>
+                <th>本仓库库存</th>
+                <th>申请数量</th>
+                <th>添加时间</th>
+                <th>备注</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody id="jq-list">
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td class="temp-id">{$lv.goods_id}</td>
+                    <td class="temp-name"><a href="{:addons_url('Goods://GoodsInfo:/index?id='.$lv['goods_id'])}" target="_blank">{$lv.goods_name}</a></td>
+                    <td>{$lv.cate_name}</td>
+                    <td>{$lv.value_name}</td>
+                    <td title="{$lv.bar_code}">{$lv.bar_code|subtext=18}</td>
+                    <td>{$lv.sell_price}</td>
+                    <td class="temp-stock">{$lv.stock_num}</td>
+                    <td class="temp-current-stock">{$lv.current_stock_num}</td>
+                    <td class="temp-amount">{$lv.g_num}</td>
+                    <td>{$lv.ctime}</td>
+                    <td class="temp-remark" title="{$lv.remark}">{$lv.remark|subtext=18}</td>
+                    <td>
+                        <a class="jq-edit" href="javascript:void(0);" data-id="{$lv.id}">编辑</a>
+                        <a class="jq-confirm" href="{:addons_url('Warehouse://AssignmentApplication:/delete?id='.$lv['id'])}" data-id="{$lv.id}">删除</a>
+                    </td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <form id="form1" action="{:addons_url('Warehouse://AssignmentApplication:/send_request_temp')}" method="post" class="form-horizontal">
+        <div class="tab-pane in tab1">
+            <div class="form-item cf">
+                <div class="controls goods_div">
+                    <label>选择调拨仓库：
+                        <select id="jq-select-ship" name="warehouse_id">
+                            <option value="">请选择仓库</option>
+                            <volist name="warehouses" id="lv" key="vo">
+                                <option value="{$lv.w_id}">{$lv.w_name}</option>
+                            </volist>
+                        </select>
+                    </label>
+                    <label>备注：<input type="text" class="text input-min remark" style="width: 200px;" name="remark"/></label>
+                    <button id="jq-submit-btn" class="btn submit-btn confirm" target-form="form-horizontal" type="submit">提交临时调拨申请单</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+    <script id="temp-select-value" type="text/html">
+        <label><span>商品属性：</span>
+            <select id="jq-select-value" name="value_id">
+                {{each items as list index}}
+                <option value="{{list.value_id}}">{{list.value_name}}</option>
+                {{/each}}
+            </select>
+        </label>
+    </script>
+    <input type="hidden" id="temp_type" value="3">
+</block>
+<block name="script">
+    <script type="text/javascript">
+        layui.use(['main'], function() {
+            var $ = layui.jquery,
+            layer = layui.layer;
+
+            var Global = {
+                stockUrl: '/Erp/WarehouseAssignmentApplication/getWarehouseStockNumByRequestTempData',
+                passId: 'warehouse_id' 
+            }
+
+            $('#jq-select-ship').on({
+                change:function(){
+                    if( $(this).val() == ''){
+                        $('#jq-list').find('.temp-stock').html('');
+                        return false;
+                    }
+                    var data = Global.passId + '=' + $(this).val();
+                    $.getData({
+                        url: Global.stockUrl + '?' + data
+                    }, function(res){
+                        $('#jq-list').find('tr').each(function(){
+                            var index = $(this).index(),
+                                 oNum = $(this).find('.temp-amount'),
+                            stock_num = parseInt( res.content[index].stock_num );
+                            if( res.content[index].stock_num < parseInt( oNum.html() ) ){
+                                stock_num = '<span class="wrap-empty">'+ res.content[index].stock_num +'</span>'
+                            }
+                            $(this).find('.temp-stock').html( stock_num );
+                        });
+                    });
+                    return false;
+                }
+            });
+
+        });
+    </script>
+    <script type="text/javascript" src="__STATIC__/artDialog/lib/sea.js"></script>
+    <script type="text/javascript">
+    seajs.config({
+        alias: {
+            "jquery": "jquery-1.10.2.js"
+        }
+    });
+    seajs.use(['__STATIC__/artDialog/src/dialog-plus'], function(dialog) {
+        window.dialog = dialog;
+        $('#select_product').on('click', function() {
+            var url = "{:addons_url('Warehouse://WarehousePurchase:/get_goods_lists')}";
+            top.dialog({
+                id: 'product_lists',
+                title: '可绑定商品列表',
+                url: url,
+                width: 500,
+                height: 430,
+                onclose: function() {
+                    if( this.returnValue != '' ){
+                        var data = this.returnValue;
+                        $('[name="goods_id"]').val(data.id);
+                        $('[name="goods_name"]').val(data.data[0].title);
+                        productShow( data.id );
+                        $('#jq-select-value').parents('label').remove();
+                        if( data.data[0].select.length > 0 ){
+                            $('#jq-select-options').find('label').eq(2).after( template('temp-select-value', { items: data.data[0].select }) );
+                        }
+                    }
+                },
+            }).showModal();
+        });
+    });
+    </script>
+    <!--<script type="text/javascript" src="__STATIC__/artDialog/lib/sea.js"></script>
+    <script type="text/javascript">
+        var url = '/p/2/list_type/1/s_date/2017-11-12/e_date/2017-11-13.html';
+
+        console.log( parseInt( url.match(/(\d+)(-).html/) ) );
+
+        var hashPath = url.replace(/\//g,'.').split('.'),
+        hashPath = hashPath[hashPath.length - 8];
+        console.log(hashPath);
+
+        highlight_subnav('{:addons_url('Warehouse://AssignmentApplication:/temp')}');
+
+        function get_goods(obj){
+                var bar_code = $(obj).val();
+                var goods_title = $(obj).parents('.goods_div').find('.goods_title');
+                var goods_id = $(obj).parents('.goods_div').find('.goods_id');
+                var id_code = $(obj).parents('.goods_div').find('.id_code');
+                var goods_message = $(obj).parents('.goods_div').find('.goods_message');
+                var g_num = $(obj).parents('.goods_div').find('.g_num');
+                if(bar_code != ''){
+                    $.ajax({
+                        type:'get',
+                        url : "{:addons_url('Warehouse://AssignmentApplication:/get_one')}",
+                        data:{bar_code: bar_code, get_store:1},
+                        dataType:'json',
+                        success:function(data){
+                            if(data.status == 1){
+                                var l = '<option> - 请先选择分类 - </option>';
+                                $.each(data, function(x, y){
+                                    l += '<option value="'+y.id+'">'+y.title+'</option>';
+                                });
+                                $('[name="goods_id"]').html(l);
+                                goods_title.css('color', '#635c73');
+                                goods_title.val(data.data.title);
+                                goods_id.val(data.data.id);
+                                id_code.val('');
+                            }else{
+                                if(data.status == 2){
+                                    goods_message.css('color', 'red');
+                                    goods_message.html('商品已存在,将编辑商品数量');
+                                    goods_title.css('color', '#635c73');
+                                    goods_title.val(data.data.title);
+                                    goods_id.val(data.data.id);
+                                    g_num.val(data.data1.g_num);
+                                    //goods_id.val(0);
+                                }else {
+                                    goods_message.css('color', 'red');
+                                    goods_message.html('商品不存在');
+                                    goods_id.val(0);
+                                }
+                            }
+                        }
+                    });
+                }else{
+                    goods_title.val('');
+                    goods_id.val(0);
+                }
+            }
+
+        /****************************
+         * 通过条形码搜索
+          **************************/
+        $('.tab1').delegate('.bar_code', 'change', function(){
+            get_goods(this);
+        });
+
+        /******************************
+         * 通过ID获取商品信息
+         * *******************************/
+        function get_goods_id(obj){
+            var id_code = $(obj).val();
+            var goods_title = $(obj).parents('.goods_div').find('.goods_title');
+            var goods_id = $(obj).parents('.goods_div').find('.goods_id');
+            var bar_code = $(obj).parents('.goods_div').find('.bar_code');
+            var goods_message = $(obj).parents('.goods_div').find('.goods_message');
+            var g_num = $(obj).parents('.goods_div').find('.g_num');
+            if(id_code != ''){
+                $.ajax({
+                    type:'get',
+                    url : "{:addons_url('Warehouse://AssignmentApplication:/get_one_id')}",
+                    data:{id_code: id_code, bar_code: bar_code.val(), get_store:1},
+                    dataType:'json',
+                    success:function(data){
+                        if(data.status == 1){
+                            var l = '<option> - 请先选择分类 - </option>';
+                            $.each(data, function(x, y){
+                                l += '<option value="'+y.id+'">'+y.title+'</option>';
+                            });
+                            $('[name="goods_id"]').html(l);
+                            goods_title.css('color', '#635c73');
+                            goods_title.val(data.data.title);
+                            goods_id.val(data.data.id);
+                            bar_code.val('');
+                            goods_message.html('');
+                        }else{
+                            if(data.status == 2){
+                                goods_message.css('color', 'red');
+                                goods_message.html('商品已存在,将编辑商品数量');
+                                goods_title.css('color', '#635c73');
+                                goods_title.val(data.data.title);
+                                goods_id.val(data.data.id);
+                                g_num.val(data.data1.g_num);
+                                //goods_id.val(0);
+                            }else {
+                                goods_message.css('color', 'red');
+                                goods_message.html('商品不存在');
+                                goods_id.val(0);
+                            }
+                        }
+                    }
+                });
+            }else{
+                goods_title.val('');
+                goods_id.val(0);
+            }
+        }
+
+        $('.tab1').delegate('.id_code', 'change', function(){
+            get_goods_id(this);
+        });
+        seajs.config({
+            alias: {
+                "jquery": "jquery-1.10.2.js"
+            }
+        });
+        seajs.use(['__STATIC__/artDialog/src/dialog-plus'], function (dialog) {
+            window.dialog = dialog;
+
+            $('#select_product').on('click', function(){
+                var url = "{:addons_url('Warehouse://AssignmentApplication:/get_goods_lists')}";
+                top.dialog({
+                    id: 'product_lists',
+                    title: '可绑定商品列表',
+                    url: url,
+                    width: 500,
+                    height:430,
+                    //quickClose: true,
+                    onclose: function () {
+                        var data = this.returnValue;
+                        if (data.id) {
+                            $('.id_code').val(data.id);
+                            get_goods_id($('.id_code'));
+                        }
+                    },
+                })
+                    .showModal();
+            });
+
+        });
+    </script>-->
+</block>

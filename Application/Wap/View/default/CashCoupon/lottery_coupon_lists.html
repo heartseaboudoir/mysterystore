@@ -1,0 +1,199 @@
+<extend name="Base/common"/>
+<block name="body">
+    <include file="CashCoupon/coupon_bg" />
+    <div class="getCoupons">
+    <div class="getCoupons-bd">
+        <?php if ($is_open) { ?>
+        <div class="getCoupons-bd-form mb15" style="text-align:left;">
+            <div style="background:#fff;padding:10px;font-size:14px;">
+            <?php echo $share_msg;?>
+            </div>
+        </div>
+        <?php } ?>
+        <div class="getCoupons-bd-form mb15">
+            <notempty name="info">
+            <div class="bd">
+                <span class="price">{$info.money}</span>
+                <span class="unit">元</span>
+                <span class="tags">全场可用</span>
+                <notempty name="info.last_time">
+                <div class="data-time">{$info.create_time|time_format="Y-m-d"}至{$info.last_time|time_format="Y-m-d"}</div>
+                </notempty>
+            </div>
+            <else/>
+                <div class="bd" style="text-align:center;">
+                    <eq name="make[num]" value="$make['get_num']">
+                    <span class="unit" style="color:#888;">优惠券已经被抢光了！</span>
+                    <else/>
+                    <a class="unit" href="{:U('CashCoupon/lottery_coupon', array('cash_code' => $_GET['cash_code']))}">去领取优惠券</a>
+                    </eq>
+                </div>
+            </notempty>
+        </div>
+        <div class="getCoupons-result">
+            <span style="margin:0; color:#fff;" id="result_tips"><notempty name="mobile">优惠券已经放入账户</notempty></span> <span class="tel">{$mobile|default=''}</span><a class="change" href="javascript:;"><notempty name="mobile">修改<else/>设置手机号码</notempty></a>
+        </div>
+        <div class="getCoupons-result" style="margin-top: -20px;">
+        	<span style="margin:0; color:#fff;">登录App即可使用</span>
+        </div>
+        <div class="getCoupons-result">
+        	<a href="http://www.imzhaike.com/migo.html" style="background:#ffcc00;color: #000;padding:10px 20px;border-radius:4px;text-decoration: none;">点击安装神秘商店APP</a>
+        </div>
+        <div class="getCoupons-list">
+            <volist name="lists" id="lv">
+            <div class="getCoupons-list-item">
+                <div class="getCoupons-list-item-hd">
+                    <img src="{$lv.headimgurl}" alt="">
+                </div>
+                <div class="getCoupons-list-item-bd">
+                    <div class="name">{$lv.nickname} <span class="time">{$lv.create_time|time_format="m-d"}</span> <span class="time">{$lv.create_time|time_format="H:i"}</span></div>
+                    <div class="comment">好高兴能抽到我呢！！</div>
+                </div>
+                <div class="getCoupons-list-item-ft">{$lv.money} 元</div>
+            </div>
+            </volist>
+        </div>
+        <div class="getCoupons-bd-spec">
+            <h3><span>活动规则</span></h3>
+            <p>1.使用红包时的下单手机号需为抢红包时使用的手机号。</br>2.发放至手机号的红包需在 App 用手机号注册，或将手机号绑定至蜜狗账户后才可使用。</br>3.发放至蜜狗账户的红包登录后即可使用。</br>4.红包仅限在线支付时使用，每张订单仅限使用一张红包，红包不找零。</br>5.蜜狗保留法律范围内允许的对活动的解释权。</p>
+        </div>
+        <div>
+        <!--
+        <pre><?php print_r($make); ?></pre>
+        <pre><?php print_r($info); ?></pre>        
+        -->
+        </div>        
+    </div>
+</div>
+<!--统计代码-->
+<div style="display:none;">
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1260501276'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1260501276' type='text/javascript'%3E%3C/script%3E"));</script>
+</div>
+<!--统计代码-->
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $('body').css('background', '#b92f50');
+        shareTitle = "{:$pay_share['title']}";
+        shareDesc = "{:$pay_share['desc']}" ;
+        shareImg = "{:$pay_share['cover']}";
+        shareLink = "{:$pay_share['url']}";
+        <if condition="APP_TYPE eq 'wechat'">
+        shareFun();
+        </if>
+        
+        $(function () {
+            var timer = null;
+            $('.change').click(function() {
+                var mobile = $('.tel').html();
+                
+                ModalPhone.show({
+                    telephone : mobile,
+                    display: true,
+                    tips: '修改后，下次领取的优惠券将自动放入新的账号',
+                    onSubmit: function (telephone, code) {
+                        if(telephone == ''){
+                            Loading.show({
+                                msg: '请输入手机号码',
+                                autoClose:2000,
+                                isLoading: false
+                            });
+                            return false;
+                        }
+                        if(!/^1\d{10}$/.test(telephone)){
+                            Loading.show({
+                                msg: '请输入正确的手机号码',
+                                autoClose:2000,
+                                isLoading: false
+                            });
+                            return false;
+                        }
+                        if(mobile == telephone){
+                            Loading.show({
+                                msg: '请更改手机号码',
+                                autoClose:2000,
+                                isLoading: false
+                            });
+                            return false;
+                        }
+                        Loading.show({
+                            msg: '正在修改',
+                            isLoading: true
+                        });
+                        var url = "{:U('CashCoupon/change_lottery_mobile')}";
+                        $.ajax({
+                            type:'get',
+                            url :url,
+                            data : {mobile : telephone, sms_code:code},
+                            dataType:'json',
+                            success:function(data){
+                                Loading.hide();
+                                if(data.status == 1){
+                                    ModalPhone.show({
+                                        telephone : telephone,
+                                        display: false,
+                                    });
+                                    $('.tel').html(telephone);
+                                    $('#result_tips').html('下次领取的优惠券将放入新的账号');
+                                }
+                                Loading.show({
+                                    msg: data.info,
+                                    autoClose:2000,
+                                    isLoading: false
+                                });
+                            }
+                        });
+                        return false;
+                    },
+                    onGetCode: function (telephone, code, el) {
+                        if (!timer) {
+                            var $el = $(el);
+                            var text = $el.text();
+
+                            $el.addClass('disable');
+                            timer = new Timer({
+                                duration: 60 * 1000,
+                                format: '重新发送(ss秒)'
+                            });
+
+                            timer.on('change', function () {
+                                $el.text('重新发送(' + this.duration / 1000 + '秒)');
+                            });
+
+                            timer.on('end', function () {
+                                $el.text(text);
+                                $el.removeClass('disable');
+                                timer = null;
+                            });
+                            var url = '{:U("CashCoupon/get_mobile_code")}';
+                            Loading.show({
+                                msg: '正在发送',
+                                isLoading: true
+                            });
+                            $(el).addClass('disable');
+                            $.ajax({
+                                type:'get',
+                                url :url,
+                                data : {mobile:telephone},
+                                dataType:'json',
+                                success:function(data){
+                                    Loading.hide();
+                                    if(data.status == 1){
+                                        timer.start();
+                                    }
+                                    Loading.show({
+                                        msg: data.info,
+                                        autoClose:2000,
+                                        isLoading: false
+                                    });
+                                    $(el).removeClass('disable');
+                                }
+                            });
+                        }
+                        return false;
+                    }
+                })
+            })
+        })
+    </script>
+</block>

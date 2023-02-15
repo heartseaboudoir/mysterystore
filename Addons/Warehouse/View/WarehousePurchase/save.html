@@ -1,0 +1,124 @@
+<extend name="Public/base" />
+
+<block name="body">
+        <script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+	<!-- 标题栏 -->
+	<div class="main-title">
+		<h2>{$meta_title}</h2>
+	</div>
+        <ul class="tab-nav nav">
+            <li class="current" data-tab="tab1"><a href="javascript:void(0);">基础资料</a></li>
+            <li data-tab="tab2"><a href="javascript:void(0);">仓库管理员</a></li>
+        </ul>
+        <div class="tab-content">
+            <!-- 数据列表 -->
+            <form id="form" action="{:addons_url('Warehouse://Warehouse:/update')}" method="post" class="form-horizontal">
+                <div class="tab-pane in tab1">
+                        <div class="form-item cf">
+                            <label class="item-label">所在社区</label>
+                            <div class="controls">
+                                <select name="shequ_id">
+                                    <option value="0"> - 请选择所在社区 - </option>
+                                    <volist name="shequ_ls" id="lv">
+                                        <option value="{$key}" <eq name="key" value="$data[shequ_id]">selected</eq>>{$lv}</option>
+                                    </volist>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">仓库名</label>
+                            <div class="controls">
+                                <input type="text" class="text input-min" name="w_name" value="{$data.w_name}" />
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">仓库地址</label>
+                            <div class="controls">
+                                <input type="text" class="text input-large" name="w_address" value="{$data.w_address}" />
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">负责人</label>
+                            <div class="controls">
+                                <input type="text" class="text input-min" name="w_person" value="{$data.w_person}" />
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">负责人电话</label>
+                            <div class="controls">
+                                <input type="text" class="text input-min" name="w_person_tel" value="{$data.w_person_tel}" />
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">备注</label>
+                            <div class="controls">
+                                <textarea class="textarea input-large" style="height:300px;" name="w_remark">{$data.w_remark}</textarea>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">状态</label>
+                            <div class="controls">
+                                <label><input type="radio" name="w_type" value="0" checked="" /> 正常</label>
+                                <label><input type="radio" name="w_type" value="1" <eq name="data[w_type]" value="1">checked=""</eq> /> 禁用</label>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <button id="submit" class="btn submit-btn ajax-post hidden" target-form="form-horizontal" type="submit">确 定</button>
+                            <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                            <input type="hidden" value="<?php if($data['s_add_time'] == ''){ echo(time() );}else{ echo($data['s_add_time']); } ?>{$data.s_add_time}" name="s_add_time" />
+                            <input type="hidden" value="<?php echo(time()); ?>" name="s_edit_time" />
+                            <input type="hidden" value="{$data.w_id}" name="w_id" />
+                            <input type="hidden" value="<?php echo(UID); ?>" name="admin_id" />
+                        </div>
+                </div>
+                <div class="tab-pane tab2">
+                    <a class="btn" href="{:addons_url('Warehouse://MemberAdmin:/save', array('group' => 13, 'warehouse_id' => $data['w_id']))}">添加</a>
+                    <!-- 数据列表 -->
+                    <div class="data-table table-striped">
+                        <table>
+                            <thead> 
+                                <tr>
+                                    <th>登录名</th>
+                                    <th>昵称</th>
+                                    <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <notempty name="member_ls[13]">
+                            <volist name="member_ls[13]" id="lv" key="vo">
+                                <tr>
+                                    <td>{$lv.uid|get_username}</td>
+                                    <td>{$lv.uid|get_nickname}</td>
+                                    <td>
+                                        <a class="confirm ajax-get" href="{:addons_url('Warehouse://MemberAdmin:/delete', array('id' => $lv['uid'], 'type' => 1, 'group' => 2, 'warehouse_id' => $data['w_id']))}" data-id="{$lv.uid}">删除</a>
+                                    </td>
+                                </tr>
+                            </volist>
+                            <else/>
+                                <tr><td colspan="3">暂无数据~</td></tr>
+                            </notempty>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="form-item cf">
+                        <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+</block>
+<block name="script">
+	<script type="text/javascript">
+		$(function(){
+                    var Global = {
+                        jump: window.location.pathname.match(/(\D*)save/)[1],
+                    }
+                    $("a[href$='" + Global.jump + "index.html']").parent().addClass('layui-this');
+                    //全选节点
+                    $('.check-all').on('change',function(){
+                        $('.ids').prop('checked',this.checked);
+                    });showTab();
+		});
+                
+	</script>
+</block>

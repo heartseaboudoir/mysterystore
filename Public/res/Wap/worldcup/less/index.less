@@ -1,0 +1,483 @@
+@r: 50rem;
+@f: 25rem;
+@w: 750/@r;
+@colorf: #fff;
+@color0: #000;
+@colortext: #bababa;
+@colormain: #21b3ff;
+@f10: 10/@f;
+@f12: 12/@f;
+@f14: 14/@f;
+@f16: 16/@f;
+@f18: 18/@f;
+@f20: 20/@f;
+@f24: 24/@f;
+@f36: 36/@f;
+@f50: 50/@f;
+
+.wrap-img{
+    position: relative;
+    img{
+        max-width: 100%;
+        max-height: 100%;
+        position: absolute;
+        margin: auto;
+        top: 0px;
+        right: 0px;
+        bottom: 0px;
+        left: 0px;
+    }
+}
+
+.border-radius ( @radius ) {
+    border-radius: @radius;
+    -moz-border-radius: @radius;
+    -webkit-border-radius: @radius;
+}
+.border-radius-left ( @radius ) {
+    border-radius: @radius 0 0 @radius;
+    -moz-border-radius: @radius 0 0 @radius;
+    -webkit-border-radius: @radius 0 0 @radius;
+}
+.transition ( @options ) {
+    transition: @options;
+    -moz-border-radius: @options;
+    -webkit-border-radius: @options;
+}
+.animation ( @options ) {
+    animation: @options;
+    -moz-animation: @options;
+    -webkit-animation: @options;
+}
+.box-shadow ( @options ) {
+    -moz-box-shadow: @options; 
+    -webkit-box-shadow: @options; 
+    box-shadow: @options;
+}
+
+.site-loading{
+    img{
+        border: none;
+        width: auto;
+        height: auto;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto;
+    }
+}
+.site-hide {
+    display: none;
+}
+.site-tips {
+    width: @w;
+    margin: 0 auto;
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    //color: @colorf;
+    text-align: center;
+    z-index: 10;
+    p {
+        display: block;
+        margin: 50% 200/@r 0;
+        padding: 20/@r 0;
+        background: rgba(255,255,255,0.8);
+        .border-radius( 10/@r );
+    }
+}
+.site-container {
+    width: 100%;
+    height: auto;
+    overflow: auto;
+    color: @colortext;
+}
+
+.site-login {
+    background: #0a0d12 url('/Public/res/Wap/worldcup/img/bg.jpg');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: 100%;
+
+    .wrap-form {
+        position: fixed;
+        bottom: 0;
+        left: 50%;
+        width: 600/@r;
+        height: 500/@r;
+        margin-left: -300/@r;
+        label {
+            display: block;
+            width: 100%;
+            height: 137/@r;
+            background: url('/Public/res/Wap/worldcup/img/bet01.png');
+            background-size: cover;
+            color: @colormain;
+            input {
+                background: transparent;
+                height: 78/@r;
+                line-height: 78/@r;
+                margin: 40/@r 0 0 20/@r;
+                width: 470/@r;
+                padding: 0 20/@r;
+                color: @colormain;
+            }
+            input::-webkit-input-placeholder {
+                color: @colormain; 
+            }   
+            input:-moz-placeholder {   
+                color: @colormain;
+            }   
+            input::-moz-placeholder {   
+                color: @colormain; 
+            }
+            .wrap-captcha {
+                position: absolute;
+                top: 53/@r;
+                right: 30/@r;
+                width: 197/@r;
+                height: 53/@r;
+                line-height: 53/@r;
+                background: @colormain;
+                color: #0d4867;
+                text-align: center;
+            }   
+        }
+        .wrap-submit {
+            color: transparent;
+            display: block;
+            width: 570/@r;
+            height: 106/@r;
+            background: url('/Public/res/Wap/worldcup/img/bet03.jpg');
+            background-size: cover;
+            margin: 20/@r 0 0 15/@r;
+        }
+    }
+}
+
+.site-index {
+    width: @w;
+    margin: 0 auto;
+    background: @color0;
+    padding-bottom: 80/@r;
+    overflow: hidden;
+    .wrap-box {
+        width: @w;
+        height: auto;
+        float: left;
+        position: relative;
+        .wrap-img {
+            z-index: 1;
+            width: 100%;
+            height: 177/@r;
+            text-align: center;
+        }
+        .wrap-pos {
+            z-index: 2;
+            position: absolute;
+        }
+        .wrap-pdt {
+            width: 615/@r;
+            top: -58/@r;
+            left: 54/@r;
+            li {
+                width: 104/@r;
+                height: auto;
+                margin: 20/@r 0 0 45/@r;
+                float: left;
+                img {
+                    width: 100%;
+                    height: 98/@r;
+                }
+                p {
+                    padding: 5/@r 0;
+                    font-size: @f10;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                }
+            }
+        }
+        .wrap-money {
+            width: 233/@r;
+            top: 108/@r;
+            left: 259/@r;
+            color: #fc3502;
+            text-align: center;
+            overflow: hidden;
+            h1 {
+                font-size: @f14;
+                span {
+                    font-size: @f18;
+                    font-weight: 600;
+                }
+            }
+        }
+        .wrap-des {
+            padding: 0 25/@r;
+            width: 578/@r;
+            top: 40/@r;
+            left: 62/@r;
+            line-height: 160%;
+            font-size: @f10;
+            text-align: justify;
+            h1 {
+                font-size: @f14;
+                font-weight: bold;
+            }
+            span {
+                color: #ffc001;
+            }
+            i {
+                display: block;
+                margin-top: 20/@r;
+            }
+        }
+        .wrap-des2 {
+            top: 0/@r;
+        }
+        .wrap-time {
+            width: 306/@r;
+            top: 126/@r;
+            left: 186/@r;
+            color: @colormain;
+            text-align: center;
+            overflow: hidden;
+            font-size: @f10;
+        }
+        .wrap-time2 {
+            width: 276/@r;
+            top: 45/@r;
+            left: 214/@r;
+        }
+        .wrap-team {
+            width: 628/@r;
+            top: -35/@r;
+            left: 97/@r;
+            li {
+                width: 281/@r;
+                height: auto;
+                float: left;
+                position: relative;
+                .wrap-team-img {
+                    width: 100%;
+                    height: 335/@r;
+                }
+                p {
+                    display: inline-block;
+                    position: absolute;
+                    top: 7/@r;
+                    left: 15/@r;
+                    color: @colorf;
+                    font-size: @f10;
+                    span {
+                        font-style: normal;
+                    }
+                }
+                a {
+                    width: 255/@r;
+                    height: 78/@r;
+                    margin-top: 30/@r;
+                    display: inline-block;
+                    img {
+                        width: 100%;
+                        height: 100%;
+                    }
+                }
+            }
+            li:last-child {
+                p {
+                    text-indent: 25/@r;
+                }
+                a {
+                    float: right;
+                }
+            }
+        }
+        .wrap-total {
+            width: 518/@r;
+            top: 4/@r;
+            left: 113/@r;
+            color: @colormain;
+            p {
+                float: left;
+                margin-left: 22/@r;
+                span {
+                    font-size: @f36;
+                    font-weight: 600;
+                }
+            }
+            a {
+                float: right;
+                width: 189/@r;
+                height: 53/@r;
+                display: inline-block;
+                margin-right: 21/@r;
+                img {
+                    width: 100%;
+                    height: 100%;
+                }
+            }
+        }
+        .wrap-result {
+            width: 576/@r;
+            top: -44/@r;
+            left: 88/@r;
+            text-align: center;
+            .wrap-prize {
+                width: 409/@r;
+                height: 233/@r;
+                margin: 0 auto 20/@r;
+                border: 1px solid @colormain;
+            }
+            span {
+                display: block;
+                font-size: @f10;
+            }
+            .wrap-name {
+                width: 411/@r;
+                height: 34/@r;
+                margin: 4/@r auto 2/@r;
+            }
+        }
+        .wrap-btn {
+            display: block;
+            width: 635/@r;
+            height: 87/@r;
+            margin: 60/@r auto 0;
+        }
+    }
+    .wrap-block {
+        .wrap-img {
+            height: 220/@r;
+        }
+    }
+    .wrap-mask,
+    .wrap-layer {
+        z-index: 9;
+        display: none;
+    }
+    .wrap-mask {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background: rgba(0,0,0,0.7);
+    }
+    .wrap-layer {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+    }
+    .wrap-view {
+        width: 648/@r;
+        height: 220/@r;
+        margin: -110/@r 0 0 -323/@r;
+        background: url('/Public/res/Wap/worldcup/img/pdtbg.png') no-repeat;
+        background-size: cover;
+        animation-fill-mode: forwards;
+        img,
+        div {
+            float: left;
+        }
+        img {
+            width: 180/@r;
+            height: 180/@r;
+            margin: 20/@r 25/@r 0 20/@r;
+        }
+        div {
+            width: 400/@r;
+            margin-top: 50/@r;
+            h1 {
+                font-size: @f14;
+                font-weight: 600;
+                color: @colorf;
+                line-height: 140%;
+            }
+            p {
+                margin-top: 15/@r;
+                font-size: @f12;
+            }
+        }
+    }
+    .wrap-start {
+        .animation ( start 1s linear 0s 1 forwards );
+        @keyframes start {
+            0% {
+                transform: scale(0,0);
+            }
+            10% {
+                transform: scale(1.2,1.2);
+            }
+            30% {
+                transform: scale(0.8,0.8);
+            }
+            40% {
+                transform: scale(1,1);
+            }
+            100% {
+                transform: scale(1,1);
+            }
+        }
+    }
+    .wrap-end {
+        .animation ( end 1s linear 0s 1 forwards );
+        @keyframes end {
+            0% {
+                transform: scale(1,1);
+            }
+            10% {
+                transform: scale(0,0);
+            }
+            100% {
+                transform: scale(0,0);
+            }
+        }
+    }
+    .wrap-bet { 
+        width: 600/@r;
+        height: 276/@r;
+        margin: -138/@r 0 0 -300/@r;
+        animation-fill-mode: forwards;
+        label {
+            display: block;
+            width: 100%;
+            height: 137/@r;
+            background: url('/Public/res/Wap/worldcup/img/bet01.png');
+            background-size: cover;
+            color: @colormain;
+            input {
+                background: transparent;
+                height: 78/@r;
+                line-height: 78/@r;
+                margin: 40/@r 0 0 20/@r;
+                width: 470/@r;
+                padding: 0 20/@r;
+                color: @colormain;
+            }
+            input::-webkit-input-placeholder {
+                color: @colormain; 
+            }   
+            input:-moz-placeholder {   
+                color: @colormain;
+            }   
+            input::-moz-placeholder {   
+                color: @colormain; 
+            }   
+        }
+        .wrap-submit {
+            color: transparent;
+            display: block;
+            width: 570/@r;
+            height: 106/@r;
+            background: url('/Public/res/Wap/worldcup/img/bet02.png');
+            background-size: cover;
+            margin: 20/@r 0 0 15/@r;
+        }
+    }
+} 

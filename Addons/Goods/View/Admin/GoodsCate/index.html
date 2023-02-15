@@ -1,0 +1,69 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <a class="btn" href="{:addons_url('Goods://GoodsCateAdmin:/save')}">添加</a>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+                <tr>
+                    <th>排序</th>
+                    <th>分类名</th>
+                    <th>添加时间</th>
+                    <th>更新时间</th>
+                    <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td><input type="text" class="input-mini text listorder" value="{$lv.listorder}" item_id="{$lv.id}" maxlength="4"/></td>
+                    <td>{$lv.title}</td>
+                    <td>{$lv.create_time_text}</td>
+                    <td>{$lv.update_time_text}</td>
+                    <td>
+                        <eq name="lv[pid]" value="0">
+                        <a class="update" href="{:addons_url('Goods://GoodsCateAdmin:/save?pid='.$lv['id'])}" data-id="{$lv.id}">添加子分类</a>
+                        </eq>
+                        <a class="update" href="{:addons_url('Goods://GoodsCateAdmin:/save?id='.$lv['id'])}" data-id="{$lv.id}">编辑</a>
+                        <a class="confirm ajax-get" href="{:addons_url('Goods://GoodsCateAdmin:/delete?id='.$lv['id'])}" data-id="{$lv.id}">删除</a>
+                    </td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $(function() {
+            highlight_subnav('{:addons_url('Goods://GoodsCateAdmin:/index')}');
+            //全选节点
+            $('.check-all').on('change', function() {
+                $('.ids').prop('checked', this.checked);
+            });
+            $('.listorder').on('change', function(){
+                var id = $(this).attr('item_id'),
+                    value = $(this).val();
+                $.ajax({
+                    type: 'get',
+                    url : "{:addons_url('Goods://GoodsCateAdmin:/listorder')}",
+                    data: {listorder:value, id:id},
+                    success:function(msg){
+                        if(msg.status == 1){
+                            window.location.reload();
+                        }
+                    }
+                });
+            });
+        })
+    </script>
+</block>

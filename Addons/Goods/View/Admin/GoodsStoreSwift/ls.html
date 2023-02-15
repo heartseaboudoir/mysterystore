@@ -1,0 +1,71 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <a href="{:addons_url('Goods://GoodsStoreSwiftAdmin:/download_log', array('id' => $_GET['id']))}" class="btn">导出结款单</a>
+    <div style="margin:5px 0;">
+        计算公式：
+        <span style="margin-right:10px;"><strong>应结数 = </strong>(上期库存-月末库存)+(本月入库-本月出库)</span>
+        <span style="margin-right:10px;"><strong>丢耗数 = </strong>应结数-销量</span>
+        <span><strong>丢耗率 = </strong>丢耗金额/应结货款</span>
+    </div>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:80px">商品ID</th>
+                    <th style="width:180px">商品名</th>
+                    <th style="width:50px">销售价</th>
+                    <th style="width:80px">应结数量</th>
+                    <th style="width:80px">应结货款</th>
+                    <th style="width:50px">销量</th>
+                    <th style="width:50px">销售金额</th>
+                    <th style="width:70px">丢耗数量</th>
+                    <th style="width:70px">丢耗金额</th>
+                    <th style="width:50px">丢耗率</th>
+                    <th style="width:50px">状态</th>
+                    <th style="width:50px"></th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td>{$lv.goods_id}</td>
+                    <td><a href="{:addons_url('Goods://GoodsStoreAdmin:/show', array('id' => $lv['goods_id']))}" target="_blank">{$lv.goods_name}</a></td>
+                    <td>{$lv.price}</td>
+                    <td title="({$lv.prev_month_num}-{$lv.now_month_num})+({$lv.in_num}-{$lv.out_num})">{$lv.result_num}</td>
+                    <td title="{$lv.result_num}*{$lv.kzprice}">{$lv.result_money}</td>
+                    <td>{$lv.sell_num}</td>
+                    <td title="{$lv.kzprice}*{$lv.sell_num}"><?php echo (float)$lv['kzprice']*(float)$lv['sell_num']; ?></td>
+                    <td title="{$lv.result_num}-{$lv.sell_num}">{$lv.lost_num}</td>
+                    <td title="{$lv.price}*{$lv.lost_num}"><?php echo (float)$lv['kzprice']*(float)$lv['lost_num']; ?></td>
+                    <td title="<?php echo (float)$lv['kzprice']*(float)$lv['lost_num'] ?>/{$lv.result_num}">
+                        <?php if ( $lv['lost_num']==0 ){ echo 0; } else { echo round((float)$lv['kzprice']*(float)$lv['lost_num']/(float)$lv['result_money']*100,2) .'%'; } ?>
+                    </td>
+                    <td><switch name="lv.status"><case value="1">上架</case><case value="2">下架</case><case value="-1">已删除</case></switch></td>
+                    <td><a href="{:addons_url('Goods://GoodsStoreSwiftAdmin:/goods_show', array('id' => $_GET['id'], 'log_id' => $lv['id']))}">查看</a></td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $(function() {
+            highlight_subnav('{:addons_url('Goods://GoodsStoreSwiftAdmin:/index')}');
+            //全选节点
+            $('.check-all').on('change', function() {
+                $('.ids').prop('checked', this.checked);
+            });
+        })
+    </script>
+</block>

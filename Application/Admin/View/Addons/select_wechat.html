@@ -1,0 +1,26 @@
+<?php
+    $_wechatconfig = D('Addons://Wechat/WechatConfig')->field('title, ukey')->select();
+?>
+<select id="change_wechat_[select_name]" name="[select_name]">
+    <option value=''>请选择</option>
+    <volist name="_wechatconfig" id="_wc">
+        <option value="{$_wc['ukey']}">{$_wc['title']}</option>
+    </volist>
+</select>
+<script type="text/javascript">
+    if('[select_value]'){
+        $('#change_wechat_[select_name]').val('[select_value]');
+    }
+    if([ajax_check] == 1){
+        $('#change_wechat_[select_name]').change(function(){
+            $.ajax({
+                type: 'get',
+                url: "{:addons_url('Wechat://WechatConfig:/ajax_set_ukey')}",
+                data:{change:1, ukey:$(this).val()},
+                success:function(msg){
+                    window.location.reload();
+                }
+            });
+        });
+    }
+</script>

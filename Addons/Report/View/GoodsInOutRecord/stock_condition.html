@@ -1,0 +1,231 @@
+<extend name="Public/base" />
+<block name="body">
+    <div id="jq-content" class="site-content">
+        <div class="main-title">
+            <h2>批次库存对比</h2>
+        </div>
+        <div class="search-form fr cf">
+            <form id="jq-search-form">
+            	<label class="wrap-select">
+					<select id="jq-select-ship" name="shequ_id">
+                        <option value="">请选择区域</option>
+                    </select>
+                </label>
+                <div class="sleft">
+                	<input type="text" name="goods_name" class="text input-text search-input" placeholder="请输入商品名查找" />
+                    <a id="jq-search-btn" class="sch-btn" href="javascript:void(0);"><i class="btn-search"></i></a>
+                </div>
+            </form>
+        </div>
+        <a id="jq-download" class="btn" href="javascript:void(0);" style="cursor: default;">导出Excel</a>
+        <a id="jq-save-piall" class="btn" href="javascript:void(0);" style="cursor: default;">批量修改批次</a>
+        <div style="margin-top: 10px;">
+            计算公式：<strong>相差数量 = </strong>( 门店库存+仓库库存+门店在途数量+仓库在途数量 ) - 批次数量
+        </div>
+        <div class="data-table table-striped">
+            <table>
+                <thead>
+                    <tr>
+                        <th>商品ID</th>
+                        <th>商品名称</th>
+                        <th>门店库存</th>
+                        <th>仓库库存</th>
+                        <th>门店在途数量</th>
+                        <th>仓库在途数量</th>
+                        <th>批次数量</th>
+                        <th>相差数量</th>
+                        <th>入库平均价</th>
+                        <th>修改批次</th>
+                    </tr>
+                </thead>
+                <tbody id="jq-list"></tbody>
+            </table>
+        </div>
+        <div id="jq-page" class="page"></div>
+    </div>
+    <script id="temp-select-ship" type="text/html">
+        {{each items as list index}}
+        <option value="{{list.shequ_id}}">{{list.shequ_name}}</option>
+        {{/each}}
+    </script>
+    <script id="temp-list" type="text/html">
+        {{each items as list index}}
+        <tr data-id="{{list.id}}">
+            <td>{{list.goods_id}}</td>
+            <td title="{{list.goods_name}}">
+            {{if list.goods_name != null}}
+                {{if list.goods_name.length > 19}}
+                    {{list.goods_name.slice(0,18) + '...'}}
+                {{else}}
+                    {{list.goods_name}}
+                {{/if}}
+            {{/if}}
+            </td>
+            <td>{{list.store_num}}</td>
+            <td>{{list.warehouse_num}}</td>
+            <td>{{list.store_zt_num}}</td>
+            <td>{{list.warehouse_zt_num}}</td>
+            <td>{{list.inout_num}}</td>
+            <td>{{list.b_num}}</td>
+            <td>{{list.ginprice}}</td>
+            <td>
+                {{if list.b_num != 0}}
+                <button  value_num="{{list.b_num}}" value_goods_id = "{{list.goods_id}}" class="wrap-search  inout_id_save" style=" color:#fff;background-color: #4D90FE;padding: 5px 20px; border: none;">修改</button>
+                {{/if}}
+            </td>
+        </tr>
+        {{/each}}
+    </script>
+</block>
+<block name="script">
+    <script type="text/javascript">
+    layui.use(['main'], function() {
+        var $ = layui.jquery,
+            layer = layui.layer;
+ 
+        var Global = {
+            fileUrl: '/Erp/GoodsInOutRecord/export_stock_condition',
+            listUrl: '/Erp/GoodsInOutRecord/stock_condition',
+            saveUrl: '/Erp/GoodsInOutRecord/save_stock_condition',
+            jump: window.location.pathname.match(/(\D*)stock_condition/)[1],
+            shequ_id: '',
+            goods_name: '',
+        }
+        $("a[href$='" + Global.jump + "stock_condition.html']").parent().addClass('layui-this');
+
+        var parameter = window.location.pathname.replace(/\//g,'.').split('.');
+        $.each( parameter, function(i,items){
+            switch(items){
+                case 'shequ_id':
+                Global.shequ_id = parameter[i+1];
+                break;
+                case 'goods_name':
+                Global.goods_name = decodeURIComponent( parameter[i+1] );
+                $('[name="goods_name"]').val( Global.goods_name );
+                break;
+            }
+        });
+        var passData = $.dataJson({
+            shequ_id: Global.shequ_id,
+            goods_name: Global.goods_name
+        }); 
+
+        delete passData.s_date;
+        delete passData.e_date;
+        var data = $.parseJson( passData );
+        
+        $.getData({
+             url: Global.listUrl + '?' + data,
+            load: true
+        }, function(res){
+            dataShow(res);
+        });
+        function dataShow(res,callback){
+            var oDownload = $('#jq-download'),
+                    oList = $('#jq-list'),
+                    oPage = $('#jq-page');
+
+            $('#jq-select-ship').html(template('temp-select-ship', { items: res.content.shequ }));
+            if( Global.shequ_id != '' ){
+                $('#jq-select-ship option[value="'+Global.shequ_id+'"]').attr('selected',true);
+            }
+
+            if( res.content.data == null || res.content.data.length == 0 ){
+                oList.html('<tr><td class="wrap-empty">暂无内容！</td></tr>');
+                $('#jq-page').html('');
+                oDownload.attr('href','javascript:void(0);').unbind().css('cursor','default');
+            }else{
+                oList.html(template('temp-list', { items: res.content.data }));
+                if( res.content.recordCount > res.content.pageSize ){
+	                var total = '<span class="rows">共'+res.content.recordCount+'条记录</span>';
+	                oPage.html( res.content.pager.replace( /\+/g, '%20' ).replace( new RegExp(Global.listUrl,'g'),Global.jump+'stock_condition' ) + total );
+	            }else{
+	                oPage.html( res.content.pager );
+	            }
+
+                var data = $('#jq-search-form').find('input,select').serialize();
+                oDownload.fileDown({
+                     url: Global.fileUrl + '?' + data
+                }).removeAttr('style');
+            }
+            $('.inout_id_save').on({
+                click:function(){
+                    $(this).hide();
+                    var value_num = $(this).attr('value_num');
+                    var value_goods_id = $(this).attr('value_goods_id');
+                    var value_shequ_id = Global.shequ_id;
+                    $.getJSON(Global.saveUrl,{shequ_id:value_shequ_id,id:value_goods_id,num:value_num},function(json){
+                        if(json.code == 200){
+                            passData = $.dataJson({
+                                shequ_id: Global.shequ_id,
+                                goods_name: $('[name="goods_name"]').val()
+                            });
+                            delete passData.s_date;
+                            delete passData.e_date;
+                             data = $.parseJson( passData );
+                            $.getData({
+                                url: Global.listUrl + '?' + data,
+                                load: true
+                            }, function(res){
+                                dataShow(res);
+                            });
+                        }else{
+                            alert(json.content);
+                            $(this).show();
+                        }
+                    });
+                    return false;
+                }
+            });
+        }
+
+        $('#jq-search-btn').off().on({
+            click: function() {
+                if( $('#jq-select-ship').val() == ''){
+                    var tip = $('#jq-select-ship option:first').text();
+                    layer.msg( tip, {
+                        time: 1500
+                    });
+                    return false;
+                }
+                Global.shequ_id = $('#jq-select-ship').val();
+                var data = $('#jq-search-form').find('select').serialize() + '&pageSize='+passData.pageSize,
+                   oName = $('[name="goods_name"]');
+                    if( oName.val() != '' ){
+                        data += '&goods_name='+ encodeURIComponent( oName.val() );
+                    }
+                $.getData({
+                    url: Global.listUrl + '?' + data
+                }, function(res){
+                    dataShow(res,true);
+                    data = data.replace(/\=|\&/g,'\/');
+                    window.history.pushState( {},'',Global.jump+'stock_condition/'+data+'.html' );
+                });
+                return false;
+            }
+        });
+        $(document).keydown(function(e) {
+            if (e.which == 13) {
+                $('#jq-search-btn').click();
+                return false;
+            }
+        });
+        $('#jq-save-piall').on({
+            click:function(){
+              //  $('#jq-save-piall').hide();
+                var value_shequ_id = Global.shequ_id;
+                $.getJSON(Global.saveUrl,{shequ_id:value_shequ_id,act:'all'},function(json){
+                    if(json.code == 200){
+                        alert('成功');
+                        $('#jq-search-btn').click();
+                    }else{
+                        alert(json.content);
+                    }
+                });
+
+                return false;
+            }
+        })
+    });
+    </script>
+</block>

@@ -1,0 +1,929 @@
+
+		<!DOCTYPE html>
+        <html>
+            <head>
+				<meta charset="UTF-8">
+                <title>接口详细</title>
+				<style>body{margin:0; padding:0;}.tt{padding-top:70px;} .nav a{color:rgb(202,22,32);}</style>
+            </head>
+            <body>
+                <div class="nav" style="position:fixed; top:0; width:100%; background:#fff; padding:10px;border-bottom:2px solid #ccc;">
+                    模块快捷指引（点击跳转）：
+                    <br><a href="#base" style="margin-right:20px;">特殊说明</a>
+                    【客户端】<a href="#Account" style="margin-right:10px;">用户</a> <a href="#Module" style="margin-right:10px;">模块</a> <a href="#Order" style="margin-right:10px;">订单</a> <a href="#Shop" style="margin-right:10px;">店铺/商品</a> <a href="#Wallet" style="margin-right:10px;">钱包</a> 【内部端】<a href="#Internal" style="margin-right:10px;"><strong>内部APP</strong></a> 【公共】<a href="#Poster" style="margin-right:10px;">广告</a> 【门店端】<a href="#Store" style="margin-right:10px;">门店端</a> 
+                </div>
+				<div style="padding:10px;">
+				<div id="base" class="tt" style="margin-bottom:10px;">【特殊说明】</div>
+				<div>
+					为保证通讯安全，所有接口需要有header头添加以下参数：<br>utoken : 接口调用密钥<br>device : 调用端类型 1 android 2 iOS <br>version : 当前版本号<br><br>
+					<strong>接口调用密钥生成机制：</strong><br>
+					md5(接口地址[需转为小写]+通讯密钥+当前日期)<br><br>
+					例：<br>
+					接口地址为： 	http://chaoshipos.k.hiiyee.com/Apiv2/Account/login<br>
+					通讯密钥：chaoshiappkey<br>
+					调用日期：2016-03-10<br>
+					计算utoken：md5(http://chaoshipos.k.hiiyee.com/apiv2/account/loginchaoshiappkey2016-03-10)<br>
+					最终生成：75b4ea6e17ba19884205a746f85828f7<br><br>
+				</div>
+				<div style="float:left; margin-right:20px;">
+					
+                    <strong>门店端接口调用时必传参数</strong>
+                    <br>
+                    <br>
+                    uid: 设备管理员ID（未登录时为0）
+                    <br>
+                    <br>
+                    pos_id: 当前设备编号
+                    <br>
+                    <br>
+                    token: 接口密钥（请跟相关人员获得）
+					<br>-------------------------------------------------------
+                </div>
+                <div style="float:left;">
+                    <strong>返回status详解:</strong>
+                    <br>
+                    -100 : 通讯密钥utoken异常
+                    <br>
+                    -2 : 参数出错
+                    <br>
+                    0 : 逻辑错误
+                    <br>
+                    1 : 操作成功
+                </div>
+                <div style="clear: both;"></div>
+                
+				<div id="Account" class="tt">
+					用户
+					<table style="border: 1px solid #CDCDCD; width:98%; margin:20px;">
+						<tr>
+							<th width="150">入口</th>
+							<th width="300">url</th>
+							<th width="300">参数</th>
+							<th width="20%">返回数据</th>
+							<th>备注</th>
+						</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">登录接口</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Account/login</td>
+						<td style="padding:10px 2px;">string $mobile   手机号码（使用token登录时可不传）<br>string $code     手机验证码（使用token登录时可不传）<br>string $token    用户token（默认为空，使用mobile登录时可不传）</td>
+						<td style="padding:10px 2px;">[uid] => 用户ID<br>
+                [mobile] => 手机号码<br>
+                [nickname] => 用户昵称<br>
+                [header_pic] => 头像地址<br>
+                [score] => 当前蜜糖<br>
+                [exper] => 当前经验<br>
+                [level_title] => 当前等级称号<br>
+                [level_icon] => 当前等级ICON<br>
+                [exchange_title] => 蜜糖兑换文本<br>
+                [next_level_exper] => 下一等级经验<br>
+                [next_level_title] => 下一等级称号<br>
+                [next_level_icon] => 下一等级ICON<br>
+                [im_userid] => im用户名 <br>[im_password] => im密码<br>
+                [is_checkin] => 是否已签到 1 是 0 否<br>
+                [token] => 登录成功后的token值，调用其他接口时需传递<br>
+                [is_auth] => 是否认证（0 否 1 是 2 待审核）<br>[shop_star] => 店铺星级<br>[follow_num] => 关注人数<br>[be_follow_num] => 粉丝人数<br></td>
+						<td style="padding:10px 2px;">1 每次成功登录后，token将会做更新<br> 
+                2 当mobile为空并且token不为空时，将使用token进行登录<br>
+                3 当mobile与token都不为空时，使用mobile进行登录<br></td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">获取登录用户的信息</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Account/get_login_info</td>
+						<td style="padding:10px 2px;"> string  $token   用户token</td>
+						<td style="padding:10px 2px;">参与见接口 login</td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">获取登录验证码</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Account/get_login_code</td>
+						<td style="padding:10px 2px;"> string  $mobile  手机号码</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;">验证码有效时长为600秒，验证码发送间隔为90秒</td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">更新绑定手机</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Account/change_mobile</td>
+						<td style="padding:10px 2px;"> string  $mobile  手机号码<br> string  $code    验证码</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;">验证码有效时长为600秒，验证码发送间隔为90秒</td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">获取绑定手机验证码</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Account/get_bind_code</td>
+						<td style="padding:10px 2px;"> string  $mobile  手机号码</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;">验证码有效时长为600秒，验证码发送间隔为90秒</td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">修改信息</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Account/update_info</td>
+						<td style="padding:10px 2px;"> string  $nickname  昵称<br> string  $token</td>
+						<td style="padding:10px 2px;">[nickname] => 昵称</td>
+						<td style="padding:10px 2px;">为空或不传值时表示不做修改</td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">修改头像</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Account/update_header_img</td>
+						<td style="padding:10px 2px;"> string  $header_img  头像上传key值<br> string  $token</td>
+						<td style="padding:10px 2px;">[header_pic] => 新的头像地址</td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">蜜狗等级对应列表</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Account/score_level</td>
+						<td style="padding:10px 2px;"> string  $token</td>
+						<td style="padding:10px 2px;">[title] => 等级称号 [exper] => 经验底限 [icon] => 等级图标</td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">个人蜜糖记录列表</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Account/score_log_lists</td>
+						<td style="padding:10px 2px;"> string  $page  页码（默认为1）<br> string  $type  类型（0：全部 1：增加 2：减少 默认为0）<br> string  $token</td>
+						<td style="padding:10px 2px;">[id] => 记录ID<br>[title] => 标题<br>[description] => 描述<br>[score] => 操作的蜜糖<br>[type] => 类型 1: 增加 2: 减少 <br>[create_time] => 创建时间<br>[create_time_text] => 创建时间文本</td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">签到</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Account/checkin</td>
+						<td style="padding:10px 2px;"> string  $token</td>
+						<td style="padding:10px 2px;">[action_score] => 签到所得的蜜糖<br> [score] => 当前的蜜糖 <br>[exper] => 当前的经验 <br>[level_title] => 当前的等级<br>[level_icon] => 当前的等级图标
+                [next_score] => 下次签到可得蜜糖<br>[check_times] => 已签到天数<br>[day_data] => <br>(<br>[date] => 日期 <br>[score] => 可得蜜糖<br>[is_check] => 是否已领 1 是 0 否<br>)<br></td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">获取上一次的签到信息</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Account/get_before_checkin</td>
+						<td style="padding:10px 2px;"> string  $token</td>
+						<td style="padding:10px 2px;">[next_score] => 下次签到可得蜜糖<br>[check_times] => 已签到天数<br>[day_data] => <br>(<br>[date] => 日期 <br>[score] => 可得蜜糖<br>[is_check] => 是否已领 1 是 0 否<br>)<br></td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">蜜糖兑换优惠券</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Account/exchange_cash_coupon</td>
+						<td style="padding:10px 2px;"> string  $token</td>
+						<td style="padding:10px 2px;">[score] => 当前蜜糖<br>[exper]=>当前经验<br>[level_title]=>当前等级<br>[level_icon] => 当前等级图标</td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">个人优惠券列表</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Account/cash_coupon_lists</td>
+						<td style="padding:10px 2px;"> string  $page            页码（默认为1）<br> string  $type            类型（默认为0 0：不限 1：未使用 2：已使用 3：已过期 4：已作废【预留】）<br> string  $order_money     订单金额（默认为0， 从订单详情去选择可用的优惠券列表时使用）<br> string  $token</td>
+						<td style="padding:10px 2px;">[title] => 标题<br>
+                [description] => 描述<br>
+                [code] => 优惠券码<br> 
+                [type] => 类型（1 满减券 2 折扣券）<br>
+                [money] => 优惠金额（满减券时使用有效）<br>
+                [min_use_money] => 满多少钱可用（为0时，不限制。 满减券时使用有效）<br>
+                [discount] => 折扣数（折扣券时使用有效，范围0.1-9.9）<br>
+                [max_dis_money] => 最多折扣金额（为0时，不限制。 折扣券时使用有效，当计算后的折扣金额大于最多折扣金额时，折扣金额则取最多折扣金额）<br>
+                [last_times] => 最后使用时间，为0时表示无限期<br>
+                [status] => 状态：1 未使用 2 已使用 3 已过期 4 已作废<br>
+                [create_time] => 领取时间<br>
+                [last_time_text] => 最后有效日期<br>
+                [last_day] => 最后有效时间<br>
+                [cash_money] => 优惠券可优惠金额（为计算后的优惠券可优惠金额，订单支付页调用）<br>
+                [coupon_money] => 优惠券最高可使用的金额（为优惠券最高可优惠金额， 显示在 ￥ 旁，保留两个小数）<br>
+                [is_usable] => 是否可用 （0 否 1 是）<br>
+                <br>以下参数，在order_money > 0时返回有效<br><br>
+                [user_discount_money] => 会员优惠金额<br>
+                [discount_money] => 总优惠金额<br>
+                [pay_money] => 实付金额<br>
+                [order_money] => 订单金额<br></td>
+						<td style="padding:10px 2px;">从订单跳转至优惠券选择时附加order_money参数后，将返回使用优惠券后，订单金额的相关参数</td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">图文列表</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Account/pic_lists</td>
+						<td style="padding:10px 2px;"> string  $page   页码（默认为1）</td>
+						<td style="padding:10px 2px;">[id] => id<br>[title] => 标题<br>[description] => 介绍<br> [pic_url] => 图片<br>[url] => 链接地址<br>
+                [tag] => 标签<br>[has_goods] => 是否有商品<br></td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">首页轮播图</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Account/index_pos</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;">[title] => 标题<br>[pic_url] => 图片地址<br>[url] => 链接地址<br>[has_goods] => 是否关联商品（1 是 0 否）<br>[action_id] => 图文ID</td>
+						<td style="padding:10px 2px;">url为空时，则不可跳转</td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">设置（文档）</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Account/document_lists</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;">[id] => 文档ID<br>[name] => 标识(注：标识为 check_update 为检查更新)<br>[title] => 标题<br>[url] => 链接地址<br>[has_blank] => 是否有空白块</td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">app版本信息</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Account/app_info</td>
+						<td style="padding:10px 2px;">string $type 类型（可选值：android、ios， 不传递时默认为android）</td>
+						<td style="padding:10px 2px;">[app_no] => 版本号<br>[app_name] => 版本名<br>[app_url] => 更新地址</td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">个人收货地址列表</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Account/receipt_lists</td>
+						<td style="padding:10px 2px;">int       $page       页码（默认为1）<br>string    $token      用户token</td>
+						<td style="padding:10px 2px;">[id] => ID<br>[name] => 收货人<br>[mobile] => 手机号码<br>[zip_code] => 邮编<br>[address] => 收货地址<br>
+                [sheng] => 省ID<br>[shi]=>市ID<br>[qu] => 区ID<br>[sheng_title] => 省文本<br>[shi_title]=>市文本<br>[qu_title]=>区文本<br>[is_default] => 是否默认地址（0 否  1 是）</td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">添加个人收货地址</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Account/receipt_add</td>
+						<td style="padding:10px 2px;">string    $name       收货人<br>string    $mobile     手机号码<br>string    $address    收货地址<br>string    $sheng      省份ID<br>string    $shi        城市ID<br>string    $zip_code   邮编（6位数字，可为空）<br>string    $is_default 是否设为默认地址 1 是 0 否（默认为0）<br>string    $token      用户token</td>
+						<td style="padding:10px 2px;">[id] => ID<br>[name] => 收货人<br>[mobile] => 手机号码<br>[zip_code] => 邮编<br>[address] => 收货地址<br>
+                [sheng] => 省ID<br>[shi]=>市ID<br>[qu] => 区ID<br>[sheng_title] => 省文本<br>[shi_title]=>市文本<br>[qu_title]=>区文本<br>[is_default] => 是否默认地址（0 否  1 是）</td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">修改个人收货地址</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Account/receipt_edit</td>
+						<td style="padding:10px 2px;">int       $id         收货地址ID<br>string    $name       收货人<br>string    $mobile     手机号码<br>string    $address    收货地址<br>string    $sheng      省份ID<br>string    $shi        城市ID<br>string    $qu         区ID<br>string    $zip_code   邮编（6位数字，可为空）<br>string    $is_default 是否设为默认地址 1 是 0 否（默认为0）<br>string    $token      用户token</td>
+						<td style="padding:10px 2px;">[id] => ID<br>[name] => 收货人<br>[mobile] => 手机号码<br>[zip_code] => 邮编<br>[address] => 收货地址<br>
+                [sheng] => 省ID<br>[shi]=>市ID<br>[qu] => 区ID<br>[sheng_title] => 省文本<br>[shi_title]=>市文本<br>[qu_title]=>区文本<br>[is_default] => 是否默认地址（0 否  1 是）</td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">删除个人收货地址</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Account/receipt_del</td>
+						<td style="padding:10px 2px;">int       $id         收货地址ID<br>string    $token      用户token</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">故事信息</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Account/pic_info</td>
+						<td style="padding:10px 2px;"> string  $id   信息ID<br>  string $totken 用户token(无登录时传空值)</td>
+						<td style="padding:10px 2px;">[id] => ID<br>[title] => 标题<br>[content] => 详情<br> [pic_url] => 图片<br>[from] => 来源<br>[url] => 链接地址<br>[create_time] => 创建时间
+                 [has_goods] => 是否有商品<br>[goods_data] => (<br>[id] => 商品ID<br>[title] => 商品名<br>[price] => 售价<br>[pic_url] => 图片地址<br>[like_num] => 喜欢数<br>[num] => 库存<br>[is_like] => 1 已喜欢 2 未喜欢)<br>
+                 [share] => 页面分享(<br>[title] =>标题<br>[desc] => 描述<br>[pic_url] => 图片地址<br>[url] => 分享地址<br>) <br></td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">商品喜欢操作</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Account/goods_like_do</td>
+						<td style="padding:10px 2px;"> int    $goods_id   商品ID<br> int    $token      用户token</td>
+						<td style="padding:10px 2px;">[like_num] => 喜欢数<br>[type] => 当前操作方式，1 添加喜欢 2 取消喜欢</td>
+						<td style="padding:10px 2px;">接口将自动判断是添加还是取消</td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">对应的下级地区列表</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Account/area_lists</td>
+						<td style="padding:10px 2px;">int $pid 上级地区ID （默认为 0，即获取省级地区）</td>
+						<td style="padding:10px 2px;">[id] => 地区ID <br>[title] => 地区名<br>[level] => 级别（1 省 2 市  3区）</td>
+						<td style="padding:10px 2px;">结果返回的是下级地区列表，若参数未传，则获取省级地区</td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">所有地区列表</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Account/area_all</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;">[id] => 地区ID <br>[title] => 地区名<br>[level] => 级别（1 省 2 市  3区）<br>[pid] => 上级ID<br>[child] => 下级地区集</td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">关注/取消关注</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Account/follow</td>
+						<td style="padding:10px 2px;">string $fid   用户ID</td>
+						<td style="padding:10px 2px;">[type] => 操作结果 ： 1 关注 2 取消关注</td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">关注/粉丝 列表</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Account/follow_lists</td>
+						<td style="padding:10px 2px;">string $uid   用户ID（为空时则默认为当前登录的用户）<br>string $type  类型：1 关注的人 2 粉丝(默认为1)</td>
+						<td style="padding:10px 2px;">[uid] => 用户ID<br>[nickname] => 昵称<br>[header_pic] => 头像<br>[create_time]关注时间<br>[is_follow] => 是否关注 1 是 0 否</td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">个人主页</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Account/user_index</td>
+						<td style="padding:10px 2px;">string $uid 用户ID</td>
+						<td style="padding:10px 2px;">[nickname] => 昵称 <br>[header_pic] => 头像<br>[shop_star] => 星级<br>[is_auth] => 是否认证 0 否 1 是 2待审核<br>[follow_num] => 关注数<br>[be_follow_num] => 被关注数<br>[is_follow] => 是否关注 0 否 1 是<br><br>
+                 [goods] => 发布的商品集合（参数见门店的列表接口返回[Shop/lists]）<br></td>
+						<td style="padding:10px 2px;">返回信息为支付宝返回，为支付宝用户主动设置，若未设置，则对应字段将返回空字符。 goods字段为列表形式，当商品内容需要获取第2页后的数据时，调用Shop/lists接口获取</td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">用户的评价列表</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Account/my_assess_lists</td>
+						<td style="padding:10px 2px;">string $uid      用户ID(为空时则获取当前登录的用户ID)<br>int    $type     类型：1 我发出的 2 我收到的<br>int    $page     页码（默认为1）</td>
+						<td style="padding:10px 2px;">[create_uid] => 发表的用户<br>[nickname] => 昵称<br>[header_pic] => 头像<br>[content] => 评价内容<br>[create_time] => 创建时间<br>[bind_sn] => 对应的订单号<br>
+                 [order_end_time] => 交易完成时间<br>[goods_data] => 商品信息数组（字段如下）<br>-----<br>[goods_id] => 商品ID<br>[title] => 商品名<br>[pic] => 商品图片</td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">实名认证申请</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Account/auth_apply</td>
+						<td style="padding:10px 2px;">  string $real_name 真实姓名<br>  string $mobile    手机号码<br>  string $cert_no   身份证号码<br>  string $cert_pic1 身份证正面<br>  string $cert_pic2 身份证反面<br>  string $cert_pic3 身份证手持照</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">图片上传</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Account/update_pic</td>
+						<td style="padding:10px 2px;"> string  $num         上传的图片数量（若数量与上传数不符，则不返回）<br> string  $cover+$num  图片上传key值(格式如：  $cover1, $cover2)<br> string  $token    用户token</td>
+						<td style="padding:10px 2px;">[id] => 图片id <br> [pic_url] => 图片地址</td>
+						<td style="padding:10px 2px;">当前接口需使用 multipart/form-data 方式上传图片<br>最多同时上传12张图片<br>num值必须与图片上传的key对应，否则将返回空</td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">消息列表</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Account/notice_lists</td>
+						<td style="padding:10px 2px;"> string  $cate        类型（1：系统默认 2：点赞/收藏/评论 3：新关注）<br> string  $page        页码（默认为1）<br> string  $token    用户token</td>
+						<td style="padding:10px 2px;">[type] => 类型：(order = 买家订单, seller_order = 卖家订单, zan = 点赞, collect = 收藏, comment = 评论, notice = 通知, follow = 关注 )<br>
+                [act_uid] => 对应的用户ID<br>[act_id] => 对应的ID <br> [pic_url] => 图片地址<br> [is_read] => 是否已读<br> [create_time] => 创建时间戳<br>
+                [title] => 消息标题<br>[content] => 消息内容<br>[nickname] => 用户昵称<br>[header_pic] => 头像<br>[act_title] => 对应内容的标题<br>
+                [url] => 跳转的h5地址</td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">消息未读数量</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Account/notice_new_num</td>
+						<td style="padding:10px 2px;"> string  $token    用户token</td>
+						<td style="padding:10px 2px;">[sy] => 系统通知数量<br>[shop] => 商品操作相关数量（点赞、收藏、评论）<br>[follow] => 商品操作相关数量（点赞、收藏、评论）</td>
+						<td style="padding:10px 2px;">调用消息列表数据之后，将自动清空未读数量</td>
+					</tr></table></div>
+				<div id="Module" class="tt">
+					模块
+					<table style="border: 1px solid #CDCDCD; width:98%; margin:20px;">
+						<tr>
+							<th width="150">入口</th>
+							<th width="300">url</th>
+							<th width="300">参数</th>
+							<th width="20%">返回数据</th>
+							<th>备注</th>
+						</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">推荐页</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Module/page_index</td>
+						<td style="padding:10px 2px;">  string $keyword  关键词（默认为空）</td>
+						<td style="padding:10px 2px;">[top] => 顶部推荐<br>[shop] => 商品数据(<br>[type] => 类型：renqi 人气单品,shuhui 书会 xian 闲逛区<br>[item] => 数据数组<br>)<br>----统一数据参数----<br>
+                [title] => 标题 <br>[description] => 介绍 <br> [pic_url] => 图片 <br>[bind_id] => 对应的文章ID<br>[b_type] => 显示类型，对应首页设计1~4<br>[url] => 内容url（只有神秘书会有）<br>----以下是除神秘书会类型外返回的数据----<br>[collect_num] => 收藏数<br>[comment_num] => 评论数
+                [zan_num] => 点赞数<br> [read_num] => 阅读数<br>[uid] => 用户ID<br>[nickname] => 昵称<br>[header_pic] => 头像<br>[is_follow] => 是否关注 1 是 0 否<br><br>
+                [xian] => 闲逛区(字段参数见Shop/lists接口)<br></td>
+						<td style="padding:10px 2px;">闲逛区为列表数据，加载下一页的数据时，通过Shop/lists获取，调用时不需要附加其他请求参数</td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">关注页</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Module/page_follow</td>
+						<td style="padding:10px 2px;"> string $keyword  关键词（默认为空）<br> string $page 页码</td>
+						<td style="padding:10px 2px;">[position_member] => 推荐关注的用户，只有第一页才会返回（数组返回见下）<br>
+                [uid] => 用户ID<br>[nickname] => 昵称<br>[header_pic] => 头像<br>[is_follow] => 是否关注 1 是 0 否<br>--------<br>
+                [lists] => 商品内容数组（详细参数可参见Shop/lists接口）<br><br></td>
+						<td style="padding:10px 2px;"></td>
+					</tr></table></div>
+				<div id="Order" class="tt">
+					订单
+					<table style="border: 1px solid #CDCDCD; width:98%; margin:20px;">
+						<tr>
+							<th width="150">入口</th>
+							<th width="300">url</th>
+							<th width="300">参数</th>
+							<th width="20%">返回数据</th>
+							<th>备注</th>
+						</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">添加订单</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Order/add_order</td>
+						<td style="padding:10px 2px;"> int     $shop_uid    卖家ID（若是购买网上门店的商品，则不传值）<br> string  $goods       商品信息json数据，支持多个（id:商品ID, num:数量 格式：[{"id": 1,"num":5}]）<br> int     $rid         收货地址ID<br> string  $pay_type    支付方式(wechat:微信 alipay:支付宝)<br> string  $cash_code   优惠券号（可为空）<br> string  $remark      备注信息<br> string  $token</td>
+						<td style="padding:10px 2px;">返回参数见接口 Order/pay_order</td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">获取支付信息</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Order/pay_order</td>
+						<td style="padding:10px 2px;">string $order_sn  订单号<br>string $pay_type  支付方式(wechat => 微信 alipay => 支付宝)<br>string $cash_code 可用的优惠券号(默认为空，第一次结算时传递有效)<br> string  $token</td>
+						<td style="padding:10px 2px;">[wechat_data] => (<br>
+                &nbsp;&nbsp;[appid] => 应用ID<br>
+                &nbsp;&nbsp;[partnerid] => 商户号<br>
+                &nbsp;&nbsp;[prepayid] => 预支付交易会话ID<br>
+                &nbsp;&nbsp;[timestamp] => 时间戳<br>
+                &nbsp;&nbsp;[wx_package] =>  扩展字段<br>
+                &nbsp;&nbsp;[noncestr] => 随机字符串<br>
+                &nbsp;&nbsp;[sign] => 签名）<br>
+                [alipay_data] => (<br>
+                &nbsp;&nbsp;[server] => 接口名称<br>
+                &nbsp;&nbsp;[partner] => 合作者身份ID <br>
+                &nbsp;&nbsp;[_input_charset] => 参数编码字符集<br>
+                &nbsp;&nbsp;[sign_type] => 签名方式<br>
+                &nbsp;&nbsp;[sign] => 签名<br>
+                &nbsp;&nbsp;[notify_url] => 服务器异步通知页面路径 <br>
+                &nbsp;&nbsp;[app_id] => 客户端号<br>
+                &nbsp;&nbsp;[appenv] => 客户端来源<br>
+                &nbsp;&nbsp;[out_trade_no] => 商户网站唯一订单号<br>
+                &nbsp;&nbsp;[payment_type] => 支付类型<br>
+                &nbsp;&nbsp;[subject] => 商品名称<br>
+                &nbsp;&nbsp;[seller_id] => 卖家支付宝账号<br>
+                &nbsp;&nbsp;[total_fee] => 总金额<br>
+                &nbsp;&nbsp;[body] => 商品详情<br>
+                &nbsp;&nbsp;[goods_type] => 商品类型<br>
+                &nbsp;&nbsp;[rn_check] => 是否发起实名校验<br>
+                &nbsp;&nbsp;[it_b_pay] => 未付款交易的超时时间<br>
+                &nbsp;&nbsp;[extern_token] => 授权令牌<br><br>
+                [order_sn] => 订单号<br></td>
+						<td style="padding:10px 2px;">当返回的status = 2时， 表示当前的订单自动支付成功，无需调用支付sdk。 <br>
+                当返回的status = 3时， 表示当前的订单已被取消。 <br></td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">获取商品在确认购买时的信息</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Order/get_goods_order</td>
+						<td style="padding:10px 2px;"> int    $goods_id   商品ID<br> int    $num        数量<br> string $token   用户token</td>
+						<td style="padding:10px 2px;">[store_title] => 门店名<br>[goods_data] => 商品信息(<br>[id] => 商品id<br>[title] => 商品标题<br>[pic_url] => 图片地址<br>[price] => 价格<br>[num] => 购买数量 <br>[goods_money] => 商品总金额 <br>)<br>
+                [receipt_info] =>收货信息,没有时为空<br>(<br>[id] => 地址ID<br>[name] => 收货人<br>[mobile] => 联系方式<br>[sheng_title] => 省份文本<br>[shi_title] => 城市文本<br>[qu_title] => 地区文本<br>[address] => 地址<br>)<br>
+                [express_money] => 运费<br>[pay_money] => 总支付金额<br>[user_discount_money] => 会员优惠<br>[user_sale] => 会员折扣<br>[type] => 要确认的订单类型（store:线下 online：线上）</td>
+						<td style="padding:10px 2px;">用于在APP确认购买后显示的商品订单信息，只适用于系统门店</td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">商品确认订单信息（仅支持店铺商品）</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Order/get_shop_goods_order</td>
+						<td style="padding:10px 2px;"> string  $goods       商品信息json数据，支持多个同店铺的商品（goods_id:商品ID, num:数量 格式：[{"goods_id": 1,"num":5}]）<br> int    $shop_uid     店铺用户ID<br> string $token   用户token</td>
+						<td style="padding:10px 2px;">[shop_data] => 店铺信息（<br>[uid] => 店铺用户ID<br>[nickname] => 昵称<br>[header_pic] => 头像<br>）<br>[goods_data] => 商品信息数组(<br>[goods_id] => 商品id<br>[goods_title] => 商品标题<br>[goods_pic] => 图片地址<br>[price] => 价格<br>[num] => 购买数量 <br>[goods_money] => 商品金额 <br>)<br>
+                [receipt_info] =>收货信息,没有时为空<br>(<br>[id] => 地址ID<br>[name] => 收货人<br>[mobile] => 联系方式<br>[sheng_title] => 省份文本<br>[shi_title] => 城市文本<br>[qu_title] => 地区文本<br>[address] => 地址<br>)<br>
+                [express_money] => 运费<br>[pay_money] => 总支付金额<br><br>[goods_money] => 商品总金额[user_discount_money] => 会员优惠<br>[user_sale] => 会员折扣<br>[goods_num] => 商品总数量<br></td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">获取运费</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Order/get_express_money</td>
+						<td style="padding:10px 2px;"> int  $goods_id   商品ID<br> int  $sheng      省份ID</td>
+						<td style="padding:10px 2px;">[express_money] => 运费</td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">我的订单列表</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Order/order_lists</td>
+						<td style="padding:10px 2px;">int $page   页码（默认为1）<br>int $utype 对象：1 买家 2 卖家（默认为1）<br>int $type   类型（默认为0 0：全部 1：待付款 2：待发货 3：待收货  4：已完成 5：待退款）<br> string  $token</td>
+						<td style="padding:10px 2px;">[order_sn] => 订单号 <br> [create_time] =>创建时间<br> [create_time_text] =>创建时间文本 <br>[money] => 总价<br>
+                [pic_url] => 图片地址<br>[store_title] => 门店名/卖家昵称<br>[store_pic] => 门店图标（目前为空）/卖家头像<br>[pay_status]支付状态：1 未支付 2 已支付 <br>[status] => 订单状态 1 未支付 2 已支付 3 已取消 4 已发货 5 已完成 6 已退款<br>
+                [title] => 商品名<br>[pay_money] => 实际支付<br>[cash_money] => 优惠金额<br>[user_discount_money] => 会员优惠金额<br>[express_money] => 运费<br>[num] => 数量<br>[last_pay_second] => 剩余支付秒数(未支付时有效)<br>[last_pay_time] => 最后支付的时间戳<br>
+                [type] => 订单类型：（store:门店订单[线下] online:线上 shop:用户店铺订单）<br>[is_assess] => 是否已评价 0 否 1 是[goods_total_num] => 商品总数量<br>[goods_total_money] => 商品总价<br>
+                [detail] => 商品信息数组（<br>[title] => 商品名<br>[pic_url] => 商品图片<br>[price] => 价格<br>[num] => 数量<br>[d_id] => 商品ID<br>[goods_num] => 当前库存<br>）
+                [refund_status] => 退款状态（0 未申请 1 已申请 2 已通过退款中 3 已拒绝 4 退款成功）<br>[refund_money] => 退款金额<br>[uid] => 买家用户ID<br>[nickname] => 买家昵称<br>[header_pic] => 买家头像<br>
+                [cashcoupon_title] => 已绑定的优惠券标题<br>[user_sale] => 当前会员优惠折扣（0~1）</td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">订单详情</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Order/order_info</td>
+						<td style="padding:10px 2px;">string  $order_sn 订单号<br> string  $token</td>
+						<td style="padding:10px 2px;">[store_id] => 门店ID/卖家ID<br>[store_title] => 门店名/卖家昵称<br>[store_pic] => 门店图标（目前为空）/卖家头像<br>
+                [order_sn] => 订单号<br>[pay_money] => 支付金额<br>[money] => 订单总金额<br>[cash_title] => 绑定优惠券名<br>[cash_money] => 绑定优惠券金额（折扣券时，则为折扣的金额）<br>
+                [cash_type] => 绑定优惠券类型（1 满减券 2 折扣券）<br>[cash_discount] => 绑定优惠券折扣额度（折扣券时调用）<br>[create_time] => 创建时间<br>
+                [detail] => 商品详细<br>
+                ([title] => 商品名<br>[pic_url] => 图片地址<br>[price] => 售价<br>[num] => 数量<br> ) <br>
+                [pay_type] => 支付方式(wechat:微信 alipay:支付宝)<br>
+                [status] => 订单状态 1 未支付 2 已支付 3 已取消 4 已发货 5 已完成 6 已退款<br>
+                [redbag_title] => 支付后获取的红包分享标题<br>
+                [redbag_desc] => 支付后获取的红包分享描述<br>
+                [redbag_pic] => 支付后获取的红包分享图片<br>
+                [redbag_url] => 支付后获取的红包分享url<br>
+                [discount_money] => 总优惠金额<br>
+                [user_discount_money] => 会员优惠金额<br>
+                [user_sale] => 会员当前折扣值（0到1之间）<br>
+                [last_pay_second] => 剩余支付时间<br>[last_pay_time] => 最后支付的时间戳<br>
+                [receipt_info] =>收货信息(<br>[name] => 收货人<br>[mobile] => 联系方式<br>[sheng_title] => 省份文本<br>[shi_title] => 城市文本<br>[qu_title] => 地区文本<br>[address] => 地址<br>)<br>
+                [express_money] => 运费<br>
+                [express_info] => 发货信息<br>(<br>[no] => 物流号<br>[company] => 快递公司<br>)<br>
+                [type] => 订单类型：（store:门店订单[线下]   online:线上）<br>
+                [express_data] => 物流信息数组<br>(<br>[time] => 时间<br>[文本内容]<br>)<br>
+                [goods_total_num] => 商品总数<br>
+                [goods_total_money] => 商品总价<br>
+                [pay_time] => 支付时间<br>
+                [express_time] => 发货时间<br>
+                [is_assess] => 是否已评价<br>
+                [refund_status] => 退款状态（0 未申请 1 已申请 2 已通过退款中 3 已拒绝 4 退款成功）<br>
+                [refund_times] => 已发起申请次数<br>
+                [last_refund_second] => 剩余自动退款时间<br>[last_refund_time] => 自动退款的时间戳<br>[refund_apply_time] => 退款申请时间<br>
+                [last_receipt_second] => 剩余自动收货时间<br>[last_receipt_time] => 自动收货的时间戳<br>
+                [refund_data] => 退款信息（<br>[reason] => 理由<br>[pics] => 图片数组<br>[money] => 金额<br>[seller_reason] => 卖家拒绝理由<br>）<br>
+                [end_time] => 交易完成时间<br>[remark] => 备注<br>[stoer_im_userid] => 卖家的用户的im ID（只有类型为shop的才会有）</td>
+						<td style="padding:10px 2px;">通过门店端扫码调用接口时，order_sn值为扫码得到的链接，截取出order_sn，如：<br>
+                扫码得到的：http://chaoshipos.k.hiiyee.com/Api/Relay/order/order_sn/160529165445139921.html<br>
+                则截取从 order_sn/ 开始到 .html 中间的字符串，得160529165445139921<br><br>
+                cash_title 和 cash_money 在第一次结算时做绑定，绑定后，无法再修改优惠券<br>
+                参数返回为时间戳时，将会额外添加一个时间格式的参数，如 end_time 对应增加 end_time_text<br></td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">卖家订单详情</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Order/buyer_order_info</td>
+						<td style="padding:10px 2px;">string  $order_sn 订单号<br> string  $token</td>
+						<td style="padding:10px 2px;">[store_id] => 门店ID/卖家ID<br>[store_title] => 门店名/卖家昵称<br>[store_pic] => 门店图标（目前为空）/卖家头像<br>
+                [order_sn] => 订单号<br>[pay_money] => 支付金额<br>[money] => 订单总金额<br>[cash_money]=>优惠券金额<br>[user_discount_money] => 会员优惠金额<br>[create_time] => 创建时间<br>
+                [detail] => 商品详细<br>([title] => 商品名<br>[pic_url] => 图片地址<br>[price] => 售价<br>[num] => 数量<br> ) <br>
+                [status] => 订单状态 1 未支付 2 已支付 3 已取消 4 已发货 5 已完成 6 已退款<br>
+                [last_pay_second] => 剩余支付时间<br>[last_pay_time] => 最后支付的时间戳<br>
+                [receipt_info] =>收货信息(<br>[name] => 收货人<br>[mobile] => 联系方式<br>[sheng_title] => 省份文本<br>[shi_title] => 城市文本<br>[qu_title] => 地区文本<br>[address] => 地址<br>)<br>
+                [express_money] => 运费<br>
+                [express_info] => 发货信息<br>(<br>[no] => 物流号<br>[company] => 快递公司<br>)<br>
+                [type] => 订单类型：（store:门店订单[线下]   online:线上）<br>
+                [express_data] => 物流信息数组<br>(<br>[time] => 时间<br>[文本内容]<br>)<br>
+                [goods_total_num] => 商品总数<br>
+                [goods_total_money] => 商品总价<br>
+                [pay_time] => 支付时间<br>
+                [express_time] => 发货时间<br>
+                [is_assess] => 是否已评价<br>
+                [refund_status] => 退款状态（0 未申请 1 已申请 2 已通过退款中 3 已拒绝 4 退款成功）<br>
+                [refund_times] => 已发起申请次数<br>
+                [last_refund_second] => 剩余自动退款时间<br>[last_refund_time] => 自动退款的时间戳<br>[refund_apply_time] => 退款申请时间<br>
+                [last_receipt_second] => 剩余自动收货时间<br>[last_receipt_time] => 自动收货的时间戳<br>
+                [refund_data] => 退款信息（<br>[reason] => 理由<br>[pics] => 图片数组<br>[money] => 金额<br>[seller_reason] => 卖家拒绝理由<br>）<br>
+                [end_time] => 交易完成时间<br>[uid] => 买家ID<br>[nickname] => 买家昵称<br>[header_pic] => 买家头像<br>[remark] => 备注<br>[im_userid] => 订单用户的im ID</td>
+						<td style="padding:10px 2px;">参数返回为时间戳时，将会额外添加一个时间格式的参数，如 end_time 对应增加 end_time_text</td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">取消订单（未付款的订单可取消）</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Order/cancel_order</td>
+						<td style="padding:10px 2px;"> string  $order_sn    订单号<br> string  $token       用户token</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">订单申请退款</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Order/refund_apply</td>
+						<td style="padding:10px 2px;"> string  $order_sn    订单号<br> string  $money       退款金额（保留两位小数）<br> string  $reason      理由（最多150个字符，一个中文为3个字符）<br> string  $pics        图片ID集合（可为空，多个图片ID之间使用,分格）<br> string  $token       用户token</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;">只有已支付且未收货的订单可以发起退款申请</td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">取消退款申请</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Order/cancel_refund_apply</td>
+						<td style="padding:10px 2px;">  string  $order_sn  订单号</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">订单确认收货</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Order/confirm_receipt</td>
+						<td style="padding:10px 2px;"> string  $order_sn    订单号<br> string  $token       用户token</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;">只有已发货的订单可以做确认收货操作</td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">发表评价</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Order/add_assess</td>
+						<td style="padding:10px 2px;">string $order_sn      订单号<br>string $content       内容<br>int    $goods_star    商品质量星级（0-50）<br>int    $shop_star     商家服务星级（0-50）</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;">只对已完成的门店商品订单</td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">快递公司信息</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Order/express_data</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;">[express_name] => 快递公司标识<br>[company] => 快递公司名</td>
+						<td style="padding:10px 2px;">因快递信息不会频繁变化，请在本地做数据缓存，在每次打开App时获取即可。</td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">（卖家）修改订单金额</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Order/order_edit_money</td>
+						<td style="padding:10px 2px;">string $order_sn      订单号<br>string $money         修改金额</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">（卖家）订单发货</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Order/order_delivery</td>
+						<td style="padding:10px 2px;">string $order_sn      订单号<br>string $express_name  快递公司标识<br>string $no    快递单号</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">（卖家）拒绝退款</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Order/denied_refund</td>
+						<td style="padding:10px 2px;">string $order_sn     订单号<br>string $reason       理由</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">（卖家）同意退款</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Order/agree_refund</td>
+						<td style="padding:10px 2px;">string $order_sn      订单号</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">删除订单</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Order/del_order</td>
+						<td style="padding:10px 2px;">string $order_sn      订单号</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">购物车商品</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Order/cart_data</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;">[shop] => 店铺信息(<br><div style="padding-left:20px;">[uid] => 用户ID<br>[nickname] => 昵称<br>[header_pic]=>头像<br></div>)<br><br>
+                [goods] => 商品数组信息(<br><div style="padding-left:20px;">[cid] => 购物车ID<br>[goods_id] => 商品ID<br>[num] => 购物车数量<br>[goods_title] => 商品名<br>[goods_pic]=>商品图片<br>[goods_num]=>商品数量<br>[express_money]=>运费<br>[price]=>售价<br><div>)</td>
+						<td style="padding:10px 2px;">当前接口会返回数组形式，每一个数组成员都会有shop 和 goods<br>每次获取时，会先检查商品是否存在，若不存在，则直接删除</td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">购物车数量</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Order/cart_num</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;">[num] => 购物车数量</td>
+						<td style="padding:10px 2px;">当前接口只做数量统计，不进行排查购物车的商品是否有效。需要排查时，调用购物车列表接口将会自动排查</td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">更新购物车商品数量</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Order/cart_update</td>
+						<td style="padding:10px 2px;">string  $goods_id     商品ID<br>string  $num          数量（须大于0）</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">删除购物车商品</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Order/cart_del</td>
+						<td style="padding:10px 2px;">string  $cid  购物车ID，从购物车数组中获得，多个ID之间用,间隔</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;"></td>
+					</tr></table></div>
+				<div id="Shop" class="tt">
+					店铺/商品
+					<table style="border: 1px solid #CDCDCD; width:98%; margin:20px;">
+						<tr>
+							<th width="150">入口</th>
+							<th width="300">url</th>
+							<th width="300">参数</th>
+							<th width="20%">返回数据</th>
+							<th>备注</th>
+						</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">所有标签</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Shop/tags</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;">返回为数组形式</td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">列表</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Shop/lists</td>
+						<td style="padding:10px 2px;">  string $keyword  关键词（默认为空）<br>  string $tag  标签（默认为空）<br>  string $uid  用户ID（默认全部）<br>  string $page  页码 默认为1</td>
+						<td style="padding:10px 2px;">[id] => 文章ID<br>[bind_id] => 文章ID<br> [title] => 标题 <br>[description] => 介绍 <br> [pic_url] => 图片 <br>[collect_num] => 收藏数<br>[comment_num] => 评论数
+                [zan_num] => 点赞数<br> [read_num] => 阅读数<br>[create_time] => 创建时间<br>[uid] => 用户ID<br>[nickname] => 昵称<br>[header_pic] => 头像<br>[is_follow] => 是否关注 1 是 0 否</td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">店铺文章商品</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Shop/info</td>
+						<td style="padding:10px 2px;">string    $aid        文章id</td>
+						<td style="padding:10px 2px;">[title] => 标题 <br>[content] => 内容 <br> [pic_url] => 文章封面图 <br> [pics_data] => 图片集合 <br>[collect_num] => 收藏数<br>[comment_num] => 评论数
+                [zan_num] => 点赞数<br> [read_num] => 阅读数<br> [create_time] => 创建时间<br>[uid] => 用户ID<br>[nickname] => 昵称<br>[header_pic] => 头像<br>[is_follow] => 是否关注 1 是 0 否<br>
+                [has_goods] => 是否有商品 1 是 0 否 <br>[goods_id] => 商品ID<br> [goods_title] => 商品名<br>[goods_pic] => 商品图片<br>[price] => 价格<br>[express_money] => 运费<br>[num] => 库存<br>
+                [zan_data] => 点赞的用户集合<br> [comment_data] => 留言集合，返回字段见留言列表接口<br>[is_zan] => 是否已赞 1 是 0 否 <br>[is_collect] => 是否已收藏 1 是 0 否<br>
+                [im_userid] => im用户名 <br>[status] => 状态：-1 已删除 0 待审核 1 已审核 2 未通过<br>[is_shelf] => 上架状态： 0 未上架  1 已上架 2 已下架<br>
+                [share] => 页面分享(<br>[title] =>标题<br>[desc] => 描述<br>[pic_url] => 图片地址<br>[url] => 分享地址<br>) <br></td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">赞过的人</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Shop/act_user_lists</td>
+						<td style="padding:10px 2px;">string    $aid        文章id</td>
+						<td style="padding:10px 2px;">[uid] => 用户ID <br> [nickname] => 昵称 <br> [header_pic] => 头像 <br> [is_follow] => 是否关注：0 否 1 是</td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">添加/取消赞</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Shop/zan_act</td>
+						<td style="padding:10px 2px;">string $aid 文章ID</td>
+						<td style="padding:10px 2px;">[act] => 操作：1 添加 2 取消 <br>[zan_num] => 点赞数</td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">添加/取消收藏</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Shop/collect_act</td>
+						<td style="padding:10px 2px;">string $aid 文章ID</td>
+						<td style="padding:10px 2px;">[act] => 操作：1 添加 2 取消 <br>[collect_num] => 收藏数</td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">收藏列表</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Shop/collect_lists</td>
+						<td style="padding:10px 2px;">string $page  页码（默认为1）</td>
+						<td style="padding:10px 2px;">[bind_id] => 文章ID<br>[title] =>标题<br>[pic_url]=>封面图<br>[content]=>描述<br>[zan_num]=>点赞数 <br>[collect_num] => 收藏数 <br>[comment_num] => 评论数</td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">留言列表</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Shop/comment_lists</td>
+						<td style="padding:10px 2px;">string $aid   文章ID<br>string $page  页码（默认为1）</td>
+						<td style="padding:10px 2px;">字段返回参见 comment_info接口</td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">留言详情</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Shop/comment_info</td>
+						<td style="padding:10px 2px;">string $cid   留言ID</td>
+						<td style="padding:10px 2px;">[id] => id<br>[uid]=>用户ID<br>[nickname] => 昵称<br>[header_pic] => 头像<br>[puid]=>被回复的用户ID<br>[p_nickname] => 被回复的昵称<br>[p_header_pic] => 被回复的头像<br>[content] => 内容<br>[create_time] => 创建时间<br>[c_num] => 留言回复数量<br>
+                [child] => 该留言下面的所有回复的留言，返回信息参见上方</td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">添加留言</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Shop/add_comment</td>
+						<td style="padding:10px 2px;">string $aid  文章ID<br>string $cid  回复的留言ID（默认为0）<br>string $content  留言内容</td>
+						<td style="padding:10px 2px;">[id] => id<br>[uid]=>用户ID<br>[nickname] => 昵称<br>[header_pic] => 头像<br>[content] => 内容<br>[create_time] => 创建时间</td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">添加商品</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Shop/add_goods</td>
+						<td style="padding:10px 2px;">string    $title      文章标题<br>string    $content    文章内容<br>string    $cover      文章封面图<br>string    $pics       文章图片集合，多个图片id间用,分格(需要使用图片上传接口上传图片)<br>string    $goods_title    商品名<br>string    $goods_pic    商品封面ID<br>string    $num          库存数量（大于0的整数）<br>string    $price        价格（保留两位小数）<br>string    $express_money     运费（保留两位小数）<br>string    $tag                标签，多个标签间用,间隔（非必选）<br>string    $sheng      省份ID<br>string    $shi        城市ID<br>string    $qu         城市ID<br>string    $token      用户token</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">修改库存</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Shop/edit_num</td>
+						<td style="padding:10px 2px;">string    $goods_id       商品ID<br>string    $num            新的库存数量</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">用户发布的商品列表</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Shop/user_goods_lists</td>
+						<td style="padding:10px 2px;">string    $type      类型：1 待审核  2 发布中 3 已下架</td>
+						<td style="padding:10px 2px;">[id] => 文章ID<br>[bind_id] => 文章ID<br>[goods_id] => 商品id<br>[title] => 商品标题<br>[goods_pic] => 商品封面图<br>[price] => 售价<br>[num] => 库存<br>[express_money] => 运费<br>
+                [status] => 状态：0 待审核 1 已通过 2 审核不通过<br>[is_shelf] => 上架状态： 0 未操作 1 已上架 2 已下架<br>[create_time] => 添加时间<br>[review_time] => 审核时间<br>[remark] => 商品备注信息（审核不通过的原因）</td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">发布商品</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Shop/to_publish</td>
+						<td style="padding:10px 2px;">string    $goods_id       商品ID</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">下架商品</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Shop/to_down</td>
+						<td style="padding:10px 2px;">string    $goods_id       商品ID</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">删除商品</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Shop/del_goods</td>
+						<td style="padding:10px 2px;">string    $goods_id       商品ID</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;">只能删除 待审核、审核不通过、已下架的商品</td>
+					</tr></table></div>
+				<div id="Wallet" class="tt">
+					钱包
+					<table style="border: 1px solid #CDCDCD; width:98%; margin:20px;">
+						<tr>
+							<th width="150">入口</th>
+							<th width="300">url</th>
+							<th width="300">参数</th>
+							<th width="20%">返回数据</th>
+							<th>备注</th>
+						</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">钱包</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Wallet/info</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;">[money] => 可用余额 <br>[lock_money] => 锁定金额（用户不可操作的部分） <br>[all_money] => 账号总余额（ 可用余额+锁定金额 ）<br>
+                [is_bind]   => 是否绑定支付宝（1 是 0 否）<br>[nick_name]=>昵称<br>[avatar] => 头像</td>
+						<td style="padding:10px 2px;">当is_bind 为 1时，将返回用户的绑定信息<br>注：<br>1.返回的信息会添加*号密文<br>2.mobile_text 和 email_text 因支付宝机制问题，不一定都有值，需要自行做逻辑判断。</td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">绑定支付宝账号</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Wallet/bind_alipay</td>
+						<td style="padding:10px 2px;">string $code 支付宝登录后返回的授权码</td>
+						<td style="padding:10px 2px;">[nick_name] => 昵称 <br>[avatar] => 头像地址</td>
+						<td style="padding:10px 2px;">返回信息为支付宝返回，为支付宝用户主动设置，若未设置，则对应字段将返回空字符。</td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">发起提现</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Wallet/withdraw_apply</td>
+						<td style="padding:10px 2px;">int $money   金额，最多保留两位小数<br>string $code 手机验证码</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">获取提现申请验证码</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Wallet/get_withdraw_code</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;">验证码有效时长为600秒，验证码发送间隔为90秒</td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">钱包明细</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Wallet/log_lists</td>
+						<td style="padding:10px 2px;">int     $type     收支类型： 1 收入 2 支出 0 全部（默认0）<br>string  $act      操作类型：(withdraw:提现) 默认（空）<br>int     $page     页码</td>
+						<td style="padding:10px 2px;">[id] => 记录ID<br>[type] => 收支（1收入 2 支出）<br>[action] => 类型<br>[action_title] => 操作类型标题<br>[money]=>操作金额<br>
+                [is_lock]=>是否被锁定（0 否 1 是）<br>[unlock_time] => 解锁时间<br>[create_time] => 创建时间</td>
+						<td style="padding:10px 2px;"></td>
+					</tr></table></div>
+				<div id="Internal" class="tt">
+					<strong>内部APP</strong>
+					<table style="border: 1px solid #CDCDCD; width:98%; margin:20px;">
+						<tr>
+							<th width="150">入口</th>
+							<th width="300">url</th>
+							<th width="300">参数</th>
+							<th width="20%">返回数据</th>
+							<th>备注</th>
+						</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">登录接口</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Internal/login</td>
+						<td style="padding:10px 2px;">string $username 用户名<br>string $password 密码 (用md5加密)<br>string $stime    当前时间戳（精确到秒） 必传<br>string $ckey     用户名登录成功后获得</td>
+						<td style="padding:10px 2px;">[uid] => 用户ID<br>
+                [username] => 用户登录名<br>
+                [nickname] => 用户姓名<br>
+                [group_id] => 管理员类型（1：超级管理员 2 门店管理员）<br>
+                [group_text] => 管理员类型文本<br>
+                [ckey] => 访问内部APP其他接口时所需要的值</td>
+						<td style="padding:10px 2px;"><br><br> 只允许超级管理员或门店管理员登录 <br><br>  ckey每次登录后会重新生成</td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">获取当前管理员可管理的门店</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Internal/get_store_lists</td>
+						<td style="padding:10px 2px;">int       $page       分页数（默认为1）<br>string    $ckey       登录后返回的ckey<br>string    $ctime      当前时间戳</td>
+						<td style="padding:10px 2px;">[id]=> 门店ID<br>
+                [title]=> 门店名<br>
+                [address]=> 门店地址<br>
+                [logo]=> logo地址 <br></td>
+						<td style="padding:10px 2px;">接口附加返回参数<br><br>
+                [row] => 每次获取的条数<br>
+                [page] => 当前页码<br>
+                [count] => 当前返回的数据条数<br>
+                [total] => 总的数据条数<br><br></td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">获取商品详细</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Internal/goods_detail</td>
+						<td style="padding:10px 2px;">int       $id       商品条形码ID<br>int       $store_id 门店ID<br>string    $ckey      登录后返回的ckey<br>string    $ctime      当前时间戳</td>
+						<td style="padding:10px 2px;">[id] => 商品ID<br>
+                [title] => 商品标题<br>
+                [pic_url] => 图片地址<br>
+                [price] => 商品售价<br>
+                [num] => 当前库存<br>
+                [cate_title] => 商品分类名<br>
+                [bar_code] => 条码形（数组）<br></td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">更新商品库存</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Internal/change_goods_stock</td>
+						<td style="padding:10px 2px;">int $store_id 门店ID<br>string    $ckey      登录后返回的ckey<br>string    $ctime      当前时间戳<br>string    $barcode    扫描的条形码<br>int $id   商品ID<br>int $num  操作的数量<br>int $total_cost  入库总成本(当操作类型为inc时，为必填项)<br>string $type  操作的类型(inc:增加 dec:减少 find:找回 lost:丢耗)</td>
+						<td style="padding:10px 2px;">[num] => 操作得的商品数量<br></td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">单个商品盘点</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Internal/goods_inventory</td>
+						<td style="padding:10px 2px;">int $store_id 门店ID<br>string    $ckey      登录后返回的ckey<br>string    $ctime      当前时间戳<br>string    $barcode    扫描的条形码<br>int $id   商品ID<br>int $num  盘点的数量，不得小于0</td>
+						<td style="padding:10px 2px;">[num] => 操作得的商品数量<br></td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">商品盘点</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Internal/inventory</td>
+						<td style="padding:10px 2px;">int $store_id 门店ID<br>string    $ckey           登录后返回的ckey<br>string    $ctime          当前时间戳<br>string    $goods_data     商品信息json数组，需要使用base64加密(格式：[{"id":1,"num":20},{"id":2,"num":40}])</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;">当前接口需使用POST方式<br>每一个商品信息数组中，必须有id和num字段<br>若数组中一个商品出现多次，使用最后出现的商品数据。</td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">商品分类列表</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Internal/cate_list</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;">[id] => ID<br>[pid] => 上级ID<br>[title] => 分类名<br></td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">商品列表(全部)</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Internal/goods_list</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;">[id] => 商品ID<br>
+                [title] => 商品标题<br>
+                [pic_url] => 图片地址<br>
+                [price] => 商品售价<br>
+                [num] => 当前库存<br>
+                [cate_title] => 商品分类名<br>
+                [bar_code] => 条码形（数组）<br></td>
+						<td style="padding:10px 2px;"></td>
+					</tr></table></div>
+				<div id="Poster" class="tt">
+					广告
+					<table style="border: 1px solid #CDCDCD; width:98%; margin:20px;">
+						<tr>
+							<th width="150">入口</th>
+							<th width="300">url</th>
+							<th width="300">参数</th>
+							<th width="20%">返回数据</th>
+							<th>备注</th>
+						</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">*广告内容列表(门店端调用)</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Poster/lists_by_shop</td>
+						<td style="padding:10px 2px;">  string $poster_name  广告位标识</td>
+						<td style="padding:10px 2px;">[title] => 广告标题 <br> [pic_url] => 广告图 <br> [url] => 广告跳转地址</td>
+						<td style="padding:10px 2px;">广告位标识对应： <br> shop_app = 门店端广告</td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">广告内容列表</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Poster/lists</td>
+						<td style="padding:10px 2px;">  string $poster_name  广告位标识<br>  string $store_id     门店ID</td>
+						<td style="padding:10px 2px;">[title] => 广告标题 <br> [pic_url] => 广告图 <br> [url] => 广告跳转地址</td>
+						<td style="padding:10px 2px;">广告位标识对应： <br> shop_app = 门店端广告</td>
+					</tr></table></div>
+				<div id="Store" class="tt">
+					门店端
+					<table style="border: 1px solid #CDCDCD; width:98%; margin:20px;">
+						<tr>
+							<th width="150">入口</th>
+							<th width="300">url</th>
+							<th width="300">参数</th>
+							<th width="20%">返回数据</th>
+							<th>备注</th>
+						</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">登录接口</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Store/login</td>
+						<td style="padding:10px 2px;">string $username 用户名<br>string $password 密码 (用md5加密)<br>string $pos_id   登录的设备编号<br>string $pos_title   登录的设备名称</td>
+						<td style="padding:10px 2px;">[uid] => 用户ID<br>
+                [username] => 用户登录名<br>
+                [nickname] => 用户姓名<br>
+                [pay_seconds] => 支付限时秒长<br>
+                [store_title] => 门店名<br>
+                [store_admin] => 门店管理员<br>
+                [pos_title] =>  设备名称<br>
+                [pos_tag] =>  设备标签<br></td>
+						<td style="padding:10px 2px;">管理员只能同时在一个设备上登录，若上次登录未退出，下次登录只能通过原设备登录，或通过后台退出后才可登录另外的设备。</td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">退出门店登录</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Store/logout</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">商品分类信息</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Store/cate_info</td>
+						<td style="padding:10px 2px;">int  id  分类ID</td>
+						<td style="padding:10px 2px;">[id] => ID<br>[pid] => 上级ID<br>[title] => 分类名<br></td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">商品分类列表</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Store/cate_list</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;">[id] => ID<br>[pid] => 上级ID<br>[title] => 分类名<br></td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">商品列表</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Store/lists</td>
+						<td style="padding:10px 2px;">  string   $ids  商品ID，默认为0，不使用此参数（多个商品ID间使用,格式，如:  12,3,22。）<br>  int $cate_id  分类ID(默认为全部)<br>  string $keyword  (关键词，可以是标题，首字母，拼音，默认为无)<br>  int $row 条数(最大值为500, 默认为100)<br>  int $offset  数据页数(默认为1，即为第1页)</td>
+						<td style="padding:10px 2px;">[id] => ID<br>[title] => 商品名<br>[pinyin] => 商品拼音<br>[fir_letter] => 商品标题首字母<br>[num] => 库存<br>[month_num] => 本月销售数量<br>[price] => 售价<br>[unit] => 商品单位<br>[cate_id] => 分类ID<br>[pic_url] => 商品图片<br>[create_time] => 创建时间戳<br>[is_hot] => 是否热销(0 否 1 是)<br>[hot_val] => 热度值<br>[bar_code] => 条形码（数组）<br>[content] => 商品详情描述</td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">关键词列表</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Store/keyword_lists</td>
+						<td style="padding:10px 2px;">  string $keyword  (关键词）</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;"></td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">提交订单</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Store/add_order</td>
+						<td style="padding:10px 2px;"> json  $goods  商品json数组,每个数组中的参数为：<br>[id] => 商品ID，[num] => 商品数量<br>示例:<br>[{"id":1,"num":2},{"id":3,"num":2}]</td>
+						<td style="padding:10px 2px;">[order_sn] => 订单号<br>
+                [pay_money] => 总价<br>
+                [num] => 订单商品总数<br>
+                [pay_status] => 支付状态： 1 未支付 2 已支付<br>
+                [pay_status_text] => 支付状态文本<br>
+                [create_time] => 交易时间<br>
+                [status] => 状态 1 新订单 2 待确认 3 已取消 4 已完成<br>
+                [status_text] => 状态文本<br>
+                [pay_qrcode_url] => 支付扫码地址<br>
+                <br>[goods_data] => 订单内容<br><br>
+                -- goods_data 数组字段 --<br>
+                [goods_id] => 商品ID<br>
+                [title] => 标题<br>
+                [pic_url] => 图片<br>
+                [num] => 数量<br>
+                [month_num] => 本月销量<br>
+                [hot_val] => 热度值<br>
+                [price] => 单价<br></td>
+						<td style="padding:10px 2px;">测试过程中，在支付时，订单的金额将为1分。</td>
+					</tr><tr style="padding:5px 0; ">
+						<td style="padding:10px 2px;">查询订单支付状态</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Store/get_pay_status</td>
+						<td style="padding:10px 2px;">string  $order_sn  订单号</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;">用于查询用户是否通过微信或支付宝进行支付。<br>状态：<br>-1 : 订单不存在 <br> 1 订单已支付 <br> 0 订单未支付</td>
+					</tr><tr style="padding:5px 0;  background-color:#EEEEEE; ">
+						<td style="padding:10px 2px;">app版本信息</td>
+						<td style="padding:10px 2px;">http://chaoshipos.k.hiiyee.com/Apiv2/Store/app_info</td>
+						<td style="padding:10px 2px;"></td>
+						<td style="padding:10px 2px;">[app_no] => 版本号<br>[app_name] => 版本名<br>[app_url] => 更新地址</td>
+						<td style="padding:10px 2px;"></td>
+					</tr></table></div></div>
+            </body>
+            </html>

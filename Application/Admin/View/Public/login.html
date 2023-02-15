@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>欢迎您登录{:C('APP_TITLE')}</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="stylesheet" href="/Public/res/Admin/src/css/layui.css" media="all">
+    <link rel="stylesheet" href="/Public/res/Admin/src/css/base.css" media="all">
+    <link rel="stylesheet" href="/Public/res/Admin/src/css/index.css" media="all">
+    <style type="text/css" media="screen">
+    body {
+        background: url('http://www.imzhaike.com/img/494493189495661858.png') no-repeat;
+        background-size: cover;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="site-cover"></div>
+    <div class="site-login">
+        <form id="jq-form" class="layui-form site-form" action="{:U('login')}">
+            <h1>{:C('APP_TITLE')}管理平台</h1>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <input type="text" name="username" autocomplete="off" placeholder="请输入用户名" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <input type="password" name="password" autocomplete="off" placeholder="请输入密码" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <input type="text" name="verify" autocomplete="off" placeholder="请输入验证码" class="layui-input" maxlength="5">
+                    <p id="jq-captcha" class="wrap-captcha"><img src="{:U('Public/verify')}"></p>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button id="jq-submit" class="btn-submit layui-btn">登录</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <script src="/Public/res/Admin/src/layui.js"></script>
+    <script type="text/javascript">
+    layui.config({
+        base: '/Public/res/Admin/src/lay/modules/layui/'
+    });
+    </script>
+    <script type="text/javascript">
+    layui.use(['jquery', 'verifyForm'], function() {
+        var $ = layui.jquery;
+
+        $('#jq-captcha').on({
+            click: function() {
+                var oImg = $(this).find('img'),
+                    aImg = oImg.attr('src');
+                if (aImg.indexOf('?') > 0) {
+                    oImg.attr("src", aImg + '&random=' + Math.random());
+                } else {
+                    oImg.attr("src", aImg.replace(/\?.*$/, '') + '?' + Math.random());
+                }
+            }
+        });
+
+        $('#jq-form').verifyForm({
+            fields: {
+                '[name=username]': {
+                    notEmpty: {
+                        message: '请输入用户名'
+                    }
+                },
+                '[name=password]': {
+                    notEmpty: {
+                        message: '请输入密码'
+                    }
+                },
+                '[name=verify]': {
+                    notEmpty: {
+                        message: '请输入验证码'
+                    }
+                }
+            }
+        });
+
+    });
+    </script>
+</body>

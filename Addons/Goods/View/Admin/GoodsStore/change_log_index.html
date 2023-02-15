@@ -1,0 +1,45 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead> 
+                <tr>
+                    <th>商品名</th>
+                    <th>价格</th>
+                    <th>操作人</th>
+                    <th>操作时间</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td>{$goods[$lv['goods_id']]['title']}</td>
+                    <td>{$lv.price}</td>
+                    <td>{$lv.uid|get_nickname}</td>
+                    <td>{$lv.create_time|time_format="Y-m-d H:i"}</td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $(function() {
+            //全选节点
+            $('.check-all').on('change', function() {
+                $('.ids').prop('checked', this.checked);
+            });
+        })
+    </script>
+</block>

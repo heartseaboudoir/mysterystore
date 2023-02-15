@@ -1,0 +1,101 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <style>
+        .read:before{
+            display:inline-block;
+            background:#dd4b39;
+            color:#fff;
+            content:"已阅";
+            width:30px;
+            padding:1px 5px;
+            border-radius: 10px 0;
+            text-align:center;
+            font-size:12px;
+        }
+    </style>
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <button class="btn ajax-post" url="{:addons_url('Goods://GoodsStoreAdmin:/set_apply_is_read')}" target-form="ids">已阅</button>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead> 
+                <tr>
+                    <th class="row-selected row-selected"><input class="check-all" type="checkbox"/></th>
+                    <th width="30"></th>
+                    <th>单号</th>
+                    <th>操作</th>
+                    <th>操作管理员</th>
+                    <th>状态</th>
+                    <th>操作时间</th>
+                    <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td><input class="ids" type="checkbox" name="id[]" value="{$lv.id}" /></td>
+                    <td class="<eq name="lv.is_read" value="1">read</eq> fir_td"></td>
+                    <td>{$lv.sn}</td>
+                    <td><switch name="lv.type"><case value="1">入库</case><case value="2">出库</case><case value="3">找回</case><case value="4">丢耗</case><case value="5">价格修改</case><case value="6">盘点</case></switch></td>
+                    <td>{$lv.uid|get_nickname}</td>
+                    <td><switch name="lv.status"><case value="1">待审核</case><case value="2">已通过</case><case value="3">已拒绝</case></switch></td>
+                    <td>{$lv.create_time|time_format="Y-m-d H:i"}</td>
+                    <td>
+                        <a class="show" href="{:addons_url('Goods://GoodsStoreAdmin:/apply_show', array('sn' => $lv['sn']))}" data-id="{$lv.id}">详细</a>
+                        <eq name="lv.status" value="1">
+                        <a class="update ajax-get confirm" href="{:addons_url('Goods://GoodsStoreAdmin:/set_apply', array('id' => $lv['id'], 'status' => 'y'))}" data-id="{$lv.id}">通过</a>
+                        <a class="update ajax-get confirm" href="{:addons_url('Goods://GoodsStoreAdmin:/set_apply', array('id' => $lv['id'], 'status' => 'n'))}" data-id="{$lv.id}">拒绝</a>
+                        </eq>
+                        <eq name="lv.is_read" value="0">
+                        <a class="set_read" href="{:addons_url('Goods://GoodsStoreAdmin:/set_apply_is_read', array('id' => $lv['id']))}" data-id="{$lv.id}">已阅</a>
+                        </eq>
+                    </td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $(function() {
+            //全选节点
+            $('.check-all').on('change', function() {
+                $('.ids').prop('checked', this.checked);
+            });
+            $('.listorder').on('change', function(){
+                var id = $(this).attr('item_id'),
+                    value = $(this).val();
+                $.ajax({
+                    type: 'get',
+                    url : "{:addons_url('Goods://GoodsStoreAdmin:/listorder')}",
+                    data: {listorder:value, id:id},
+                    success:function(msg){
+                        if(msg.status == 1){
+                            window.location.reload();
+                        }
+                    }
+                });
+            });
+            $('.set_read').click(function(){
+                var $this = $(this);
+                var url = $this.attr('href');
+                $.get(url,function(res){
+                    if(res.status == 1){
+                        $this.parents('tr').find('.fir_td').addClass('read');
+                        $this.remove();
+                    }
+                });
+                return false;
+            });
+        })
+    </script>
+</block>

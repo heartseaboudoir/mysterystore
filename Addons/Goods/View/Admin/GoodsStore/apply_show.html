@@ -1,0 +1,199 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <style>
+        .read:before{
+            display:inline-block;
+            background:#dd4b39;
+            color:#fff;
+            content:"已阅";
+            width:30px;
+            padding: 2px 10px;
+            border-radius: 10px 0;
+            text-align:center;
+            font-size:14px;
+        }
+    </style>
+        <script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+	<!-- 标题栏 -->
+	<div class="main-title">
+		<h2>{$meta_title}</h2>
+	</div>
+        <div class="tab-content">
+            <!-- 数据列表 -->
+            <form id="form" action="{:addons_url('Goods://GoodsStoreAdmin:/add_apply')}" method="post" class="form-horizontal">
+                <div class="tab-pane in tab1">
+                        <div class="form-item cf">
+                            <label class="item-label">单号</label>
+                            <div class="controls sn">
+                                <eq name="info.is_read" value="1"><span class="read"></span></eq> {$info[sn]}
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">操作</label>
+                            <div class="controls">
+                                <label><switch name="info.type"><case value="1">入库</case><case value="2">出库</case><case value="3">找回</case><case value="4">丢耗</case><case value="5">价格修改</case><case value="6">盘点</case></switch></label>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">操作管理员</label>
+                            <div class="controls">
+                                <label>{$info.uid|get_username}</label>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">操作时间</label>
+                            <div class="controls">
+                                <label>{$info.create_time|time_format}</label>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">申请内容</label>
+                            <div class="controls">
+                                <volist name="info[data]" id="lv">
+                                    <div class="form-item cf">
+                                        <switch name="info.type">
+                                            <case value="5">
+                                                <div class="controls goods_div">
+                                                    <label>商品名：{$goods[$lv[id]][title]}</label>
+                                                    <label>价格：￥{$lv[price]}</label>
+                                                </div>
+                                            </case>
+                                            <case value="6">
+                                                <div class="controls goods_div">
+                                                    <label>商品名：{$goods[$lv[id]][title]}</label>
+                                                    <label>类型：<switch name="lv['type']"><case value="3">找回</case><case value="4">丢耗</case></switch></label>
+                                                    <label>数量：{$lv[num]}</label>
+                                                </div>
+                                            </case>
+                                            <default/>
+                                            <div class="controls goods_div">
+                                                <?php if (!empty($lv['bar_code'])) { ?>
+                                                <label>条形码：<?php echo $lv['bar_code'];?></label>
+                                                <?php } else { ?>
+                                                <label>ID：<?php echo $lv['id'];?></label>
+                                                <?php } ?>
+                                                <label>商品名：{$goods[$lv[id]][title]}</label>
+                                                <label>数量：{$lv[num]}</label>
+                                                <eq name="info.type" value="1">
+                                                <label>入库总成本：{$lv[total_cost]|default=0}</label>
+                                                </eq>
+                                            </div>
+                                        </switch>
+                                    </div>
+                                </volist>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">状态</label>
+                            <div class="controls">
+                                <eq name="info.type" value="5">
+                                <switch name="info.status"><case value="1">待生效</case><case value="2">已生效</case><case value="3">已拒绝</case></switch>
+                                <else/>
+                                <switch name="info.status"><case value="1">待审核</case><case value="2">已通过</case><case value="3">已拒绝</case></switch>
+                                </eq>
+                            </div>
+                        </div>
+                        <eq name="info.type" value="5">
+                        <div class="form-item cf">
+                            <label class="item-label">生效方式</label>
+                            <div class="controls">
+                                <eq name="info.do_action" value="1">
+                                即时生效
+                                <else/>
+                                定时生效
+                                </eq>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">生效时间</label>
+                            <div class="controls">
+                                <notempty name="info.timer_time">{$info.timer_time|time_format="Y-m-d H:i"}<else/>未生效</notempty>
+                            </div>
+                        </div>
+                        </eq>
+                </div>
+                <div class="tab-pane tab2">
+                    
+                </div>
+                <div class="form-item cf">
+                    <eq name="info.status" value="1">
+                    <a class="update ajax-get confirm btn submit-btn" href="{:addons_url('Goods://GoodsStoreAdmin:/set_apply', array('id' => $info['id'], 'status' => 'y'))}">通过</a>
+                    <a class="update ajax-get confirm btn btn-return" href="{:addons_url('Goods://GoodsStoreAdmin:/set_apply', array('id' => $info['id'], 'status' => 'n'))}">拒绝</a>
+                    </eq>
+                    <eq name="info.is_read" value="0">
+                    <a class="confirm btn btn-return set_read" href="{:addons_url('Goods://GoodsStoreAdmin:/set_apply_is_read', array('id' => $info['id']))}" data-id="{$lv.id}">已阅</a>
+                    </eq>
+                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                </div>
+            </form>
+        </div>
+</block>
+<block name="script">
+	<script type="text/javascript">
+		$(function(){
+                    <eq name="info.type" value="5">
+                    highlight_subnav('{:addons_url('Goods://GoodsStoreAdmin:/apply_price_index')}');
+                    <else/>
+                    highlight_subnav('{:addons_url('Goods://GoodsStoreAdmin:/apply_index')}');
+                    </eq>
+                    //全选节点
+                    $('.check-all').on('change',function(){
+                        $('.ids').prop('checked',this.checked);
+                    });
+                    showTab();
+                    function get_goods(obj){
+                        var bar_code = $(obj).val();
+                        var goods_title = $(obj).parents('.goods_div').find('.goods_title');
+                        var goods_id = $(obj).parents('.goods_div').find('.goods_id');
+                        var goods_num = $(obj).parents('.goods_div').find('.goods_num');
+                        if(bar_code != ''){
+                            $.ajax({
+                                type:'get',
+                                url : "{:addons_url('Goods://GoodsAdmin:/get_one')}",
+                                data:{bar_code: bar_code},
+                                dataType:'json',
+                                success:function(data){
+                                    if(data.status == 1){
+                                        var l = '<option> - 请先选择分类 - </option>';
+                                        $.each(data, function(x, y){
+                                            l += '<option value="'+y.id+'">'+y.title+'</option>';
+                                        });
+                                        $('[name="goods_id"]').html(l);
+                                        goods_title.css('color', '#635c73');
+                                        goods_title.val(data.data.title);
+                                        goods_id.val(data.data.id);
+                                        goods_num.val(data.data.num);
+                                    }else{
+                                        goods_title.css('color', 'red');
+                                        goods_title.val('商品不存在');
+                                        goods_id.val(0);
+                                        goods_num.val(0);
+                                    }
+                                }
+                            });
+                        }else{
+                            goods_title.val('');
+                            goods_id.val(0);
+                            goods_num.val(0);
+                        }
+                    }
+                    $('.tab1').delegate('.bar_code', 'change', function(){
+                        get_goods(this);
+                    });
+                    
+                    $('.set_read').click(function(){
+                        var $this = $(this);
+                        var url = $this.attr('href');
+                        $.get(url,function(res){
+                            if(res.status == 1){
+                                $('.sn').prepend('<span class="read"></span>');
+                                $this.remove();
+                            }
+                        });
+                        return false;
+                    });
+		});
+                
+	</script>
+</block>

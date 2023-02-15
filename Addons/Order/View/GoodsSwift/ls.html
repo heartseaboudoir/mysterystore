@@ -1,0 +1,226 @@
+<extend name="Public/base"/>
+<block name="body">
+    <div id="jq-content" class="site-content">
+        <div class="main-title">
+            <h2 id="jq-title"></h2>
+        </div>
+        <!--<div class="search-form fr cf">
+            <form id="jq-search-form">
+                <div class="sleft">
+                    <input type="text" name="s_date" class="text input-text search-input time" placeholder="请选择开始日期" />
+                    <input type="text" name="e_date" class="text input-text search-input time" placeholder="请选择结束日期" />
+                    <a id="jq-search-btn" class="sch-btn" href="javascript:void(0);"><i class="btn-search"></i></a>
+                </div>
+            </form>
+        </div>-->
+        <a id="jq-download" class="btn" href="javascript:void(0);">导出Excel</a>
+        <div style="margin:5px 0;">
+            <table cellpadding="0" cellspacing="0">
+                <tr>
+                    <td>计算公式：</td>
+                    <td><strong>应结数量</strong></td>
+                    <td width="20px" align="center">=</td>
+                    <td>(上期库存-月末库存)+(本月入库-本月出库)</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><strong>应结货款</strong></td>
+                    <td align="center">=</td>
+                    <td>应结数量&nbsp;x&nbsp;销售价</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><strong>销售金额</strong></td>
+                    <td align="center">=</td>
+                    <td>销售价&nbsp;x&nbsp;销量</span></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><strong>盘盈盘亏</strong></td>
+                    <td align="center">=</td>
+                    <td>盘盈盘亏合计</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><strong>成本金额</strong></td>
+                    <td align="center">=</td>
+                    <td>各订单合计</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><strong>丢耗数量</strong></td>
+                    <td align="center">=</td>
+                    <td>应结数量&nbsp;-&nbsp;销售数量</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><strong>丢耗金额</strong></td>
+                    <td align="center">=</td>
+                    <td>丢耗数量&nbsp;x&nbsp;销售价</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><strong>丢耗率</strong></td>
+                    <td align="center">=</td>
+                    <!--<td>丢耗金额&nbsp;/&nbsp;应结货款</td>-->
+                    <td>丢耗数量&nbsp;/&nbsp;应结数量</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><strong>毛利</strong></td>
+                    <td align="center">=</td>
+                    <td>销售金额&nbsp;-&nbsp;成本金额</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><strong>毛利率</strong></td>
+                    <td align="center">=</td>
+                    <td>毛利&nbsp;/&nbsp;销售金额</td>
+                </tr>
+            </table>
+            <!--计算公式：
+            <span style="margin-right:10px;"><strong>应结数量 = </strong>(上期库存-月末库存)+(本月入库-本月出库)</span>
+            <span style="margin-right:10px;"><strong>应结货款 = </strong>应结数量&nbsp;x&nbsp;销售价</span>
+            <span style="margin-right:10px;"><strong>销售金额 = </strong>销量&nbsp;x&nbsp;销售价</span><br/>
+            <label style="visibility:hidden;" >计算公式：</label>
+            <span style="margin-right:10px;"><strong>成本价 = </strong>根据采购计算所得</span>
+            <span style="margin-right:10px;"><strong>丢耗数 = </strong>应结数-销量</span>
+            <span><strong>丢耗率 = </strong>丢耗金额/应结货款</span>-->
+        </div>
+        <div class="data-table table-striped">
+            <table>
+                <thead>
+                <tr>
+                    <th>商品ID</th>
+                    <th>商品名称</th>
+                    <th>销售价</th>
+                    <th>应结数量</th>
+                    <th>应结货款</th>
+                    <th>销量</th>
+                    <th>销售金额</th>
+                    <!--<th>成本价</th>-->
+                    <th>成本金额</th>
+                    <!--<th>库存成本金额</th>-->
+                    <th>毛利</th>
+                    <th>毛利率</th>
+                    <th>丢耗数量</th>
+                    <th>丢耗金额</th>
+                    <th>丢耗率</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody id="jq-list"></tbody>
+            </table>
+        </div>
+        <div id="jq-page" class="page"></div>
+    </div>
+    <script id="temp-list" type="text/html">
+        {{each items as list index}}
+        <tr data-id="{{list.id}}">
+            <td>{{list.goods_id}}</td>
+            <td title="{{list.goods_name}}">
+                {{if list.goods_name != null}}
+                {{if list.goods_name.length > 19}}
+                {{list.goods_name.slice(0,18) + '...'}}
+                {{else}}
+                {{list.goods_name}}
+                {{/if}}
+                {{/if}}
+            </td>
+            <td>{{list.price}}</td>
+            <td>{{list.result_num}}</td>
+            <td>{{list.result_money}}</td>
+            <td>{{list.sell_num}}</td>
+            <td>{{list.sell_money}}</td>
+            <td>{{list.inprice_money}}</td>
+            <td>{{list.gross_profit}}</td>
+            <td>{{list.gross_profit_rate}}%</td>
+            <td>{{list.system_lost_num}}</td>
+            <td>{{list.lost_money}}</td>
+            <td>{{list.lost_rand}}%</td>
+            <td class="wrap-highlight">{{list.status_name}}</td>
+            <td>
+                <a class="temp-view" href="javascript:void(0);">查看</a>
+            </td>
+        </tr>
+        {{/each}}
+    </script>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        layui.use(['main'], function () {
+            var $ = layui.jquery,
+                layer = layui.layer;
+
+            var Global = {
+                listUrl: '/Erp/StoreGoodsSwift/ls',
+                fileUrl: '/Erp/StoreGoodsSwift/exportLsExcel',
+                jump: window.location.pathname.match(/(\D*)ls/)[1],
+                passId: 'id'
+            }
+            $("a[href$='" + Global.jump + "index.html']").parent().addClass('layui-this');
+
+            var passData = $.dataJson({
+                id: window.location.pathname.match(/\/(\w+).html/)[1]
+            });
+            delete passData.s_date;
+            delete passData.e_date;
+            var data = $.parseJson(passData);
+
+            $.getData({
+                url: Global.listUrl + '?' + data,
+                load: true
+            }, function (res) {
+                dataShow(res);
+            });
+            function dataShow(res, callback) {
+
+                   var oList = $('#jq-list'),
+                    oPage = $('#jq-page');
+
+                //oDownload.attr('href','javascript:void(0);');
+
+                if (res.content.data == null || res.content.data.length == 0) {
+                    oList.html('<tr><td class="wrap-empty">暂无内容！</td></tr>');
+                    //oDownload.css('cursor', 'default');
+                } else {
+                    $.each(res.content.data, function (i, items) {
+                        res.content.data[i].inprice = items.inprice > 0 ? items.inprice : 0;
+                    });
+                    oList.html(template('temp-list', {items: res.content.data}));
+                    $.each(res.content.data, function (i, items) {
+                        var url = Global.jump + 'view/id/' + passData.id + '/did/' + items[Global.passId] + '.html',
+                            oId = $('[data-id=' + items[Global.passId] + ']');
+                        oId.find('.temp-view').attr('href', url);
+
+                        if (passData.p > 1 && callback == undefined) {
+                            var id = parseInt(oId.find('.temp-id').html()),
+                                sum = passData.p * passData.pageSize - passData.pageSize;
+                            oId.find('.temp-id').html(id + sum);
+                        } else {
+                            oId.find('.temp-id').html(id);
+                        }
+
+                    });
+
+                   // oDownload.attr('href', Global.fileUrl + '?' + 'id=' + passData.id);
+                }
+
+                if (res.content.recordCount > res.content.pageSize) {
+                    var total = '<span class="rows">共' + res.content.recordCount + '条记录</span>';
+                    oPage.html(res.content.pager.replace(new RegExp(Global.listUrl, 'g'), Global.jump + 'ls') + total);
+                } else {
+                    oPage.html(res.content.pager);
+                }
+
+                var vTitle = '结款单 > ' + res.content.year + '年' + res.content.month + '月';
+                $('#jq-title').html(vTitle);
+            }
+            $('#jq-download').fileDown({
+                url: Global.fileUrl + '?' + data
+            });
+
+        });
+    </script>
+</block>

@@ -1,0 +1,78 @@
+<extend name="Base/common"/>
+<block name="body">
+    <button type="button" onclick="recordStart()">start</button><br><br><br><br>
+    <button type="button" onclick="recordEnd()">end</button><br><br><br><br>
+    <button type="button" onclick="recordId()">test</button><br><br><br><br>
+    <button type="button" onclick="recordPlay()">play</button><br><br><br><br>
+    <button type="button" onclick="recordUpload()">upload</button><br><br><br><br>
+    
+</block>
+<block name="script">
+    <script type="text/javascript">
+    
+    
+    var localId = 0;
+    
+    
+    function recordStart() {
+        wx.startRecord();
+    }
+    
+    function recordEnd() {
+        wx.stopRecord({
+            success: function (res) {
+                localId = res.localId;
+            }
+        });
+    }
+    
+    
+    function recordId() {
+        alert(localId);
+    }
+    
+    function recordPlay() {
+        if (localId != 0) {
+            wx.playVoice({
+                localId: localId // 需要播放的音频的本地ID，由stopRecord接口获得
+            });
+        } else {
+            alert(localId);
+        }
+    }
+    
+    function recordUpload() {
+        if (localId != 0) {
+            wx.uploadVoice({
+                localId: localId, // 需要上传的音频的本地ID，由stopRecord接口获得
+                isShowProgressTips: 1, // 默认为1，显示进度提示
+                success: function (res) {
+                    var serverId = res.serverId; // 返回音频的服务器端ID
+                    
+                    
+                    // 上传服务ID至神秘商店
+                    $.ajax({
+                        type: 'POST',
+                        url: '/Wap/TestApi/save',
+                        data: {'wx_id': serverId},
+                        dataType: 'json',
+                        success: function(data) {
+                            alert(data.content);
+                        }
+                        
+                    })
+                    
+                    
+                    
+                }
+            }); 
+        } else {
+            alert(localId);
+        }
+    }    
+    
+   
+    
+    
+    </script>
+</block>

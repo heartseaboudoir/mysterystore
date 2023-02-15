@@ -1,0 +1,357 @@
+<extend name="Public/base" />
+<style>
+    .div-inline{ width:100px;height:50px;border:1px solid #F00}
+</style>
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <?php
+     if($gname != ''){
+        $strhref .= '&gname=' .$gname;
+     }
+     if($gid != ''){
+        $strhref .= '&gid=' .$gid;
+     }
+     if($s_date != ''){
+        $strhref .= '&s_date=' .$s_date;
+        $datehref .= '&s_date=' .$s_date;
+     }
+     if($e_date != ''){
+        $strhref .= '&e_date=' .$e_date;
+        $datehref .= '&e_date=' .$e_date;
+     }
+     ?>
+    <div style="clear:both;"></div>
+    <div style="width: 100%;height:800px;float:left;">
+        <a href="{:addons_url('Report://GoodsSale:/goods_buy')}?dwm=d{$strhref}" class="btn">日</a>
+        <a href="{:addons_url('Report://GoodsSale:/goods_buy')}?dwm=w{$strhref}" class="btn">周</a>
+        <a href="{:addons_url('Report://GoodsSale:/goods_buy')}?dwm=m{$strhref}" class="btn">月</a>
+        <a href="{:addons_url('Report://GoodsSale:/goods_buy')}?isprint=1&dwm={$dwm}{$strhref}" class="btn">导出Excel</a>
+        <!-- 高级搜索 -->
+        <div class="search-form fr cf">
+            <form id="search-form" onsubmit="return false;">
+                <div class="search-form fr cf">
+                    <label id="msg" name="msg"></label>
+                    <div class="sleft">
+                        <input type="text" name="gname" class="text input-text search-input" style="" value="{$gname}" placeholder="请输入商品名查找" />
+                        <input type="text" name="s_date" class="text search-input time" style="width:100px;" value="{$s_date}" placeholder="起始时间" />
+                        <input type="text" name="e_date" class="text search-input time" style="width:140px;" value="{$e_date}" placeholder="结束时间" />
+                        <a class="sch-btn" href="javascript:;" id="search" url="{:addons_url('Report://GoodsSale:/goods_buy')}?dwm={$dwm}"><i class="btn-search"></i></a>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <!-- 第一个图表 -->
+        <div id="first" style="width: 100%;height:700px;float:left;"></div>
+        <!-- 分页 -->
+        <div class="page" style="float:left;width: 100%;">
+            {$_page}
+        </div>
+    </div>
+    <div class="main-title">
+        <h2>门店商品销售TOP25>>><a href="{:addons_url('Report://Sale:/goods_top10')}?od=sum_amount{$datehref}">更多</a></h2>
+    </div>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+            <tr>
+                <th style="text-align:center;">排名</th>
+                <th style="text-align:center;">商品名</th>
+                <th style="text-align:center;">分类名</th>
+                <th style="text-align:center;">销售数量</th>
+                <th style="text-align:center;">销售金额</th>
+                <th style="text-align:center;">日均销量</th>
+                <th style="text-align:center;">日均销售额</th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php $i = 0; ?>
+            <notempty name="listu25">
+                <volist name="listu25" id="lv" key="vo">
+                    <?php $i++; ?>
+                    <tr>
+                        <td>{$i}</td>
+                        <td align="center">{$lv.goods_name}</td>
+                        <td align="center">{$lv.cate_name}</td>
+                        <td align="center">{$lv.buynum}</td>
+                        <td align="center">{$lv.buymoney}</td>
+                        <td align="center">{$lv.avgnum}</td>
+                        <td align="center">{$lv.avgmoney}</td>
+                    </tr>
+                </volist>
+                <else/>
+                <tr>
+                    <td colspan="8" align="center">没有销售记录</td>
+                </tr>
+            </notempty>
+            </tbody>
+        </table>
+    </div>
+    <div style="clear:both;"></div>
+    <div id="l0" style="width: 100%;height:50px;float:left;">&nbsp;</div>
+    <div id="l1" style="width: 10%;height:700px;float:left;">&nbsp;</div>
+
+    <!-- 第二个图表 -->
+    <div id="second" style="width: 42%;height:700px;float:left;"></div>
+
+    <!-- 第三个图表 -->
+    <div id="third" style="width: 40%;height:700px;float:left;"></div>
+</block>
+<block name="script">
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/echarts.js"></script>
+    <link href="__STATIC__/datetimepicker/css/datetimepicker.css" rel="stylesheet" type="text/css">
+    <link href="__STATIC__/datetimepicker/css/dropdown.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+    <script type="text/javascript">
+        highlight_subnav('{:addons_url('Report://GoodsSale:/goods_buy')}');
+            //搜索功能
+                $('.search-form input').focus(function(){
+                    $(document).keypress(function (e) {
+                        // 回车键事件
+                        if (e.which == 13) {
+                            $("#search").click();
+                        }
+                    });
+                });
+        $("#search").click(function() {
+            var url = $(this).attr('url');
+            var query = $('.search-form').find('input').serialize();
+            query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g, '');
+            query = query.replace(/^&/g, '');
+            if (url.indexOf('?') > 0) {
+                url += '&' + query;
+            } else {
+                url += '?' + query;
+            }
+            var query2 = $('#select-form').serialize();
+            if (url.indexOf('?') > 0) {
+                url += '&' + query2;
+            } else {
+                url += '?' + query2;
+            }
+            window.location.href = url;
+        });
+
+        // 状态搜索子菜单
+        $(".search-form").find(".drop-down").hover(function() {
+            $("#sub-sch-menu").removeClass("hidden");
+        }, function() {
+            $("#sub-sch-menu").addClass("hidden");
+        });
+        $("#sub-sch-menu li").find("a").each(function() {
+            $(this).click(function() {
+                var text = $(this).text();
+                $("#sch-sort-txt").text(text).attr("data", $(this).attr("value"));
+                $("#sub-sch-menu").addClass("hidden");
+            })
+        });
+        var _T;
+        $('#select-form input').change(function(){
+            clearTimeout(_T);
+            _T = setTimeout(function(){
+                $("#search").click();
+            }, 1000);
+        });
+        $('.time').datetimepicker({
+            format: 'yyyy-mm-dd',
+            language: "zh-CN",
+            minView: 2,
+            autoclose: true
+        });
+    </script>
+    <script type="text/javascript">
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('first'));
+        // 显示标题，图例和空的坐标轴
+        /*grid: {
+         left: '3%',
+         right: '4%',
+         bottom: '3%',
+         containLabel: true
+         },
+         toolbox: {
+         feature: {
+         saveAsImage: {}
+         }
+         },*/
+        option = {
+            title: {
+                text: '{$legendstr}',
+                subtext: '{$title_top10_1_sub}'
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            color:['black','red','blue'],
+            legend: {
+                data:['{$legendstr1}','{$legendstr2}','{$legendstr3}'],
+            },
+            toolbox: {
+                show: false,
+                feature: {
+                    magicType: {show: true, type: ['stack', 'tiled']},
+                    saveAsImage: {show: true}
+                }
+            },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: [{$xstr}],
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [
+                {
+                    "name":"{$legendstr1}",
+                    "type":"line","smooth":false,
+                    "data":[{$datastr1}]
+                },
+                {
+                    "name":"{$legendstr2}",
+                    "type":"line","smooth":false,
+                    "data":[{$datastr2}]
+                },
+                {
+                    "name":"{$legendstr3}",
+                    "type":"line","smooth":false,
+                    "data":[{$datastr3}]
+                }
+            ]
+        };
+        myChart.setOption(option);
+        myChart.on('click', function (params) {
+            var ids = params.dataIndex;
+            var id1 = params.seriesIndex;
+            var uidary = params.seriesId;
+            var uida = uidary.split(',');
+            var uid = uida[ids];
+            var str1 = '';
+            if(id1 == 0){
+                str1 = '{:addons_url('Report://Sale:/newuserlist')}?v=3{$strhref}';
+                window.location.href = str1;
+            };
+            if(id1 == 1){
+                str1 = '{:addons_url('Report://Sale:/newuserlist')}?v=4{$strhref}';
+                window.location.href = str1;
+            };
+        });
+        var myChart1 = echarts.init(document.getElementById('second'));
+        var datas_name = '{$xstr_top10_1}'.split(',');
+        var datas_value = '{$datastr_top10_1}'.split(',');
+        option1 = {
+            title : {
+                text: '{$title_top10_1}',
+                subtext: '{$title_top10_1_sub}',
+                x:'center'
+            },
+            tooltip : {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+            legend: {
+                orient: 'horizontal',
+                bottom: 'bottom',
+                data: [{$xstr_top10_1_1}],
+                formatter: function (name) {
+                    return (name.length > 5 ? (name.slice(0,5)+"...") : name );
+                }
+            },
+            series : [
+                {
+                    name: '销售金额',
+                    type: 'pie',
+                    data:[
+                        {value:datas_value[0], name:datas_name[0]},
+                        {value:datas_value[1], name:datas_name[1]},
+                        {value:datas_value[2], name:datas_name[2]},
+                        {value:datas_value[3], name:datas_name[3]},
+                        {value:datas_value[4], name:datas_name[4]},
+                        {value:datas_value[5], name:datas_name[5]},
+                        {value:datas_value[6], name:datas_name[6]},
+                        {value:datas_value[7], name:datas_name[7]},
+                        {value:datas_value[8], name:datas_name[8]},
+                        {value:datas_value[9], name:datas_name[9]},
+                    ],
+                    itemStyle: {
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }
+            ]
+        };
+        myChart1.setOption(option1);
+        myChart1.on('click', function (params) {
+            var ids = params.dataIndex;
+            var uidary = params.seriesId;
+            var uida = uidary.split(',');
+            var uid = uida[ids];
+            var str = '{:addons_url('Report://Sale:/goods_top10')}?od=sum_amount&s_date={$s_date}&e_date={$e_date}';
+                    window.location.href = str;
+        });
+
+        var myChart2 = echarts.init(document.getElementById('third'));
+        var datas_name2 = "{$xstr_top10_2}".split(',');
+        var datas_value2 = '{$datastr_top10_2}'.split(',');
+        option2 = {
+            title : {
+                text: '{$title_top10_2}',
+                subtext: '{$title_top10_2_sub}',
+                x:'center'
+            },
+            tooltip : {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+            legend: {
+                orient: 'horizontal',
+                bottom: 'bottom',
+                data: [{$xstr_top10_2_2}],
+                formatter: function (name) {
+                    return (name.length > 5 ? (name.slice(0,5)+"...") : name );
+                }
+            },
+            series : [
+                {
+                    name: '分类销售额',
+                    type: 'pie',
+                    data:[
+                        {value:datas_value2[0], name:datas_name2[0]},
+                        {value:datas_value2[1], name:datas_name2[1]},
+                        {value:datas_value2[2], name:datas_name2[2]},
+                        {value:datas_value2[3], name:datas_name2[3]},
+                        {value:datas_value2[4], name:datas_name2[4]},
+                        {value:datas_value2[5], name:datas_name2[5]},
+                        {value:datas_value2[6], name:datas_name2[6]},
+                        {value:datas_value2[7], name:datas_name2[7]},
+                        {value:datas_value2[8], name:datas_name2[8]},
+                        {value:datas_value2[9], name:datas_name2[9]},
+                    ],
+                    itemStyle: {
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }
+            ]
+        };
+        myChart2.setOption(option2);
+        myChart2.on('click', function (params) {
+            var ids = params.dataIndex;
+            var uidary = params.seriesId;
+            var uida = uidary.split(',');
+            var uid = uida[ids];
+            var str = '{:addons_url('Report://Sale:/cate_top10')}?od=sum_amount&s_date={$s_date}&e_date={$e_date}';
+                    window.location.href = str;
+        });
+    </script>
+</block>

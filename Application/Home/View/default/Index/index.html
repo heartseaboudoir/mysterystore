@@ -1,0 +1,31 @@
+<extend name="Base/common"/>
+
+<block name="header">
+</block>
+
+
+<block name="body">
+    <div class="">
+        <!-- Contents
+        ================================================== -->
+        <section id="contents">
+			<volist name="lists" id="lv">
+				<div style="float:left; margin:5px 0px; width:20%; padding:5px 2.5%; <if condition="$i%2">background:#efefef;<else/>background:#dfdfdf;</if>">
+					<div class="">
+						<h4><a href="{:U('Goods/detail?id='.$lv['id'])}">{$lv.title|msubstr=0,10,'utf-8',''}</a></h4>
+					</div>
+					<notempty name="lv[cover_id]">
+					<div>
+						<img src="{$lv.cover_id|get_cover_url}" style="max-height:100px;">
+					</div>
+					</notempty>
+					<div>
+						<span><a href="{:U('Goods/detail?id='.$lv['id'])}">查看</a></span>
+					</div>
+				</div>
+			</volist>
+
+        </section>
+    </div>
+        </div>
+</block>

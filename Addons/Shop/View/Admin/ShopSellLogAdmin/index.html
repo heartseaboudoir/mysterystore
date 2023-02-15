@@ -1,0 +1,107 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <!-- 高级搜索 -->
+    <div class="cf">
+        <div class="search-form fr cf">
+            <div class="sleft">
+                <input type="text" name="start_date" class="text search-input time" style="width:100px;" value="{$_GET['start_date']}" placeholder="起始时间" />
+                <input type="text" name="end_date" class="text search-input time" style="width:100px;" value="{$_GET['end_date']}" placeholder="结束时间" />
+                <a class="sch-btn" href="javascript:;" id="search" url="{:addons_url('Shop://ShopSellLogAdmin/index')}"><i class="btn-search"></i></a>
+            </div>
+        </div>
+    </div>
+    <div style="clear:both;"></div>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+                <tr>
+                    <th>购买人</th>
+                    <th>店铺用户</th>
+                    <th>商品</th>
+                    <th style="width:100px">购买数量</th>
+                    <th style="width:120px">操作时间</th>
+            </tr>
+            </thead>
+            <tbody>
+            <notempty name="list">
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td><a href="{:U('Member/show', array('id' => $lv['fid']))}" target="_blank"><img src="{$lv.fid|get_header_pic}" class="header_pic" />{$lv.fid|get_nickname}</a></td>
+                    <td><a href="{:U('Member/show', array('id' => $lv['uid']))}" target="_blank"><img src="{$lv.uid|get_header_pic}" class="header_pic" />{$lv.uid|get_nickname}</a></td>
+                    <td><a href="{:addons_url('Shop://ShopArticleAdmin/save', array('id' => $lv['aid']))}" target="_blank">{$lv.art_title}</a></td>
+                    <td>{$lv.num}</td>
+                    <td>{$lv.create_time|time_format}</td>
+                </tr>
+            </volist>
+             <else/>
+             <tr><td colspan="6">暂无数据~</td></tr>
+            </notempty>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <link href="__STATIC__/datetimepicker/css/datetimepicker.css" rel="stylesheet" type="text/css">
+    <link href="__STATIC__/datetimepicker/css/dropdown.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+    <script type="text/javascript">
+        $(function() {
+            highlight_subnav('{:addons_url('Shop://ShopSellLogAdmin:/index')}');
+            //全选节点
+            $('.check-all').on('change', function() {
+                $('.ids').prop('checked', this.checked);
+            });
+            $('.search-form input').focus(function(){
+                $(document).keypress(function (e) {
+                    // 回车键事件 
+                    if (e.which == 13) {
+                        $("#search").click();
+                    }
+                });
+            });
+            $("#search").click(function() {
+                var url = $(this).attr('url');
+                var query = $('.search-form').find('input').serialize();
+                query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g, '');
+                query = query.replace(/^&/g, '');
+                if (url.indexOf('?') > 0) {
+                    url += '&' + query;
+                } else {
+                    url += '?' + query;
+                }
+                window.location.href = url;
+            });
+
+            /* 状态搜索子菜单 */
+            $(".search-form").find(".drop-down").hover(function() {
+                $("#sub-sch-menu").removeClass("hidden");
+            }, function() {
+                $("#sub-sch-menu").addClass("hidden");
+            });
+            $("#sub-sch-menu li").find("a").each(function() {
+                $(this).click(function() {
+                    var text = $(this).text();
+                    $("#sch-sort-txt").text(text).attr("data", $(this).attr("value"));
+                    $("#sub-sch-menu").addClass("hidden");
+                })
+            });
+            $('.time').datetimepicker({
+                format: 'yyyy-mm-dd',
+                language: "zh-CN",
+                minView: 2,
+                autoclose: true
+            });
+        })
+    </script>
+</block>

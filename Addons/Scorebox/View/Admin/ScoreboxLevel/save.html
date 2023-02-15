@@ -1,0 +1,104 @@
+<extend name="Public/base" />
+
+<block name="body">
+        <script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+	<!-- 标题栏 -->
+	<div class="main-title">
+		<h2>{$meta_title}</h2>
+	</div>
+        <div class="tab-content">
+            <!-- 数据列表 -->
+            <form id="form" action="{:addons_url('Scorebox://ScoreboxLevelAdmin:/update')}" method="post" class="form-horizontal">
+                <div class="tab-pane in tab1">
+                        <div class="form-item cf">
+                            <label class="item-label">等级称号</label>
+                            <div class="controls">
+                                <input type="text" class="text input-large" name="title" value="{$data.title}" />
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">等级图标<span class="check-tips">（图标最佳长宽比例为1:1）</span></label>
+                            <div class="controls">
+                                <input type="file" id="upload_picture_cover_id">
+                                <input type="hidden" name=icon id=cover_id value="{$data[icon]}"/>
+                                <div class="upload-img-box">
+                                    <notempty name="data[icon]">
+                                        <div class="upload-pre-item"><img src="{$data[icon]|get_cover='path'}"/></div>
+                                    </notempty>
+                                </div>
+                                <script type="text/javascript">
+                                //上传图片
+                                /* 初始化上传插件 */
+                                $("#upload_picture_cover_id").uploadify({
+                                    "height"          : 30,
+                                    "swf"             : "__STATIC__/uploadify/uploadify.swf",
+                                    "fileObjName"     : "download",
+                                    "buttonText"      : "上传图片",
+                                    "uploader"        : "{:U('File/uploadPicture',array('session_id'=>session_id()))}",
+                                    "width"           : 120,
+                                    'removeTimeout'	  : 1,
+                                    'fileTypeExts'	  : '*.jpg; *.png; *.gif;',
+                                    "onUploadSuccess" : uploadPicturecover_id,
+                                    'onFallback' : function() {
+                                        alert('未检测到兼容版本的Flash.');
+                                    }
+                                });
+                                function uploadPicturecover_id(file, data){
+                                    var data = $.parseJSON(data);
+                                    var src = '';
+                                    if(data.status){
+                                            $("#cover_id").val(data.id);
+                                            src = data.url || '__ROOT__' + data.path
+                                            $("#cover_id").parent().find('.upload-img-box').html(
+                                                    '<div class="upload-pre-item"><img src="__ROOT__' + src + '"/></div>'
+                                            );
+                                    } else {
+                                            updateAlert(data.info);
+                                            setTimeout(function(){
+                                            $('#top-alert').find('button').click();
+                                            $(that).removeClass('disabled').prop('disabled',false);
+                                        },1500);
+                                    }
+                                }
+                                </script>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">经验底限<span class="check-tips">（用户经验高于或等于设置值时的称号）</span></label>
+                            <div class="controls">
+                                <input type="text" class="text input-min" name="exper" value="{$data.exper}" />
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">等级优惠折扣<span class="check-tips">（按百分比,最小值0，最大值99.99，保存两位小数）</span></label>
+                            <div class="controls">
+                                <input type="text" class="text input-mini" name="sale" value="{$data.sale|default=0}" maxlength="5" />％
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">最后更新时间<span class="check-tips"></span></label>
+                            <div class="controls">
+                                {$data.update_time|time_format="Y-m-d H:i"}
+                            </div>
+                        </div>
+                </div>
+                <div class="form-item cf">
+                    <button id="submit" class="btn submit-btn ajax-post hidden" target-form="form-horizontal" type="submit">确 定</button>
+                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                    <input type="hidden" value="{$data.id}" name="id" />
+                </div>
+            </form>
+        </div>
+</block>
+<block name="script">
+	<script type="text/javascript">
+		$(function(){
+                    highlight_subnav('{:addons_url('Scorebox://ScoreboxLevelAdmin:/index')}');
+                    //全选节点
+                    $('.check-all').on('change',function(){
+                        $('.ids').prop('checked',this.checked);
+                    });showTab();
+		})
+                
+	</script>
+</block>

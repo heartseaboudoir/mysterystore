@@ -1,0 +1,98 @@
+<extend name="Public/base" />
+<block name="body">
+	<script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/Public/res/code/ueditor/ueditor.config.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/Public/res/code/ueditor/ueditor.all.min.js"> </script>
+    <script type="text/javascript" charset="utf-8" src="/Public/res/code/ueditor/lang/zh-cn/zh-cn.js"></script> 
+	<!-- 标题栏 -->
+	<div class="main-title">
+		<h2>{$meta_title}</h2>
+	</div>
+        <div class="tab-content site-lottery">
+            <!-- 数据列表 -->
+            <form id="form" action="{:addons_url('CashCoupon://WorldCup:/update_team')}" method="post" class="form-horizontal">
+                <script type="text/plain" id="upload_ue"></script>
+                <script type="text/plain" id="upload_ue2"></script>
+                <div class="tab-pane in tab1">
+
+
+                  
+                    <div class="form-item cf">
+                        <label class="item-label">A球队名<span class="check-tips"></span></label>
+                        <div class="controls">
+                            <input class="text input-large" type="text" value="{$data1['wc_name']}" name="wc_name1" maxlength="30">
+                        </div>
+                    </div>
+                    <div class="form-item cf">
+                        <label class="item-label">A球队图片<span class="check-tips"></span></label>
+                        <div class="controls">
+                            <input type="text" readonly="readonly" class="text input-large" id="wc_pic1" name="wc_pic1" value="{$data1['wc_pic']}"><a href="javascript:void(0);" onclick="upImage();">上传图标</a>
+                        </div>
+                        <div style="width:200px;">
+                            <img id="showimg1" style="width:100%;" src="{$data1['wc_pic']}" />
+                        </div>
+                    </div>  
+                    <div class="form-item cf">
+                        <label class="item-label">B球队名<span class="check-tips"></span></label>
+                        <div class="controls">
+                            <input class="text input-large" type="text" value="{$data2['wc_name']}" name="wc_name2" maxlength="80">
+                        </div>
+                    </div>                     
+                    <div class="form-item cf">
+                        <label class="item-label">B球队图片<span class="check-tips"></span></label>
+                        <div class="controls">
+                            <input type="text" readonly="readonly" class="text input-large" id="wc_pic2" name="wc_pic2" value="{$data2['wc_pic']}"><a href="javascript:void(0);" onclick="upImage2();">上传轮播图片</a>
+                        </div>
+                        <div style="width:200px;">
+                            <img id="showimg2" style="width:100%;" src="{$data2['wc_pic']}" />
+                        </div>
+                    </div>                     
+                </div>                 
+                <div class="form-item cf">
+                    <button id="submit" class="btn submit-btn ajax-post hidden" target-form="form-horizontal" type="submit">确 定</button>
+                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                </div>
+            </form>
+        </div>
+
+</block>
+<block name="script">
+
+
+
+<script type="text/javascript">
+
+var _editor = UE.getEditor('upload_ue');
+_editor.ready(function () {
+    _editor.hide();
+    _editor.addListener('beforeInsertImage', function (t, arg) {
+        $("#wc_pic1").attr("value", arg[0].src);
+        $("#showimg1").attr("src", arg[0].src);
+    })
+});
+
+
+var _editor2 = UE.getEditor('upload_ue2');
+_editor2.ready(function () {
+    _editor2.hide();
+    _editor2.addListener('beforeInsertImage', function (t, arg) {
+        $("#wc_pic2").attr("value", arg[0].src);
+        $("#showimg2").attr("src", arg[0].src);
+    })
+});
+
+//弹出图片上传的对话框
+function upImage() {
+    var myImage = _editor.getDialog("insertimage");
+    myImage.open();
+}
+
+function upImage2() {
+    var myImage = _editor2.getDialog("insertimage");
+    myImage.open();
+}
+
+</script>
+
+
+</block>

@@ -1,0 +1,242 @@
+<extend name="Public/base" />
+
+<block name="body">
+        <script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+	<!-- 标题栏 -->
+	<div class="main-title">
+		<h2>{$meta_title}</h2>
+	</div>
+        <div class="tab-content">
+            <!-- 数据列表 -->
+            <form id="form" action="{:addons_url('Report://StoreJieCunAdmin:/dosh')}" method="post" class="form-horizontal">
+                <p class="notice_data">注：定时执行设置保存后，即时生效</p>
+                <div class="tab-pane in tab1">
+                        <div class="form-item cf">
+                            <label class="item-label">当前设定：
+                                <?php
+                                if($data['setting_date'] == 1){
+                                    echo('每日');
+                                }
+                                if($data['setting_date'] == 2){
+                                    echo('每周');
+                                    if($data['setting_num'] == 1){echo('周一');}
+                                    if($data['setting_num'] == 2){echo('周二');}
+                                    if($data['setting_num'] == 3){echo('周三');}
+                                    if($data['setting_num'] == 4){echo('周四');}
+                                    if($data['setting_num'] == 5){echo('周五');}
+                                    if($data['setting_num'] == 6){echo('周六');}
+                                    if($data['setting_num'] == 7){echo('周日');}
+                                }
+                                if($data['setting_date'] == 3){
+                                    echo('每月');
+                                    if($data['setting_num'] == 1){echo('1日');}
+                                    if($data['setting_num'] == 2){echo('2日');}
+                                    if($data['setting_num'] == 3){echo('3日');}
+                                    if($data['setting_num'] == 4){echo('4日');}
+                                    if($data['setting_num'] == 5){echo('5日');}
+                                    if($data['setting_num'] == 6){echo('6日');}
+                                    if($data['setting_num'] == 7){echo('7日');}
+                                    if($data['setting_num'] == 8){echo('8日');}
+                                    if($data['setting_num'] == 9){echo('9日');}
+                                    if($data['setting_num'] == 10){echo('10日');}
+                                    if($data['setting_num'] == 11){echo('11日');}
+                                    if($data['setting_num'] == 12){echo('12日');}
+                                    if($data['setting_num'] == 13){echo('13日');}
+                                    if($data['setting_num'] == 14){echo('14日');}
+                                    if($data['setting_num'] == 15){echo('15日');}
+                                    if($data['setting_num'] == 16){echo('16日');}
+                                    if($data['setting_num'] == 17){echo('17日');}
+                                    if($data['setting_num'] == 18){echo('18日');}
+                                    if($data['setting_num'] == 19){echo('19日');}
+                                    if($data['setting_num'] == 20){echo('20日');}
+                                    if($data['setting_num'] == 21){echo('21日');}
+                                    if($data['setting_num'] == 22){echo('22日');}
+                                    if($data['setting_num'] == 23){echo('23日');}
+                                    if($data['setting_num'] == 24){echo('24日');}
+                                    if($data['setting_num'] == 25){echo('25日');}
+                                    if($data['setting_num'] == 26){echo('26日');}
+                                    if($data['setting_num'] == 27){echo('27日');}
+                                    if($data['setting_num'] == 28){echo('28日');}
+                                    if($data['setting_num'] == 99){echo('最后一天');}
+                                }
+                                 ?></label>
+                            <label class="item-label">重新设定什么时候执行</label>
+                            <div class="selectList">
+                                <select name="province" class="province">
+                                    <option value="1"<?php if($data['setting_date'] == 1){echo(' selected="selected"');} ?>>每日</option>
+                                    <option value="2"<?php if($data['setting_date'] == 2){echo(' selected="selected"');} ?>>每周</option>
+                                    <option value="3"<?php if($data['setting_date'] == 3){echo(' selected="selected"');} ?>>每月</option>
+                                </select>
+                                <select name="city" class="city">
+                                    <?php if($data['setting_date'] == 1){echo('<option value="0" selected="selected">无</option>');} ?>
+                                    <?php
+                                   if($data['setting_num'] == 1){ $str1 = ' selected="selected"';}
+                                   if($data['setting_num'] == 2){ $str2 = ' selected="selected"';}
+                                   if($data['setting_num'] == 3){ $str3 = ' selected="selected"';}
+                                   if($data['setting_num'] == 4){ $str4 = ' selected="selected"';}
+                                   if($data['setting_num'] == 5){ $str5 = ' selected="selected"';}
+                                   if($data['setting_num'] == 6){ $str6 = ' selected="selected"';}
+                                   if($data['setting_num'] == 7){ $str7 = ' selected="selected"';}
+                                   if($data['setting_num'] == 8){ $str8 = ' selected="selected"';}
+                                   if($data['setting_num'] == 9){ $str9 = ' selected="selected"';}
+                                   if($data['setting_num'] == 10){ $str10 = ' selected="selected"';}
+                                   if($data['setting_num'] == 11){ $str11 = ' selected="selected"';}
+                                   if($data['setting_num'] == 12){ $str12 = ' selected="selected"';}
+                                   if($data['setting_num'] == 13){ $str13 = ' selected="selected"';}
+                                   if($data['setting_num'] == 14){ $str14 = ' selected="selected"';}
+                                   if($data['setting_num'] == 15){ $str15 = ' selected="selected"';}
+                                   if($data['setting_num'] == 16){ $str16 = ' selected="selected"';}
+                                   if($data['setting_num'] == 17){ $str17 = ' selected="selected"';}
+                                   if($data['setting_num'] == 18){ $str18 = ' selected="selected"';}
+                                   if($data['setting_num'] == 19){ $str19 = ' selected="selected"';}
+                                   if($data['setting_num'] == 20){ $str20 = ' selected="selected"';}
+                                   if($data['setting_num'] == 21){ $str21 = ' selected="selected"';}
+                                   if($data['setting_num'] == 22){ $str22 = ' selected="selected"';}
+                                   if($data['setting_num'] == 23){ $str23 = ' selected="selected"';}
+                                   if($data['setting_num'] == 24){ $str24 = ' selected="selected"';}
+                                   if($data['setting_num'] == 25){ $str25 = ' selected="selected"';}
+                                   if($data['setting_num'] == 26){ $str26 = ' selected="selected"';}
+                                   if($data['setting_num'] == 27){ $str27 = ' selected="selected"';}
+                                   if($data['setting_num'] == 28){ $str28 = ' selected="selected"';}
+                                   if($data['setting_num'] == 99){ $str99 = ' selected="selected"';}
+                                   if($data['setting_date'] == 2){
+                                        echo('<option value="1"' .$str1. '>周一</option>');
+                                                echo('<option value="2"' .$str2. '>周二</option>');
+                                                echo('<option value="3"' .$str3. '>周三</option>');
+                                                echo('<option value="4"' .$str4. '>周四</option>');
+                                                echo('<option value="5"' .$str5. '>周五</option>');
+                                                echo('<option value="6"' .$str6. '>周六</option>');
+                                                echo('<option value="7"' .$str7. '>周日</option>');
+                                         }
+                                        if($data['setting_date'] == 3){
+                                            echo('<option value="1"' .$str1. '>1日</option>');
+                                            echo('<option value="2"' .$str2. '>2日</option>');
+                                            echo('<option value="3"' .$str3. '>3日</option>');
+                                            echo('<option value="4"' .$str4. '>4日</option>');
+                                            echo('<option value="5"' .$str5. '>5日</option>');
+                                            echo('<option value="6"' .$str6. '>6日</option>');
+                                            echo('<option value="7"' .$str7. '>7日</option>');
+                                            echo('<option value="8"' .$str8. '>8日</option>');
+                                            echo('<option value="9"' .$str9. '>9日</option>');
+                                            echo('<option value="10"' .$str10. '>10日</option>');
+                                            echo('<option value="11"' .$str11. '>11日</option>');
+                                            echo('<option value="12"' .$str12. '>12日</option>');
+                                            echo('<option value="13"' .$str13. '>13日</option>');
+                                            echo('<option value="14"' .$str14. '>14日</option>');
+                                            echo('<option value="15"' .$str15. '>15日</option>');
+                                            echo('<option value="16"' .$str16. '>16日</option>');
+                                            echo('<option value="17"' .$str17. '>17日</option>');
+                                            echo('<option value="18"' .$str18. '>18日</option>');
+                                            echo('<option value="19"' .$str19. '>19日</option>');
+                                            echo('<option value="20"' .$str20. '>20日</option>');
+                                            echo('<option value="21"' .$str21. '>21日</option>');
+                                            echo('<option value="22"' .$str22. '>22日</option>');
+                                            echo('<option value="23"' .$str23. '>23日</option>');
+                                            echo('<option value="24"' .$str24. '>24日</option>');
+                                            echo('<option value="25"' .$str25. '>25日</option>');
+                                            echo('<option value="26"' .$str26. '>26日</option>');
+                                            echo('<option value="27"' .$str27. '>27日</option>');
+                                            echo('<option value="28"' .$str28. '>28日</option>');
+                                            echo('<option value="99"' .$str99. '>最后一天</option>');
+                                        }
+                                    ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">什么时间执行<span class="check-tips"></span></label>
+                            <div class="controls">
+                                <select name="setting_time">
+                                    <option value="0"<?php if($data['setting_time'] == 0){echo(' selected="selected"');} ?>>00:00:01</option>
+                                    <option value="1"<?php if($data['setting_time'] == 1){echo(' selected="selected"');} ?>>01:00:00</option>
+                                    <option value="2"<?php if($data['setting_time'] == 2){echo(' selected="selected"');} ?>>02:00:00</option>
+                                    <option value="3"<?php if($data['setting_time'] == 3){echo(' selected="selected"');} ?>>03:00:00</option>
+                                    <option value="4"<?php if($data['setting_time'] == 4){echo(' selected="selected"');} ?>>04:00:00</option>
+                                    <option value="5"<?php if($data['setting_time'] == 5){echo(' selected="selected"');} ?>>05:00:00</option>
+                                    <option value="6"<?php if($data['setting_time'] == 6){echo(' selected="selected"');} ?>>06:00:00</option>
+                                    <option value="7"<?php if($data['setting_time'] == 7){echo(' selected="selected"');} ?>>07:00:00</option>
+                                    <option value="8"<?php if($data['setting_time'] == 8){echo(' selected="selected"');} ?>>08:00:00</option>
+                                    <option value="9"<?php if($data['setting_time'] == 9){echo(' selected="selected"');} ?>>09:00:00</option>
+                                    <option value="10"<?php if($data['setting_time'] == 10){echo(' selected="selected"');} ?>>10:00:00</option>
+                                    <option value="11"<?php if($data['setting_time'] == 11){echo(' selected="selected"');} ?>>11:00:00</option>
+                                    <option value="12"<?php if($data['setting_time'] == 12){echo(' selected="selected"');} ?>>12:00:00</option>
+                                    <option value="13"<?php if($data['setting_time'] == 13){echo(' selected="selected"');} ?>>13:00:00</option>
+                                    <option value="14"<?php if($data['setting_time'] == 14){echo(' selected="selected"');} ?>>14:00:00</option>
+                                    <option value="15"<?php if($data['setting_time'] == 15){echo(' selected="selected"');} ?>>15:00:00</option>
+                                    <option value="16"<?php if($data['setting_time'] == 16){echo(' selected="selected"');} ?>>16:00:00</option>
+                                    <option value="17"<?php if($data['setting_time'] == 17){echo(' selected="selected"');} ?>>17:00:00</option>
+                                    <option value="18"<?php if($data['setting_time'] == 18){echo(' selected="selected"');} ?>>18:00:00</option>
+                                    <option value="19"<?php if($data['setting_time'] == 19){echo(' selected="selected"');} ?>>19:00:00</option>
+                                    <option value="20"<?php if($data['setting_time'] == 20){echo(' selected="selected"');} ?>>20:00:00</option>
+                                    <option value="21"<?php if($data['setting_time'] == 21){echo(' selected="selected"');} ?>>21:00:00</option>
+                                    <option value="22"<?php if($data['setting_time'] == 22){echo(' selected="selected"');} ?>>22:00:00</option>
+                                    <option value="23"<?php if($data['setting_time'] == 23){echo(' selected="selected"');} ?>>23:00:00</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">执行网址<span class="check-tips">（自动执行对象，由程序员填写，修改需慎重）</span></label>
+                            <div class="controls">
+                                <input type="text" style="width:50%" class="text input-max" name="url" value="{$data.url}" />
+                            </div>
+                        </div>
+                </div>
+                <div class="form-item cf">
+                    <button id="submit" class="btn submit-btn hidden" type="submit">确 定</button>
+                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                    <input type="hidden" value="{$data.id}" name="id" />
+                    <input type="hidden" name="shname" value="jiecun" />
+                </div>
+            </form>
+        </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        highlight_subnav('{:addons_url('Report://StoreJieCunAdmin:/index')}');
+        jsonstr = '[{"p":"每日","pv":"1", "c":[{"ct":"无","v":"0"}]},{"p":"每周","pv":"2","c":[{"ct":"周一","v":"1"},{"ct":"周二","v":"2"},{"ct":"周三","v":"3"},{"ct":"周四","v":"4"},{"ct":"周五","v":"5"},{"ct":"周六","v":"6"},{"ct":"周日","v":"7"}]},';
+        jsonstr += '{"p":"每月","pv":"3","c":[{"ct":"1日","v":"1"},{"ct":"2日","v":"2"},{"ct":"3日","v":"3"},{"ct":"4日","v":"4"},{"ct":"5日","v":"5"},{"ct":"6日","v":"6"},{"ct":"7日","v":"7"},{"ct":"8日","v":"8"},{"ct":"9日","v":"9"},{"ct":"10日","v":"10"},';
+        jsonstr += '{"ct":"11日","v":"11"},{"ct":"12日","v":"12"},{"ct":"13日","v":"13"},{"ct":"14日","v":"14"},{"ct":"15日","v":"15"},{"ct":"16日","v":"16"},{"ct":"17日","v":"17"},{"ct":"18日","v":"18"},';
+        jsonstr += '{"ct":"19日","v":"19"},{"ct":"20日","v":"20"},{"ct":"21日","v":"21"},{"ct":"22日","v":"22"},{"ct":"23日","v":"23"},{"ct":"24日","v":"24"},{"ct":"25日","v":"25"},{"ct":"26日","v":"26"},{"ct":"27日","v":"27"},';
+        jsonstr += '{"ct":"28日","v":"28"},{"ct":"最后一天","v":"99"}]}]';
+
+        $(function(){
+            $(".selectList").each(function(){
+                var url = "test.json";
+                var areaJson;
+                var temp_html;
+                var oProvince = $(this).find(".province");
+                var oCity = $(this).find(".city");
+                var oDistrict = $(this).find(".district");
+                //初始化省
+                var province = function(){
+                    temp_html = "";
+                    $.each(areaJson,function(i,province){
+                        temp_html+="<option value='"+province.pv+"'>"+province.p+"</option>";
+                    });
+                    oProvince.html(temp_html);
+                    city();
+                };
+                //赋值市
+                var city = function(){
+                    temp_html = "";
+                    var n = oProvince.get(0).selectedIndex;
+                    $.each(areaJson[n].c,function(i,city){
+                        temp_html+="<option value='"+city.v+"'>"+city.ct+"</option>";
+                    });
+                    oCity.html(temp_html);
+                };
+                //选择省改变市
+                oProvince.change(function(){
+                    city();
+                });
+                //获取json数据
+                $.getJSON(url,function(data){
+                    areaJson = JSON.parse(jsonstr);
+                    //province();
+                });
+            });
+
+        });
+
+    </script>
+</block>

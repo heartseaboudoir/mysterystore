@@ -1,0 +1,88 @@
+<extend name="Public/base" />
+
+<block name="body">
+        <script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+	<!-- 标题栏 -->
+	<div class="main-title">
+		<h2>{$meta_title}</h2>
+	</div>
+        <div class="tab-content">
+            <!-- 数据列表 -->
+            <form id="form" action="{:addons_url('Scorebox://ScoreboxConfigAdmin:/update')}" method="post" class="form-horizontal">
+                <div class="tab-pane in tab1">
+                        <div class="form-item cf">
+                            <label class="item-label">标题</label>
+                            <div class="controls">
+                                <input type="text" class="text input-large" name="title" value="{$data.title}" />
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">描述</label>
+                            <div class="controls">
+                                <input type="text" class="text input-large" name="description" value="{$data.description}" />
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">标识<span class="check-tips">（唯一，英文与数字结合）</span></label>
+                            <div class="controls">
+                                {$data.name}
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">每次操作可得蜜糖及经验<span class="check-tips">（多规则时，一行为一条规则， 操作值-可得蜜数值-可得经验值）</span></label>
+                            <div class="controls">
+                                <textarea name="score" class="textarea input-large" style="height:150px;">{$data.score}</textarea>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">此操作每天最多可得蜜糖次数<span class="check-tips">（0表示不限制）</span></label>
+                            <div class="controls">
+                                <input type="text" class="text input-min" name="day_times" value="{$data.day_times}" />
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">此操作最多可得蜜糖次数<span class="check-tips">（0表示不限制）</span></label>
+                            <div class="controls">
+                                <input type="text" class="text input-min" name="all_times" value="{$data.all_times}" />
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">备注<span class="check-tips"></span></label>
+                            <div class="controls">
+                                <textarea class="textarea input-large">{$data.remark}</textarea>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">类型<span class="check-tips">（在对应操作时的）</span></label>
+                            <div class="controls">
+                                <label><input type="radio" name="type" value="1" checked="" /> 增加</label>
+                                <label><input type="radio" name="type" value="2" <eq name="data.type" value="2">checked=""</eq>/> 减少</label>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">最后更新时间<span class="check-tips"></span></label>
+                            <div class="controls">
+                                {$info.update_time|time_format="Y-m-d H:i"}
+                            </div>
+                        </div>
+                </div>
+                <div class="form-item cf">
+                    <button id="submit" class="btn submit-btn ajax-post hidden" target-form="form-horizontal" type="submit">确 定</button>
+                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                    <input type="hidden" value="{$data.id}" name="id" />
+                </div>
+            </form>
+        </div>
+</block>
+<block name="script">
+	<script type="text/javascript">
+		$(function(){
+                    highlight_subnav('{:addons_url('Scorebox://ScoreboxConfigAdmin:/index')}');
+                    //全选节点
+                    $('.check-all').on('change',function(){
+                        $('.ids').prop('checked',this.checked);
+                    });showTab();
+		})
+                
+	</script>
+</block>

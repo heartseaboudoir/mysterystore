@@ -1,0 +1,107 @@
+<extend name="Public/base" />
+
+
+
+<block name="body">
+	<script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/Public/res/code/ueditor/ueditor.config.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/Public/res/code/ueditor/ueditor.all.min.js"> </script>
+    <script type="text/javascript" charset="utf-8" src="/Public/res/code/ueditor/lang/zh-cn/zh-cn.js"></script>    
+	<div class="main-title cf">
+		<h2><?php if ($new) { echo '新增';} else { echo '修改';} ?>内容-音频</h2>
+	</div>
+	<!-- 标签页导航 -->
+<div class="tab-wrap">
+	<div class="tab-content">
+	<!-- 表单 -->
+    <form id="form" action="{:U('add')}" method="post" class="form-horizontal">
+        <script type="text/plain" id="upload_ue"></script>
+        <input type="hidden" name="id" value="<?php echo $data['id'];?>">
+        <input type="hidden" name="type" value="1">
+        <div class="form-item cf">
+            <label class="item-label">标题<span class="check-tips"></span></label>
+            <div class="controls">
+                <input type="text" class="text input-large" name="title" value="<?php echo $data['title'];?>">
+            </div>
+        </div>
+        <div class="form-item cf">
+            <label class="item-label">说明<span class="check-tips"></span></label>
+            <div class="controls">
+                <input type="text" class="text input-large" name="info" value="<?php echo $data['info'];?>">
+            </div>
+        </div>     
+        <div class="form-item cf">
+            <label class="item-label">作者<span class="check-tips"></span></label>
+            <div class="controls">
+                <input type="text" class="text input-large" name="author" value="<?php echo $data['author'];?>">
+            </div>
+        </div>          
+        <div class="form-item cf">
+            <label class="item-label">状态<span class="check-tips"></span></label>
+            <div class="controls">
+                <label class="radio">
+                <input type="radio" value="1"  name="status" <?php if ($data['status'] == 1) {echo 'checked';}?>>启用
+                </label>
+                <label class="radio">
+                <input type="radio" value="0" name="status" <?php if ($data['status'] == 0) {echo 'checked';}?>>停用
+                </label>                
+            </div>
+        </div>          
+        <div class="form-item cf">
+            <label class="item-label">封面<span class="check-tips"></span></label>
+            <div class="controls">
+                <input type="text" readonly="readonly" class="text input-large" id="cover" name="cover" value="<?php echo $cover;?>"><a href="javascript:void(0);" onclick="upImage();">上传封面</a>
+            </div>
+            <div style="width:200px;">
+                <img id="showimg" style="width:100%;" src="<?php echo $cover;?>" />
+            </div>
+        </div>  
+        <div class="form-item cf">
+            <label class="item-label">音频<span class="check-tips"></span></label>
+            <div class="controls">
+                <input type="text" readonly="readonly" class="text input-large" id="music" name="music" value="<?php echo $music;?>"><a href="javascript:void(0);" onclick="upFiles();">上传音频</a>  
+            </div>
+        </div> 
+		<div class="form-item cf">
+			<button class="btn submit-btn ajax-post hidden" id="submit" type="submit" target-form="form-horizontal">确 定</button>
+			<a class="btn btn-return" href="{:U('article/index?cate_id='.$cate_id)}">返 回</a>
+		</div>
+	</form>
+	</div>
+</div>
+</block>
+
+<block name="script">
+<script type="text/javascript">
+
+var _editor = UE.getEditor('upload_ue');
+_editor.ready(function () {
+    _editor.hide();
+    _editor.addListener('beforeInsertImage', function (t, arg) {
+        $("#cover").attr("value", arg[0].src);
+        $("#showimg").attr("src", arg[0].src);
+    })
+    _editor.addListener('beforeInsertFile', function (t, arg) {
+        //$("#file").attr("value", _editor.options.filePath + arg[0].url);
+        $("#music").attr("value", arg[0].url);
+    })
+});
+//弹出图片上传的对话框
+function upImage() {
+    var myImage = _editor.getDialog("insertimage");
+    myImage.open();
+}
+//弹出文件上传的对话框
+function upFiles() {
+    var myFiles = _editor.getDialog("attachment");
+    myFiles.open();
+}
+
+
+
+$('#submit').click(function(){
+	$('#form').submit();
+});
+
+</script>
+</block>

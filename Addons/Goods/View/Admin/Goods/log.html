@@ -1,0 +1,99 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <!-- 高级搜索 -->
+    <div class="search-form fr cf">
+        <form id="search-form" onsubmit="return false;">
+        <div class="sleft">
+            <input type="text" name="keyword" class="search-input" value="{:I('keyword')}" placeholder="请输入商品ID">
+            <a class="sch-btn" href="javascript:;" id="search" url="{:addons_url('Goods://GoodsAdmin:/log')}"><i class="btn-search"></i></a>
+        </div>
+            <form>
+    </div>
+    <div style="clear:both;"></div>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead> 
+                <tr>
+                    <th>商品ID</th>
+                    <th>商品名</th>
+                    <th>展示图</th>
+                    <th>分类</th>
+                    <th>经销商</th>
+                    <th>默认售价</th>
+                    <th>操作类型</th>
+                    <th>操作人</th>
+                    <th>操作时间</th>
+                </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td>{$lv.goods_id}</td>
+                    <td>{$lv.data.title}</td>
+                    <td>
+                        <div class="upload-img-box">
+                            <notempty name="lv[cover_id]">
+                                <div class="upload-pre-item"><img src="{$lv['data']['cover_id']|get_cover='path'}" style="max-height: 80px; max-width: 100px;"/></div>
+                            </notempty>
+                        </div>
+                    </td>
+                    <td>{$cate_ls[$lv[data][cate_id]]}</td>
+                    <td>{$dealer_ls[$lv[data][dealer_id]]}</td>
+                    <td>{$lv.data.sell_price}</td>
+                    <td><eq name="lv[type]" value="1">添加<else/>修改</eq></td>
+                    <td>{$lv.uid|get_nickname}</td>
+                    <td>{$lv.create_time|time_format="Y-m-d H:i:s"}</td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $(function () {
+            highlight_subnav('{:addons_url('Goods://GoodsAdmin:/log')}');
+            //搜索功能
+            $("#search").click(function () {
+                var url = $(this).attr('url');
+                var query = $('#search-form').serialize();
+                query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g, '');
+                query = query.replace(/^&/g, '');
+                if (url.indexOf('?') > 0) {
+                    url += '&' + query;
+                } else {
+                    url += '?' + query;
+                }
+                window.location.href = url;
+            });
+
+            /* 状态搜索子菜单 */
+            $(".search-form").find(".drop-down").hover(function () {
+                $("#sub-sch-menu").removeClass("hidden");
+            }, function () {
+                $("#sub-sch-menu").addClass("hidden");
+            });
+            $("#sub-sch-menu li").find("a").each(function () {
+                $(this).click(function () {
+                    var text = $(this).text();
+                    $("#sch-sort-txt").text(text).attr("data", $(this).attr("value"));
+                    $("#sub-sch-menu").addClass("hidden");
+                })
+            });
+            //全选节点
+            $('.check-all').on('change', function () {
+                $('.ids').prop('checked', this.checked);
+            });
+        })
+    </script>
+</block>

@@ -1,0 +1,352 @@
+<extend name="Public/base" />
+
+<block name="body">
+<div class="site-search">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <a class="btn" href="{:addons_url('Purchase://PurchaseInquiry:/view')}?id={$id}&isprint=1">导出Excel</a>
+        <!-- 数据列表 -->
+        <form id="form" action="{:addons_url('Purchase://PurchaseInquiry:/update')}" method="post" class="form-horizontal">
+            <div class="tab-pane in tab1">
+                    <div class="form-item cf">
+                        <div class="controls goods_div">
+                            <label>询价单号：{$list.p_s_sn}</label>
+                            <label>创建日期：{$list.ctime}</label>
+                            <label>商品种类：{$list.g_type}</label>
+                            <label>商品数量：{$list.g_nums}</label>
+                            <label>售价金额：{$list.g_amounts}</label>
+                            <label>报价金额：{$list.g_s_amounts}</label>
+                        </div>
+                        <div class="controls goods_div1 layui-form">
+                            <label>管理员：{$list.nickname}</label>
+                            <label>收货仓库/门店：
+                                <?php if($list['warehouse_id'] != 0){ ?>
+                                    <volist name="warehouse" id="l1">
+                                         <?php if($list['warehouse_id'] == $l1['w_id']){ echo($l1['w_name']); } ?>
+                                    </volist>
+                                <?php } ?>
+                                <?php if($list['store_id'] != 0){ ?>
+                                    <volist name="store" id="l0">
+                                        <?php if($list['store_id'] == $l0['id']){ echo($l0['title']); } ?>
+                                    </volist>
+                                <?php } ?>
+                            </label>
+                            <label>供应商：
+                                <?php if($list['p_s_status'] == 0){ ?>
+                                <div class="layui-input-inline">
+                                    <select name="supply_id" lay-filter="aihao" lay-search>
+                                        <volist name="supply" id="l2">
+                                            <option value="{$l2.s_id}" <?php if($list['supply_id'] == $l2['s_id']){ echo('selected'); } ?>>{$l2.s_name}</option>
+                                        </volist>
+                                    </select>
+                                </div>
+                                <?php }else{
+                                   foreach($supply as $key=>$val){
+                                       if($val["s_id"]==$list["supply_id"]){
+                                          echo $val["s_name"];
+                                          break;
+                                       }
+                                   }
+                                 } ?>
+                            </label>
+                        </div>
+                        <?php if($list['pnickname'] != ''){ ?>
+                        <div class="controls goods_div2">
+                            <label>审核人：{$list.pnickname}</label>
+                            <label>审核时间：{$list.ptime}</label>
+                        </div>
+                        <?php } ?>
+                        <div class="controls goods_div3">
+                            <label>单据状态：
+                            <?php
+                        switch ($list['p_s_status'])
+                        {
+                        case 0:
+                          echo '<font color="black">新增</font>';
+                                break;
+                            case 1:
+                              echo '<font color="blue">已审核转采购单</font>';
+                              break;
+                            case 2:
+                                echo '<font color="red">已作废</font>';
+                                break;
+                            default:
+                                echo "其它";
+                            }
+                            ?></label>
+                        </div>
+                        <div class="controls goods_div4">
+                            <label>备注：
+                            <?php
+                        if($list['p_s_status'] == 0)
+                        {
+                          echo '<input type="text" class="text input-min remark" style="width: 200px;" name="remark" value="' .$list['remark']. '" />';
+                            }else{
+                                echo $list['remark'];
+                            }
+                            ?>
+                            </label>
+                        </div>
+                    </div>
+            </div>
+            <!-- 数据列表 -->
+            <div id="jq-verify" class="data-table table-striped">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>商品名称</th>
+                        <th>类别</th>
+                        <th>商品属性</th>
+                        <th>商品条码</th>
+                        <th>申请单号</th>
+                        <th>申请来源</th>
+                        <th>申请人</th>
+                        <th>商品备注</th>
+                        <th>售价</th>
+                        <th>库存数量</th>
+                        <th>箱规</th>
+                        <th>采购箱数</th>
+                        <th>每箱价格</th>
+                        <th>上次采购价</th>
+                        <th>申请数量</th>
+                        <th>采购数量</th>
+                        <th>供应商报价</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <volist name="data" id="lv" key="vo">
+                        <tr class="data_list">
+                            <td>{$lv.goods_id}</td>
+                            <td title="{$lv.goods_name}"><a href="{:addons_url('Goods://GoodsInfo:/index')}?id={$lv.goods_id}" target="_blank">{$lv.goods_name|subtext=18}</a></td>
+                            <td>{$lv.cate_name}</td>
+                            <td>{$lv.value_name}</td>
+                            <td title="{$lv.bar_code}">{$lv.bar_code|subtext=10}</td>
+                            <td title="{$lv.p_r_sn}">{$lv.p_r_sn|subtext=10}</td>
+                            <td title="{$lv.w_name}/{$lv.store_name}">{$lv.w_name|subtext=6}/{$lv.store_name|subtext=6}</td>
+                            <td title="{$lv.lnickname}">{$lv.lnickname|subtext=10}</td>
+                            <td title="{$lv.remark}">{$lv.remark|subtext=10}</td>
+                            <td class="wrap-price">{$lv.sell_price}</td>
+                            <td>{$lv.stock_num}</td>
+                            <td>
+                                <?php
+                            if($list['p_s_status'] == 0)
+                            {
+                                echo '<input type="text" class="text input-min b_n_num" style="width: 100px;" name="b_n_num[]" value="' .$lv['b_n_num'] .'" num/>';
+                                }else{
+                                echo $lv['b_n_num'];
+                                }
+                                ?>
+                            </td>
+                            <td>
+                                <?php
+                            if($list['p_s_status'] == 0)
+                            {
+                                echo '<input type="text" class="text input-min b_num" style="width: 100px;" name="b_num[]" value="' .$lv['b_num'] .'" num/>';
+                                }else{
+                                echo $lv['b_num'];
+                                }
+                                ?>
+                            </td>
+                            <td>
+                                <?php
+                            if($list['p_s_status'] == 0)
+                            {
+                                echo '<input type="text" class="text input-min b_price" style="width: 100px;" name="b_price[]" value="' .$lv['b_price'] .'" decimal/>';
+                                }else{
+                                echo $lv['b_price'];
+                                }
+                                ?>
+                            </td>
+                            <td>{$lv.last_price}</td>
+                            <td>{$lv.s_num}</td>
+                            <td>
+                                <?php
+                            if($list['p_s_status'] == 0)
+                            {
+                                echo '
+                                <input type="text"  style="width: 100px;" name="g_num[]" value="' .$lv['g_num'] .'" readonly />';
+                                }else{
+                                echo $lv['g_num'];
+                                }
+                                ?>
+                            </td>
+                            <td>
+                                <?php
+                            if($list['p_s_status'] == 0)
+                            {
+                                echo '
+                                <input type="text" class="text input-min g_price" style="width: 100px;" name="g_price[]" value="' .$lv['g_price'] .'" readonly/>
+                                <input type="hidden" class="text input-min p_s_d_id" style="width: 100px;" name="p_s_d_id[]" value="' .$lv['p_s_d_id'] .'" />';
+                                }else{
+                                echo $lv['g_price'];
+                                }
+                                ?>
+                            </td>
+                        </tr>
+                    </volist>
+                    <tr>
+                        <td colspan="16">
+                            <?php
+                            if($list['p_s_status'] == 0)
+                            {
+                            echo '<input type="hidden" class="text input-min p_s_id" style="width: 100px;" name="p_s_id" value="' .$list['p_s_id'] .'" />
+                            <button id="submit" class="btn submit-btn hidden" target-form="form-horizontal" name="submit" type="submit">修改询价单</button>';
+                            }else{
+                            echo '已处理后不能修改';
+                            }
+                            ?>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        layui.use(['main','form'], function() {
+            var $ = layui.jquery,
+            layer = layui.layer,
+             form = layui.form;
+
+            var Global = {
+                jump: window.location.pathname.match(/(\D*)view/)[1]
+            }
+            $("a[href$='" + Global.jump + "index.html']").parent().addClass('layui-this');
+
+            $('#jq-verify').find('.data_list').each(function(){
+                $(this).find(':input').keyup(function(){
+                    var self = $(this);
+                    var parents = self.parent().parent();
+
+                    var b_n_num = parents.find('[name="b_n_num[]"]');
+                    var b_num = parents.find('[name="b_num[]"]');
+                    var b_price = parents.find('[name="b_price[]"]');
+                    var g_num = parents.find('[name="g_num_show"]');
+                    var g_num1 = parents.find('[name="g_num[]"]');
+                    var g_price = parents.find('[name="g_price_show"]');
+                    var g_price1 = parents.find('[name="g_price[]"]');
+
+                    var oPrice = parents.find('.wrap-price');
+
+                    if( self.context.name == 'b_n_num[]' ){
+                        var num = self.val() * b_num.val();
+                        g_num.val( num == 0 ? '' : num );
+                        g_num1.val( num );
+                        var price = b_price.val() / self.val();
+                        priceCount( price );
+                        compared( price );
+                    }
+                    if( self.context.name == 'b_num[]' ){
+                        var num = self.val() * b_n_num.val();
+                        g_num.val( num == 0 ? '' : num );
+                        g_num1.val( num );
+                    }
+                    if( self.context.name == 'b_price[]' ){
+                        var price = self.val() / b_n_num.val();
+                        priceCount( price );
+                        compared( price );
+                    }
+                    function compared( price ) {
+                        if( price > parseFloat( oPrice.html() ) ) {
+                            layer.msg( '供应商报价须小于售价金额', {
+                                time: 1500
+                            });
+                            g_price1.val('');
+                            return false;
+                        }
+                    }
+                    function priceCount( price ){
+                        if( isNaN( price ) || price == Infinity || price == 0 ){
+                            g_price.val( '' );
+                            return false;
+                        }
+                        g_price.val( price.toFixed(2) );
+                        g_price1.val( price.toFixed(2) );
+                    }
+                });
+            });
+            $('#submit').on({
+                click:function(){
+                    $('#jq-verify').find('.data_list').each(function(){
+                        var oNum = $(this).find('[name="b_n_num[]"]'),
+                         oBoxNum = $(this).find('[name="b_num[]"]'),
+                          oPrice = $(this).find('[name="b_price[]"]'),
+                       oPriceAnd = $(this).find('[name="g_price[]"]'),
+                            vNum = oNum.val(),
+                         vBoxNum = oBoxNum.val(),
+                          vPrice = oPrice.val(),
+                       vPriceAnd = oPriceAnd.val(),
+                             reg = /^[1-9]\d*\.{0,1}([0-9]+)?$|0\.0*d*[1-9]+|0\.d*[1-9]+?$/,
+                        regPrice = reg.test( parseFloat(vPrice) ),
+                     regPriceAnd = reg.test( parseFloat(vPriceAnd) );
+
+                        if( vNum <= 0 ){ 
+                            verifyShow({
+                                text: '箱规须大于0',
+                                  id: oNum
+                            });
+                            return false;
+                        }
+                        if( vBoxNum <= 0 ){ 
+                            verifyShow({
+                                text: '采购箱数须大于0',
+                                  id: oBoxNum
+                            });
+                            return false;
+                        }
+                        if( !regPrice ){ 
+                            verifyShow({
+                                text: '每箱价格须大于0',
+                                  id: oPrice
+                            });
+                            return false;
+                        }
+
+                        if( !regPriceAnd ){ 
+                            verifyShow({
+                                text: '供应商报价须大于0',
+                                  id: oPrice
+                            });
+                            return false;
+                        }
+                        if( vNum > 0 && vBoxNum > 0 && regPrice && regPriceAnd ){
+                            $(this).find('input').removeAttr('verify');
+                        }
+                    });
+                    if( $('#jq-verify').find('[verify="true"]').length > 0){
+                        return false;
+                    }
+                }
+            });
+        });
+    </script>
+</block>
+<!--<script type="text/javascript">
+    function changevalue(obj){
+        var b_n_num = $(obj).parents('.data_list').find('.b_n_num').val();
+        var b_num = $(obj).parents('.data_list').find('.b_num').val();
+        var b_price = $(obj).parents('.data_list').find('.b_price').val();
+        var g_num = $(obj).parents('.data_list').find('.g_num');
+        var g_price = $(obj).parents('.data_list').find('.g_price');
+        var g_num_show = $(obj).parents('.data_list').find('.g_num_show');
+        var g_price_show = $(obj).parents('.data_list').find('.g_price_show');
+        var siglenum = parseInt(b_n_num * b_num);
+        //var sigleprice = parseFloat( parseFloat(b_num * b_price)/siglenum ).toFixed(2);
+        var sigleprice = parseFloat(b_num * b_price)/siglenum;
+        g_num.val(siglenum);
+        g_num_show.val(siglenum);
+        if( sigleprice != Infinity){
+            g_price.val( isNaN(sigleprice) ? 0 : sigleprice );
+            g_price_show.val( isNaN(sigleprice) ? 0 : sigleprice );
+        }
+    }
+</script>-->

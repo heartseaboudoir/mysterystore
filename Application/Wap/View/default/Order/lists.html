@@ -1,0 +1,83 @@
+<extend name="Base/common"/>
+<block name="body">
+<div class="weui_tab" id="tabs">
+    <div class="weui_navbar">
+        <div class="weui_navbar_item weui_bar_item_on">
+            未付款
+        </div>
+        <div class="weui_navbar_item">
+            全部
+        </div>
+    </div>
+    <div class="weui_tabs">
+        <div class="weui_tab_bd weui_tab_bd_on" data-type="wait">
+        </div>
+        <div class="weui_tab_bd" data-type="all">
+        </div>
+    </div>
+</div>
+<script>
+    $(function () {
+
+        function loadDataFactory(baseUrl, type) {
+            var pageNum = 1;
+            return function (next) {
+                $.get(baseUrl + '?page=' + pageNum + '&type=' + type).then(function (res) {
+                    pageNum++
+                    if (res.data.length === 0) {
+                        next({
+                            isEnd: true
+                        })
+                    } else {
+                        // res.data 应该为 html 字符串, 如果不是要做转换
+                        var l = '';
+                        $.each(res.data,function(x,y){
+                            l += '<div class="weui_cells">';
+                            l += '  <div class="weui_cell">';
+                            l += '      <div class="weui_cell_bd">';
+                            l += '          <div class="weui_cell_marketname">'+y.store_title+'</div>';
+                            l += '      </div>';
+                            l += '  </div>';
+                            l += '  <a href="'+y.url+'" class="weui_media_box weui_media_appmsg">';
+                            l += '      <div class="weui_media_hd">';
+                            l += '          <img class="weui_media_appmsg_thumb" src="'+y.pic_url+'" alt="">';
+                            l += '     </div>';
+                            l += '      <div class="weui_media_bd">';
+                            l += '          <p class="weui_media_order-time">下单时间 '+y.create_time+' </p>';
+                            l += '          <p class="weui_media_price">总价<strong>￥'+y.pay_money+'</strong></p>';
+                            l += '      </div>';
+                            l += '  </a>';
+                            l += '</div>';
+                        });
+                        
+                        next(l)
+                    }
+                }, function (err) {
+                    next(err)
+                })
+            }
+        }
+
+        $('.weui_tab_bd').each(function () {
+            var url = "{:U('Order/lists')}";
+            var scroll = ScrollLoadRender({
+                loadData: loadDataFactory(url, $(this).data('type'))
+            }, this)
+
+            $(this).data('scroll', scroll)
+        });
+        
+        TabsRender({
+            onTabChange: function () {
+                var $tab = $('.weui_tab_bd_on');
+                if (!$tab.hasClass('js-loaded')) {
+                    $tab.addClass('js-loaded').data('scroll').load();
+                }
+            },
+            onInit: function () {
+                $('.weui_tab_bd_on').addClass('js-loaded').data('scroll').load();
+            }
+        }, '#tabs');
+    });
+</script>
+</block>

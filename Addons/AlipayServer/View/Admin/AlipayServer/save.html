@@ -1,0 +1,65 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>服务窗配置</h2>
+    </div>
+    <ul class="tab-nav nav">
+        <li class="current" data-tab="tab1"><a href="javascript:void(0);">基础</a></li>
+        <li data-tab="tab2"><a href="javascript:void(0);">消息配置</a></li>
+    </ul>
+    <div class="tab-content">
+        <!-- 数据列表 -->
+        <form id="form" action="{:addons_url('AlipayServer://AlipayServerAdmin/update')}" method="post" class="form-horizontal">
+            <div class="tab-pane in tab1">
+                <div class="form-item cf">
+                    <label class="item-label">服务窗标题</label>
+                    <div class="controls">
+                        <input class="text input-large" type="text" value="{$data['title']}" name="title">
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">服务窗APPID<span class="check-tips">(必埴)</span></label>
+                    <div class="controls">
+                        <input class="text input-large" type="text" value="{$data['appid']}" name="appid">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-pane tab2">
+                <div class="form-item cf">
+                    <label class="item-label">默认回复</label>
+                    <div class="controls">
+                        <textarea name="config[msgset][default][content]" class="textarea input-large">{$data['config']['msgset']['default']['content']}</textarea>
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">首次关注回复</label>
+                    <div class="controls">
+                        <textarea name="config[msgset][subscribe][content]" class="textarea input-large">{$data['config']['msgset']['subscribe']['content']}</textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="form-item cf">
+                <button id="submit" class="btn submit-btn ajax-post hidden" target-form="form-horizontal" type="submit">确 定</button>
+                <button class="btn btn-return" onclick="javascript:history.back(-1); return false;">返 回</button>
+                <input type="hidden" value="{$data.id}" name="id" />
+            </div>
+        </form>
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+                    $(function() {
+                        highlight_subnav('{:addons_url('AlipayServer://AlipayServerAdmin:/index')}');
+                        //全选节点
+                        $('.check-all').on('change', function() {
+                            $('.ids').prop('checked', this.checked);
+                        });
+                        showTab();
+                    });
+
+    </script>
+</block>

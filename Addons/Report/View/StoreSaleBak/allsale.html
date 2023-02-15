@@ -1,0 +1,125 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <?php
+        if($store_name != ''){
+            $strhref .= "&store_name=" .$store_name;
+        }
+        if($store_name1 != ''){
+            $strhref .= "&store_name1=" .$store_name1;
+        }
+    ?>
+    <!-- 高级搜索 -->
+    <div class="cf">
+        <div class="search-form fr cf">
+            <div class="sleft">
+                <input type="hidden" name="id" value="{$id}" />
+                <input type="hidden" name="jc_id" value="{$jc_id}" />
+                <input type="text" name="store_name" class="text input-text search-input" style="" value="{$_GET['store_name']}" placeholder="门店名称" />
+                <input type="text" name="store_name1" class="text input-text search-input" style="" value="{$_GET['store_name1']}" placeholder="对比门店名称" />
+                <a class="sch-btn" href="javascript:;" id="search" url="{:addons_url('Report://StoreSale:/allsale')}"><i class="btn-search"></i></a>
+            </div>
+        </div>
+    </div>
+    <ul class="tab-nav nav">
+        <li <?php if($type == 1){ echo('class="current"'); } else { echo('class=""'); } ?> data-tab="tab1">
+            <a href="{:addons_url('Report://StoreSale:/allsale')}?type=1{$strhref}">今天</a>
+        </li>
+        <li <?php if($type == 2){ echo('class="current"'); } else { echo('class=""'); } ?> data-tab="tab2">
+            <a href="{:addons_url('Report://StoreSale:/allsale')}?type=2{$strhref}">本周</a>
+        </li>
+        <li <?php if($type == 3){ echo('class="current"'); } else { echo('class=""'); } ?> data-tab="tab3">
+            <a href="{:addons_url('Report://StoreSale:/allsale')}?type=3{$strhref}">本月</a>
+        </li>
+        <li <?php if($type == 4){ echo('class="current"'); } else { echo('class=""'); } ?> data-tab="tab4">
+            <a href="{:addons_url('Report://StoreSale:/allsale')}?type=4{$strhref}">7天</a>
+        </li>
+        <li <?php if($type == 5){ echo('class="current"'); } else { echo('class=""'); } ?> data-tab="tab5">
+            <a href="{:addons_url('Report://StoreSale:/allsale')}?type=5{$strhref}">30天</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <!-- 数据列表 -->
+            <div class="tab-pane in tab1">
+                <div class="cf">
+                    <a href="{:addons_url('Report://StoreSale:/allsale')}?type={$type}&isprint=1{$strhref}" class="btn">导出Excel</a>
+                </div>
+                <!-- 数据列表 -->
+                <div class="data-table table-striped">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>门店</th>
+                            <th>销量</th>
+                            <th>金额</th>
+                            <th>实收金额</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <notempty name="list">
+                            <volist name="list" id="lv" key="vo">
+                                <tr>
+                                    <td>{$lv.store_name}</td>
+                                    <td>{$lv.qty_day}</td>
+                                    <td>{$lv.amount_day}</td>
+                                    <td>{$lv.pay_money_day}</td>
+                                    <td><a href="{:addons_url('Report://StoreSale:/storesale?type=' .$type. '&id=' .$lv['store_id'])}">查看</a></td>
+                                </tr>
+                            </volist>
+                            <else/>
+                            <tr><td colspan="4">暂无数据~</td></tr>
+                        </notempty>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- 分页 -->
+                <div class="page">
+                    {$_page}
+                </div>
+            </div>
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        highlight_subnav('{:addons_url('Report://StoreSale:/allsale')}');
+        //搜索功能
+
+        $('.search-form input').focus(function(){
+            $(document).keypress(function (e) {
+                // 回车键事件
+                if (e.which == 13) {
+                    $("#search").click();
+                }
+            });
+        });
+        $("#search").click(function() {
+            var url = $(this).attr('url');
+            var query = $('.search-form').find('input').serialize();
+            query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g, '');
+            query = query.replace(/^&/g, '');
+            if (url.indexOf('?') > 0) {
+                url += '&' + query;
+            } else {
+                url += '?' + query;
+            }
+            var query2 = $('#select-form').serialize();
+            if (url.indexOf('?') > 0) {
+                url += '&' + query2;
+            } else {
+                url += '?' + query2;
+            }
+            window.location.href = url;
+        });
+        /*$(function() {
+            highlight_subnav('{:addons_url('Report://StoreSale:/allsale')}');
+                    showTab();
+        });*/
+
+    </script>
+</block>

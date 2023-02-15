@@ -1,0 +1,98 @@
+<extend name="Public/base" />
+<block name="body">
+    <div id="jq-content" class="site-content">
+        <div class="main-title">
+            <h2>商品区域价问题</h2>
+        </div>
+        <!--<div class="search-form fr cf">
+            <form id="jq-search-form">
+                <div class="sleft">
+                    <input type="text" name="s_date" class="text input-text search-input time" placeholder="请选择开始日期" />
+                    <input type="text" name="e_date" class="text input-text search-input time" placeholder="请选择结束日期" />
+                    <a id="jq-search-btn" class="sch-btn" href="javascript:void(0);"><i class="btn-search"></i></a>
+                </div>
+            </form>
+        </div>
+        <a id="jq-download" class="btn" href="javascript:void(0);">导出Excel</a>-->
+        <div class="data-table table-striped">
+            <table>
+                <thead>
+                    <tr>
+                        <th>区域ID</th>
+                        <th>商品ID</th>
+                        <th>商品名称</th>
+                        <th>区域名称</th>
+                        <th>商品分类名称</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="jq-list"></tbody>
+            </table>
+        </div>
+        <div id="jq-page" class="page"></div>
+    </div>
+    <script id="temp-list" type="text/html">
+        {{each items as list index}}
+        <tr data-id="{{list.goods_id}}">
+            <td>{{list.shequ_id}}</td>
+            <td>{{list.goods_id}}</td>
+            <td>{{list.goods_name}}</td>
+            <td>{{list.shequ_name}}</td>
+            <td>{{list.cate_name}}</td>
+            <td>
+                <a class="temp-view" href="javascript:void(0);">查看</a>
+            </td>
+        </tr>
+        {{/each}}
+    </script>
+</block>
+<block name="script">
+    <script type="text/javascript">
+    layui.use(['main'], function() {
+        var $ = layui.jquery,
+            layer = layui.layer;
+ 
+        var Global = {
+            listUrl: '/Erp/Goods/goods_shequ_price_issue',
+            jump: window.location.pathname.match(/(\D*)goods_shequ_price_issue/)[1],
+            shequId: 'shequ_id',
+            goodsId: 'goods_id'
+        }
+        $("a[href$='" + Global.jump + "goods_shequ_price_issue.html']").parent().addClass('layui-this');
+
+        var passData = $.dataJson(); 
+        delete passData.s_date;
+        delete passData.e_date;
+        var data = $.parseJson( passData );
+        
+        $.getData({
+             url: Global.listUrl + '?' + data,
+            load: true
+        }, function(res){
+            dataShow(res);
+        });
+        function dataShow(res,callback){
+            var oList = $('#jq-list'),
+                oPage = $('#jq-page');
+
+            if( res.content.data == null || res.content.data.length == 0 ){
+                oList.html('<tr><td class="wrap-empty">暂无内容！</td></tr>');
+            }else{
+                oList.html(template('temp-list', { items: res.content.data }));
+                $.each( res.content.data,function(i,items){
+                    var url = Global.jump + 'goods_shequ_price_issue_detail/shequ_id/'+items[Global.shequId]+'/goods_id/'+items[Global.goodsId]+'.html',
+                        oId = $('[data-id='+items[Global.goodsId]+']');
+                    oId.find('.temp-view').attr('href',url);
+                });
+            }
+
+            if( res.content.recordCount > res.content.pageSize ){
+                var total = '<span class="rows">共'+res.content.recordCount+'条记录</span>';
+                oPage.html( res.content.pager.replace( new RegExp(Global.listUrl,'g'),Global.jump+'goods_shequ_price_issue' ) + total );
+            }else{
+                oPage.html( res.content.pager );
+            }
+        }
+    });
+    </script>
+</block>

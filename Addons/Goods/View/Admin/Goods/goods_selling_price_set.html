@@ -1,0 +1,128 @@
+<extend name="Public/base" />
+<block name="body">
+    <div id="jq-content" class="site-content site-price-set">
+        <div class="main-title">
+            <h2>售价设置</h2>
+        </div>
+        <div class="wrap-info">注意：售价生效日期为下个月1日，0或空读取系统原有设定售价。</div>
+        <form id="jq-form" class="form-horizontal">
+            <div id="jq-list" class="tab-pane in tab1"></div>
+            <div class="wrap-label">
+                <label>商品售价:</label>
+                <input type="text" name="price" id="price" value="{{itmes.price}}" decimal/> <span style="color: blue" id="effect_date"></span>
+
+            </div>
+            <div class="wrap-label">
+                <a class="temp-history" id="get-history" href="javascript:void(0);">历史记录:</a>
+            </div>
+            <table class="wrap-history">
+                <thead>
+                <tr>
+                    <th>商品ID</th>
+                    <th>售价</th>
+                    <th>年份</th>
+                    <th>月份</th>
+                    <th>状态</th>
+                </tr>
+                </thead>
+                <tbody id="jq-history"></tbody>
+            </table>
+            <button id="jq-submit" type="submit" class="btn submit-btn hidden">修改销售价</button>
+        </form>
+    </div>
+    <script id="temp-list" type="text/html">
+        <div class="wrap-label"><label>商品名称：</label>{{items.goods_name}}</div>
+        <div class="wrap-label"><label>商品类别：</label>{{items.cate_name}}</div>
+        <div class="wrap-label"><label>商品当前售价：</label>{{items.sell_price}}</div>
+    </script>
+    <script id="temp-history" type="text/html">
+        {{each items as list index}}
+        <tr>
+            <td>{{list.goods_id}}</td>
+            <td>{{list.price}}</td>
+            <td>{{list.year}}</td>
+            <td>{{list.month}}</td>
+            <td>已生效</td>
+        </tr>
+        {{/each}}
+    </script>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $(function(){
+            highlight_subnav('{:addons_url('Goods://GoodsAdmin:/index')}');
+                //全选节点
+                    $('.check-all').on('change',function(){
+                        $('.ids').prop('checked',this.checked);
+                    });showTab();
+        });
+
+
+        layui.use(['main'], function() {
+            var $ = layui.jquery,
+                    layer = layui.layer;
+
+            var Global = {
+                listUrl: '/Erp/Goods/goods_selling_price_info',
+                submitUrl: '/Erp/Goods/goods_selling_price_save',
+                tempUrl: '/Erp/Goods/get_selling_price_history',
+                jump: window.location.pathname.match(/(\D*)goods_selling_price_set/)[1],
+                submitFlag: true
+            }
+            $("a[href$='" + Global.jump + "index.html']").parent().addClass('layui-this');
+
+            var passData = {
+                goods_id: window.location.pathname.match(/\/(\w+).html/)[1]
+            }
+            var data = $.parseJson( passData );
+
+            $.getData({
+                url: Global.listUrl + '?' + data,
+                load: true
+            }, function(res){
+                dataShow(res);
+            });
+            $.getData({
+                url: Global.tempUrl + '?pageSize=100&' + data
+            },function(res){
+                if( res.content.data == null ) {
+                    $('#jq-history').html('<tr><td colspan="4" class="wrap-default wrap-empty">暂无历史记录！</td></tr>');
+                } else {
+                    $('#jq-history').html(template('temp-history', { items: res.content.data }));
+                }
+            })  
+            function dataShow(res){
+                $('#jq-list').html(template('temp-list', { items: res.content.goods_info }));
+                $('#price').val( res.content.selling_price_info.price );
+                $('#effect_date').html( res.content.selling_price_info.effect_date );
+
+            }
+
+            $('#jq-submit').off().on({
+                click: function() {
+                    var price = $('#price').val();
+                    if( Global.submitFlag ){
+                        Global.submitFlag = false;
+                        var data = {
+                            goods_id: passData.goods_id,
+                            price: price
+                        }
+                        $.postData({
+                            url: Global.submitUrl,
+                            data: data
+                        }, function(res){
+                            layer.msg(res.content, {
+                                time: 1500
+                            });
+                            window.location.href = Global.jump + 'goods_selling_price_set/id/'+passData.goods_id+'.html';
+                        }, function(){
+                            Global.submitFlag = true;
+                        });
+                    }
+                    return false;
+                }
+            });
+
+        });
+    </script>
+</block>

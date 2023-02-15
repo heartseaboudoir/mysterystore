@@ -1,0 +1,243 @@
+<extend name="Public/base" />
+<block name="body">
+    <div id="jq-content" class="site-content site-price-set">
+        <div class="main-title">
+            <h2>区域价设置</h2>
+        </div>
+        <!--<a id="jq-download" class="btn" href="javascript:void(0);">导出Excel</a>-->
+        <form id="jq-form" class="form-horizontal">
+            <div id="jq-list" class="tab-pane in tab1"></div>
+            <table class="wrap-table">
+                <thead>
+                    <tr class="wrap-title">
+                        <th>社区ID</th>
+                        <th>社区名称</th>
+                        <th>区域价</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="jq-child"></tbody>
+            </table>
+            <button id="jq-submit" type="submit" class="btn submit-btn hidden">修改区域价</button>
+        </form>
+    </div>
+    <script id="temp-list" type="text/html">
+        <div class="form-item cf">
+            <div class="controls goods_div">
+                <label>商品名称：{{items.goods_name}}</label>
+                <label>商品类别：{{items.cate_name}}</label>
+				<label style="color:red;">注意：区域价生效日期为下月1日，0或空读取系统售价</label>
+            </div>
+        </div>
+    </script>
+    <script id="temp-child" type="text/html">
+        {{each items as list index}}
+        <tr class="temp-a">
+            <input type="hidden" name="goods_shequ_id" value="{{list.goods_shequ_id}}"/>
+            <input type="hidden" name="shequ_id" value="{{list.shequ_id}}"/>
+            <td>{{list.shequ_id}}</td>
+            <td title="{{list.shequ_name}}">
+            {{if list.shequ_name != null}}
+                {{if list.shequ_name.length > 19}}
+                    {{list.shequ_name.slice(0,18) + '...'}}
+                {{else}}
+                    {{list.shequ_name}}
+                {{/if}}
+            {{/if}}
+            </td>
+            <td>
+                <input type="text" name="price" value="{{list.price}}" decimal/>
+            </td>
+            <td>
+                {{list.effect_date}}
+            </td>
+            <td><a class="temp-history" href="javascript:void(0);">历史记录</a></td>
+        </tr>
+        <tr class="temp-b">
+            <td class="jq-history" colspan="5"></td>
+        </tr>
+        {{/each}}
+    </script>
+    <script id="temp-history" type="text/html">
+        <table>
+            <thead>
+                <tr>
+                    <th>商品ID</th>
+                    <th>区域价</th>
+                    <th>年份</th>
+                    <th>月份</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{each items as list index}}
+                <tr>
+                    <td>{{list.goods_id}}</td>
+                    <td>{{list.price}}</td>
+                    <td>{{list.year}}</td>
+                    <td>{{list.month}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </script>
+</block>
+<block name="script">
+    <script type="text/javascript">
+    layui.use(['main'], function() {
+        var $ = layui.jquery,
+        layer = layui.layer;
+
+        var Global = {
+              listUrl: '/Erp/Goods/goods_shequ_price_info',
+            submitUrl: '/Erp/Goods/goods_shequ_price_save',
+            tempUrl: '/Erp/Goods/get_shequ_price_history',
+            jump: window.location.pathname.match(/(\D*)goods_shequ_price_set/)[1],
+            submitFlag: true
+        }
+        $("a[href$='" + Global.jump + "index2.html']").parent().addClass('layui-this');
+
+        var passData = {
+            goods_id: window.location.pathname.match(/\/(\w+).html/)[1]
+        }
+        var data = $.parseJson( passData );
+        
+        $.getData({
+             url: Global.listUrl + '?' + data,
+            load: true
+        }, function(res){
+            dataShow(res);
+        });
+        function dataShow(res){
+            $('#jq-list').html(template('temp-list', { items: res.content.goods_info }));
+
+            var oChild = $('#jq-child');
+            if( res.content.shequ_price_info == null || res.content.shequ_price_info.length == 0 ){
+                oChild.html('<tr class="temp-a"><td class="wrap-empty" colspan="4">暂无内容！</td></tr>');
+            }else{
+
+                oChild.html(template('temp-child', { items: res.content.shequ_price_info }));
+                
+                $('#jq-child').find('.temp-a').each(function(){
+                    var oPrice = $(this).find('[name="price"]');
+                    $(this).verifyForm(); 
+                    var beforeValue = parseFloat( oPrice.val() );
+                    if( isNaN(beforeValue) ) {
+                        oPrice.attr('default',true);
+                        beforeValue = '';
+                    }else{
+                        oPrice.attr('update',true);
+                    }
+                    $(this).find('input').keyup(function(){
+                        if( beforeValue == $(this).val() && $(this).attr('default') == 'true' ){
+                           $(this).removeAttr('update');
+                        }else{
+                           $(this).attr('update',true);
+                        }
+                    });
+                });
+
+                $('.temp-history').on({
+                    click:function(){
+                        var self = $(this),
+                             oTr = self.parents('tr');
+                        if( !oTr.next().is(':hidden') ){
+                            return false;
+                        }
+                        if( self.attr('empty') ){
+                            layer.msg('暂无历史记录！', { time: 1500});
+                            return false;
+                        }
+                        var data = $.parseJson( passData ) + '&pageSize=100&shequ_id=' + oTr.find('[name="shequ_id"]').val();
+                        $.getData({
+                             url: Global.tempUrl + '?' + data
+                        }, function(res){
+                            if( res.content.data == null || res.content.data.length == 0 ){
+                                self.attr('empty',true);
+                                layer.msg('暂无历史记录！', { time: 1500});
+                            }else{
+                                oTr.next().show().find('td').html(template('temp-history', { items: res.content.data }));
+                            }
+                        });
+                    }
+                });
+            }
+        }
+
+        $('#jq-submit').off().on({
+            click: function() {
+                /*if( $('#jq-child').find('[update="true"]').length == 0 ){
+                    layer.msg( '还没添加或修改区域价', {
+                        time: 1500
+                    });
+                    return false;
+                }
+                var verify = true;
+                $('#jq-child').find('tr').each(function(){
+                    var oPrice = $(this).find('[name="price"]'),
+                        vPrice = parseFloat( oPrice.val() ),
+                           reg = /^[1-9]+\.{0,1}([0-9]+)?$|0\.0*d*[1-9]+|0\.d*[1-9]+?$/,
+                      regPrice = reg.test( vPrice );
+                    if( oPrice.val() == '' && oPrice.attr('update') ){
+                        //arr.push( oPrice.val() );
+                        layer.msg( '区域价不允许为空', {
+                            time: 1500
+                        });
+                        oPrice.focus();
+                        verify = false;
+                        return false;
+                    }
+                    if ( !isNaN(vPrice) && !regPrice ) {
+                        layer.msg( '区域价须大于0', {
+                            time: 1500
+                        });
+                        oPrice.focus();
+                        verify = false;
+                        return false;
+                    }
+                });
+                if( !verify ){
+                    return false;
+                }
+                if( arr.length == 0 ){
+                    layer.msg( '请输入区域价', {
+                        time: 1500
+                    });
+                    return false;
+                }*/
+                var arr = [];
+                $('#jq-child').find('[update="true"]').each(function(){
+                    var oUpdate = $(this);
+                    if( !oUpdate.length > 0 ){
+                        return false;
+                    }
+                    var parameter = oUpdate.parents('tr').find('input').serialize(),
+                        data = parameter.replace(/\=/g,"\"\:\"").replace(/\&/g,"\",\"");
+                        data = JSON.parse( '{"' + decodeURIComponent(data,true) + '"}' );
+                    arr.push( data );
+                });
+                if( Global.submitFlag ){
+                    Global.submitFlag = false;
+                    var data = {
+                        goods_id: passData.goods_id,
+                        price_array: arr
+                    }
+                    $.postData({
+                         url: Global.submitUrl,
+                        data: data
+                    }, function(res){
+                        layer.msg(res.content, {
+                            time: 1500
+                        });
+                        window.location.href = Global.jump + 'index2.html';
+                    }, function(){
+                        Global.submitFlag = true;
+                    });
+                }
+                return false;
+            }
+        });
+
+    });
+    </script>
+</block>

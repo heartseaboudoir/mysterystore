@@ -1,0 +1,127 @@
+<extend name="Public/base"/>
+
+<block name="body">
+	<div class="main-title">
+		<h2>{$meta_title}</h2>
+	</div>
+	<form action="{:U('apply_auth_changeStatus')}" method="post" class="form-horizontal">
+                <div class="form-item cf">
+                    <label class="item-label">申请的用户</label>
+                    <div class="controls">
+                        <img src="{$info.uid|get_header_pic}" style="width:80px; height:80px; vertical-align: middle;" /> {$info.uid|get_nickname} <a href="{:U('Member/show', array('id' => $info['uid']))}" target="_blank" class="btn">查看资料</a>
+                    </div>
+                </div>
+		<div class="form-item">
+                    <label class="item-label">真实姓名</label>
+                    <div class="controls">
+                            {$info.real_name}
+                    </div>
+		</div>
+		<div class="form-item">
+                    <label class="item-label">身份证</label>
+                    <div class="controls">
+                            {$info.cert_no}
+                    </div>
+		</div>
+                <div class="form-item cf">
+                    <label class="item-label">身份证正面照</label>
+                    <div class="controls">
+                        <notempty name="info.cert_pic1">
+                        <div class="upload-img-box" data-nodel="1">
+                            <div class="upload-pre-item"><img src="{$info.cert_pic1|get_cover=path}"/></div>
+                        </div>
+                        <else/>
+                        未上传
+                        </notempty>
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">身份证反面照</label>
+                    <div class="controls">
+                        <notempty name="info.cert_pic2">
+                        <div class="upload-img-box" data-nodel="1">
+                            <div class="upload-pre-item"><img src="{$info.cert_pic2|get_cover=path}"/></div>
+                        </div>
+                        <else/>
+                        未上传
+                        </notempty>
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">手持身份证照</label>
+                    <div class="controls">
+                        <notempty name="info.cert_pic3">
+                        <div class="upload-img-box" data-nodel="1">
+                            <div class="upload-pre-item"><img src="{$info.cert_pic3|get_cover=path}"/></div>
+                        </div>
+                        <else/>
+                        未上传
+                        </notempty>
+                    </div>
+                </div>
+		<div class="form-item">
+			<label class="item-label">申请时间</label>
+			<div class="controls">
+				{$info.create_time|time_format="Y-m-d H:i"}
+			</div>
+		</div>
+                <eq name="info.status" value="1">
+                    <div class="form-item">
+                        <label class="item-label">备注信息<span class="check-tips">（申请不通过时请填写原因）</span></label>
+                            <div class="controls">
+                                <textarea name="remark" class="textarea input-large"></textarea>
+                            </div>
+                    </div>
+                    <div class="form-item">
+                        <input type="hidden" name="id" value="{$info.id}"/>
+                        <input type="hidden" name="method" value=""/>
+                            <a class="btn submit-btn ajax-post confirm to_sub_a" data-m="agree" href="javascript:;">通 过</a>
+                            <a class="btn btn-return ajax-post confirm to_sub_a" data-m="return" href="javascript:;">不 通 过</a>
+                            <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                    </div>
+                <else/>
+                    <div class="form-item">
+                            <label class="item-label">操作时间</label>
+                            <div class="controls">
+                                    {$info.update_time|time_format="Y-m-d H:i"}
+                            </div>
+                    </div>
+                    <div class="form-item">
+                        <label class="item-label">状态</label>
+                        <div class="controls">
+                            <eq name="info.status" value="2">
+                            通过
+                            <else/>
+                            不通过
+                            </eq>
+                        </div>
+                    </div>
+                    <div class="form-item">
+                        <label class="item-label">备注信息</label>
+                        <div class="controls">
+                            {$info.remark}
+                        </div>
+                    </div>
+                    <div class="form-item">
+                        <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                    </div>
+                </eq>
+	</form>
+</block>
+
+<block name="script">
+	<script type="text/javascript">
+		Think.setValue("type", {$info.type|default=0});
+		Think.setValue("group", {$info.group|default=0});
+                //导航高亮
+                highlight_subnav('{:U('Member/apply_auth_index')}');
+                $('.to_sub_a').click(function(){
+                    var m = $(this).data('m');
+                    if(!confirm(m == 'agree' ? '确定通过申请吗？' : '确定不通过申请吗？')){
+                        return false;
+                    }
+                    $('[name="method"]').val(m);
+                    $('form').submit();
+                });
+	</script>
+</block>

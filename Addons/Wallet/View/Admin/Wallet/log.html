@@ -1,0 +1,136 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <div class="cf">
+        <a href="javascript:;" id="download" url="{:addons_url('Wallet://Admin:/download_log')}" class="btn" >记录下载</a>
+        <!-- 高级搜索 -->
+        <div class="search-form fr cf">
+            <form id="search-form" onsubmit="return false;">
+            <div class="sleft" style="margin-right:80px;">
+                <input type="text" name="uid" class="search-input" value="{:I('uid')}" placeholder="请输入用户ID">
+                <input type="text" name="start_time" class="text search-input time" style="width:100px;" value="{$_GET['start_time']}" placeholder="起始时间" />
+                <input type="text" name="end_time" class="text search-input time" style="width:100px;" value="{$_GET['end_time']}" placeholder="结束时间" />                
+                <a class="sch-btn" href="javascript:;" id="search" url="{:addons_url('Wallet://Admin:/log')}"><i class="btn-search"></i></a>
+            </div>
+            <form>
+        </div>
+    </div>
+    <div style="clear:both;"></div>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+                <tr>
+                    <th>用户</th>
+                    <th style="width:50px;">类型</th>
+                    <th style="width:80px;">金额</th>
+                    <th style="width:150px;">方式</th>
+                    <th style="width:150px;">操作时间</th>
+            </tr>
+            </thead>
+            <tbody>
+                <empty name="list">
+                        <tr>
+                            <td colspan="5" class="text-center"> 没有数据~</td>
+                        </tr>
+                <else/>
+                    <volist name="list" id="lv" key="vo">
+                        <tr>
+                            <td>{$lv.uid|get_nickname}</td>
+                            <td>
+                            <?php if (in_array($lv['type'], array(1, 3, 5))) { ?>
+                            <span style="color:green;">增加</span>
+                            <?php } else { ?>
+                            <span style="color:red;">减少</span>
+                            <?php } ?>
+                            </td>
+                            <td>{$lv.money}</td>
+                            <td>{$type[$lv['action']]}</td>
+                            <td>{$lv.create_time|time_format="Y-m-d H:i:s"}</td>
+                        </tr>
+                    </volist>
+                </empty>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <link href="__STATIC__/datetimepicker/css/datetimepicker.css" rel="stylesheet" type="text/css">
+    <link href="__STATIC__/datetimepicker/css/dropdown.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+    <script type="text/javascript">
+        $(function() {
+            highlight_subnav('{:addons_url('Wallet://Admin:/log')}');
+            //全选节点
+            $('.check-all').on('change', function() {
+                $('.ids').prop('checked', this.checked);
+            });//搜索功能
+            $("#search").click(function () {
+                var url = $(this).attr('url');
+                var status = $("#sch-sort-txt").attr("data");
+                var query = $('#search-form').serialize();
+                query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g, '');
+                query = query.replace(/^&/g, '');
+                if (status != '') {
+                    query = 'status=' + status + "&" + query;
+                }
+                if (url.indexOf('?') > 0) {
+                    url += '&' + query;
+                } else {
+                    url += '?' + query;
+                }
+                window.location.href = url;
+            });
+            
+            
+            $("#download").click(function(){
+                var url = $(this).attr('url');
+                var uid = $(':input[name=uid]').val();
+                var start_time = $(':input[name=start_time]').val();
+                var end_time = $(':input[name=end_time]').val();
+                url = url +'?uid=' + uid  + '&start_time=' + start_time + '&end_time=' + end_time;
+                window.location.href = url;
+            })            
+            
+            
+
+            /* 状态搜索子菜单 */
+            $(".search-form").find(".drop-down").hover(function () {
+                $("#sub-sch-menu").removeClass("hidden");
+            }, function () {
+                $("#sub-sch-menu").addClass("hidden");
+            });
+            $("#sub-sch-menu li").find("a").each(function () {
+                $(this).click(function () {
+                    var text = $(this).text();
+                    $("#sch-sort-txt").text(text).attr("data", $(this).attr("value"));
+                    $("#sub-sch-menu").addClass("hidden");
+                })
+            });
+            
+            var _T;
+            $('#select-form input').change(function(){
+                clearTimeout(_T);
+                _T = setTimeout(function(){
+                    $("#search").click();
+                }, 1000);
+            });
+            $('.time').datetimepicker({
+                format: 'yyyy-mm-dd',
+                language: "zh-CN",
+                minView: 2,
+                autoclose: true
+            });            
+            
+        })
+    </script>
+</block>

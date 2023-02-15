@@ -1,0 +1,135 @@
+<extend name="Public/base" />
+
+<block name="body">
+        <script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+	<!-- 标题栏 -->
+	<div class="main-title">
+		<h2>{$meta_title}</h2>
+	</div>
+        <ul class="tab-nav nav">
+            <li class="current" data-tab="tab1"><a href="javascript:void(0);">出库信息</a></li>
+        </ul>
+        <div class="tab-content">
+            <!-- 数据列表 -->
+            <form id="form" action="{:addons_url('Goods://GoodsStoreAdmin:/out_apply')}" method="post" class="form-horizontal">
+                <div class="tab-pane in tab1">
+                    <for name="i" start="1" end="21">
+                        <div class="form-item cf">
+                            <div class="controls goods_div">
+                                <label>条形码：<input type="text" class="text input-min bar_code" name="goods[{$i}][bar_code]"/></label>
+                                <label>商品ID：<input style="width:70px;" type="text" class="text input-min id_code" name="goods[{$i}][id_code]"/></label>
+                                <label>商品名：<input type="text" class="text input-min goods_title" disabled=""/></label>
+                                <input type="hidden" class="text input-min goods_id" name="goods[{$i}][id]" value="0" />
+                                <label>出库数量：<input type="text" class="text input-mini" name="goods[{$i}][num]"/>（库存：<span class="goods_num">0</span>）</label>
+                            </div>
+                        </div>
+                    </for>
+                </div>
+                <div style="height:80px;"></div>
+                <div class="form-item cf" style="position:fixed;bottom:0px; background:#fff; width:100%; margin:0; padding:30px; border-top:1px solid #ccc; left:200px">
+                    <button id="submit" class="btn submit-btn ajax-post hidden" target-form="form-horizontal" type="submit">提 交</button>
+                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                </div>
+            </form>
+        </div>
+</block>
+<block name="script">
+	<script type="text/javascript">
+		$(function(){
+                    highlight_subnav('{:addons_url('Goods://GoodsStoreAdmin:/out_apply')}');
+                    //全选节点
+                    $('.check-all').on('change',function(){
+                        $('.ids').prop('checked',this.checked);
+                    });
+                    showTab();
+                    function get_goods(obj){
+                        var bar_code = $(obj).val();
+                        var goods_title = $(obj).parents('.goods_div').find('.goods_title');
+                        var goods_id = $(obj).parents('.goods_div').find('.goods_id');
+                        var goods_num = $(obj).parents('.goods_div').find('.goods_num');
+                        var id_code = $(obj).parents('.goods_div').find('.id_code');
+                        if(bar_code != ''){
+                            $.ajax({
+                                type:'get',
+                                url : "{:addons_url('Goods://GoodsAdmin:/get_one')}",
+                                data:{bar_code: bar_code, get_store: 1},
+                                dataType:'json',
+                                success:function(data){
+                                    if(data.status == 1){
+                                        var l = '<option> - 请先选择分类 - </option>';
+                                        $.each(data, function(x, y){
+                                            l += '<option value="'+y.id+'">'+y.title+'</option>';
+                                        });
+                                        $('[name="goods_id"]').html(l);
+                                        goods_title.css('color', '#635c73');
+                                        goods_title.val(data.data.title);
+                                        goods_id.val(data.data.id);
+                                        id_code.val('');
+                                        goods_num.html(data.data.store.num);
+                                    }else{
+                                        goods_title.css('color', 'red');
+                                        goods_title.val(data.info ? data.info : '商品不存在');
+                                        goods_id.val(0);
+                                        goods_num.val(0);
+                                    }
+                                }
+                            });
+                        }else{
+                            goods_title.val('');
+                            goods_id.val(0);
+                            goods_num.val(0);
+                        }
+                    }
+                    $('.tab1').delegate('.bar_code', 'change', function(){
+                        get_goods(this);
+                    });
+                    
+                    
+                    
+                    function get_goods_id(obj){
+                        var id_code = $(obj).val();
+                        var goods_title = $(obj).parents('.goods_div').find('.goods_title');
+                        var goods_id = $(obj).parents('.goods_div').find('.goods_id');
+                        var goods_num = $(obj).parents('.goods_div').find('.goods_num');
+                        var bar_code = $(obj).parents('.goods_div').find('.bar_code');
+                        if(id_code != ''){
+                            $.ajax({
+                                type:'get',
+                                url : "{:addons_url('Goods://GoodsAdmin:/get_one_id')}",
+                                data:{id_code: id_code, bar_code: bar_code.val(), get_store:1},
+                                dataType:'json',
+                                success:function(data){
+                                    if(data.status == 1){
+                                        var l = '<option> - 请先选择分类 - </option>';
+                                        $.each(data, function(x, y){
+                                            l += '<option value="'+y.id+'">'+y.title+'</option>';
+                                        });
+                                        $('[name="goods_id"]').html(l);
+                                        goods_title.css('color', '#635c73');
+                                        goods_title.val(data.data.title);
+                                        goods_id.val(data.data.id);
+                                        goods_num.html(data.data.store.num);
+                                        bar_code.val('');
+                                    }else{
+                                        goods_title.css('color', 'red');
+                                        goods_title.val(data.info ? data.info : '商品不存在');
+                                        goods_id.val(0);
+                                    }
+                                }
+                            });
+                        }else{
+                            goods_title.val('');
+                            goods_id.val(0);
+                        }
+                    }
+                    $('.tab1').delegate('.id_code', 'change', function(){
+                        get_goods_id(this);
+                    });         
+                    
+                    
+		});
+
+
+        
+	</script>
+</block>

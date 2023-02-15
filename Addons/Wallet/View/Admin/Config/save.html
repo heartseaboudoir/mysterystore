@@ -1,0 +1,41 @@
+<extend name="Public/base"/>
+
+<block name="body">
+    <div class="main-title">
+        <h2>新增充值选项</h2>
+    </div>
+    <form action="{:addons_url('Wallet://ConfigAdmin:/save')}" method="post" class="form-horizontal">
+        <div class="form-item">
+            <label class="item-label">充值金额<span class="check-tips">（单位：元，精确至0.01）</span></label>
+            <div class="controls">
+                <input type="text" class="text input-large" name="money" value="<?php echo $info['money']?>">
+            </div>
+        </div>
+        <div class="form-item">
+            <label class="item-label">赠送金额<span class="check-tips">（单位：元，精确至0.01）</span></label>
+            <div class="controls">
+                <input type="text" class="text input-large" name="give" value="<?php echo $info['give']?>">
+            </div>
+        </div>
+        <div class="form-item">
+            <label class="item-label">说明<span class="check-tips">（对该选项的描述说明）</span></label>
+            <div class="controls">
+                <input type="text" class="text input-large" name="info" value="<?php echo $info['info']?>">
+            </div>
+        </div>
+        <input type="text" class="hidden input-large" name="id" value="<?php echo $info['id']?>">
+        <div class="form-item">
+            <button class="btn submit-btn ajax-post" id="submit" type="submit" target-form="form-horizontal">确 定</button>
+            <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+        </div>
+    </form>
+</block>
+
+<block name="script">
+    <script type="text/javascript">
+		$(function(){
+            //导航高亮
+            highlight_subnav("{:addons_url('Wallet://ConfigAdmin:/wallet_recharge_list')}");     
+        })
+    </script>
+</block>

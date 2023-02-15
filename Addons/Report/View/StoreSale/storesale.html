@@ -1,0 +1,280 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <?php
+        if($s_date != ''){
+            $strhref .= "&s_date=" .$s_date;
+        }
+        if($e_date != ''){
+            $strhref .= "&e_date=" .$e_date;
+        }
+        if($store_select != ''){
+            $strhref .= "&store=" .implode(',',$store_select);
+        }
+        if($goodscate_select != ''){
+            $strhref .= "&goodscate_select=" .implode(',',$goodscate_select);
+        }
+        if($goods_name != ''){
+            $strhref .= "&goods_name=" .$goods_name;
+        }
+        if($min_price != ''){
+            $strhref .= "&min_price=" .$min_price;
+        }
+        if($max_price != ''){
+            $strhref .= "&max_price=" .$max_price;
+        }
+    ?>
+    <!-- 高级搜索 -->
+        <form id="form" action="{:addons_url('Report://StoreSale:/storesale')}" method="post" class="form-horizontal">
+    <div class="cf">
+        <div class="search-form cf">
+            <div class="sleft" style="float:none;">
+            <dl class="checkmod">
+                <dt class="hd">
+                    <label class="checkbox">选择类别</label>
+                </dt>
+                    <notempty name="goodscate">
+                <dd class="bd">
+                    <div class="rule_check">
+                        <div>
+                           <label class="checkbox">
+                           <input class="auth_rules rules_row" type="checkbox" name="rules[]" value="{$lv.id}">选择类别
+                           </label>
+                        </div>
+                       <span class="divsion">&nbsp;</span>
+                       <span class="child_row">
+                            <volist name="goodscate" id="ld">
+                                <label class="checkbox"><input class="auth_rules" type="checkbox" name="goodscate_select[]"
+                            <?php for($i=0;$i<count($goodscate_select);$i++){
+                            if( $ld['id'] == $goodscate_select[$i] ){
+                            	echo(' checked="checked"');
+                            }
+                            } ?>
+                             value="{$ld.id}">{$ld.title}</label>
+                            </volist>
+                       </span>
+                    </div>
+            	</dd>
+                    </notempty>
+            </dl>
+            <dl class="checkmod">
+                <dt class="hd">
+                    <label class="checkbox">商品名称</label>
+                </dt>
+                <dd class="bd">
+                    <div class="rule_check">
+                        <div>
+                           <label class="checkbox">
+                           <input type="text" name="goods_name" class="text input-text search-input" style="" value="{$goods_name}" placeholder="按商品名称搜索" />
+                        </div>
+                    </div>
+            	</dd>
+            </dl>
+            <dl class="checkmod">
+                <dt class="hd">
+                    <label class="checkbox">价格区间</label>
+                </dt>
+                <dd class="bd">
+                    <div class="rule_check">
+                        <div>
+                           <label class="checkbox">
+                <input type="text" name="min_price" class="text input-text search-input" style="" value="{$min_price}" placeholder="最低价" />
+                <input type="text" name="max_price" class="text input-text search-input" style="" value="{$max_price}" placeholder="最高价" />
+                        </div>
+                    </div>
+            	</dd>
+            </dl>
+            <dl class="checkmod">
+                <dt class="hd">
+                    <label class="checkbox">时间区间</label>
+                </dt>
+                <dd class="bd">
+                    <div class="rule_check">
+                        <div>
+                           <label class="checkbox">
+                    <input type="text" name="s_date" class="text input-text search-input time" value="{$s_date}" placeholder="请选择开始日期" />
+                    <input type="text" name="e_date" class="text input-text search-input time" value="{$e_date}" placeholder="请选择结束日期" /></label>
+                        </div>
+                    </div>
+            	</dd>
+            </dl>
+                <input type="hidden" name="id" value="{$id}" />
+                <input type="hidden" name="jc_id" value="{$jc_id}" />
+                <input type="hidden" name="type" value="{$type}" />
+                <button id="submit" class="btn submit-btn ajax-post hidden" target-form="form-horizontal" type="submit">搜索</button>
+                
+            </div>
+        </div>
+    </div>
+    </form>
+    <div class="tab-content">
+        <!-- 数据列表 -->
+            <div class="tab-pane in tab1">
+                <div class="cf">
+                    <a href="{:addons_url('Report://StoreSale:/storesale')}?type={$type}&id={$id}&isprint=1{$strhref}" class="btn">导出Excel</a>
+                </div>
+                <!-- 数据列表 -->
+                <div class="data-table table-striped">
+                <dt class="hd">
+                    <label class="checkbox">类别销售排行</label>
+                </dt>
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>分类名</th>
+                            <th>销售数量</th>
+                            <th>销售金额</th>
+                            <th>日均销量</th>
+                            <th>日均销售额</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <notempty name="catelist">
+                        <?php $paiming = 0; ?>
+                            <volist name="catelist" id="lv" key="vo">
+                        <?php $paiming ++; ?>
+                        <tr>
+                            <td rowspan="<?php echo(count($lv['child'])); ?>">{$paiming}</td>
+                            <td rowspan="<?php echo(count($lv['child'])); ?>">{$lv.cate_name}</td>
+                            <td rowspan="<?php echo(count($lv['child'])); ?>">{$lv.buynum}</td>
+                            <td rowspan="<?php echo(count($lv['child'])); ?>">{$lv.buymoney}</td>
+                            <td rowspan="<?php echo(count($lv['child'])); ?>">{$lv.avgnum}</td>
+                            <td rowspan="<?php echo(count($lv['child'])); ?>">{$lv.avgmoney}</td>
+                        </tr>
+                            </volist>
+                            <else/>
+                            <tr><td colspan="4">暂无数据~</td></tr>
+                        </notempty>
+                        </tbody>
+                    </table>
+                <dt class="hd">
+                    <label class="checkbox">商品销售排行</label>
+                </dt>
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>商品名</th>
+                            <th>分类名</th>
+                            <th>销售数量</th>
+                            <th>销售金额</th>
+                            <th>日均销量</th>
+                            <th>日均销售额</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <notempty name="list">
+                        <?php $paiming = 0; ?>
+                            <volist name="list" id="lv" key="vo">
+                        <?php $paiming ++; ?>
+                        <tr>
+                            <td rowspan="<?php echo(count($lv['child'])); ?>">{$paiming}</td>
+                            <td rowspan="<?php echo(count($lv['child'])); ?>">{$lv.goods_name}</td>
+                            <td rowspan="<?php echo(count($lv['child'])); ?>">{$lv.cate_name}</td>
+                            <td rowspan="<?php echo(count($lv['child'])); ?>">{$lv.buynum}</td>
+                            <td rowspan="<?php echo(count($lv['child'])); ?>">{$lv.buymoney}</td>
+                            <td rowspan="<?php echo(count($lv['child'])); ?>">{$lv.avgnum}</td>
+                            <td rowspan="<?php echo(count($lv['child'])); ?>">{$lv.avgmoney}</td>
+                        </tr>
+                            </volist>
+                            <else/>
+                            <tr><td colspan="4">暂无数据~</td></tr>
+                        </notempty>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- 分页 -->
+                <div class="page">
+                    {$_page}
+                </div>
+            </div>
+    </div>
+</block>
+<block name="script">
+    <link href="__STATIC__/datetimepicker/css/datetimepicker.css" rel="stylesheet" type="text/css">
+    <link href="__STATIC__/datetimepicker/css/dropdown.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+
+    <script type="text/javascript" src="__STATIC__/artDialog/lib/sea.js"></script>
+    <script type="text/javascript">
+        highlight_subnav('{:addons_url('Report://StoreSale:/allsale')}');
+        var rules = [{$this_group}];
+        $('.auth_rules').each(function(){
+            if( $.inArray( parseInt(this.value,10),rules )>-1 ){
+                //$(this).prop('checked',true);
+            }
+            if(this.value==''){
+                //$(this).closest('span').remove();
+            }
+        });
+
+        //全选节点
+        $('.rules_all').on('change',function(){
+            $(this).closest('dl').find('dd').find('input').prop('checked',this.checked);
+        });
+        $('.rules_row').on('change',function(){
+            $(this).closest('.rule_check').find('.child_row').find('input').prop('checked',this.checked);
+        });
+
+
+        $('select[name=group]').change(function(){
+			location.href = this.value;
+        });
+		
+        //搜索功能
+        $(".submit-btn").click(function() {
+            var url = $(this).attr('url');
+            var query = $('.search-form').find('input').serialize();
+            query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g, '');
+            query = query.replace(/^&/g, '');
+            if (url.indexOf('?') > 0) {
+                url += '&' + query;
+            } else {
+                url += '?' + query;
+            }
+            var query2 = $('#select-form').serialize();
+            if (url.indexOf('?') > 0) {
+                url += '&' + query2;
+            } else {
+                url += '?' + query2;
+            }
+			console.log(url);
+			return false;
+            window.location.href = url;
+        });
+        // 状态搜索子菜单
+        $(".search-form").find(".drop-down").hover(function() {
+            $("#sub-sch-menu").removeClass("hidden");
+        }, function() {
+            $("#sub-sch-menu").addClass("hidden");
+        });
+        $("#sub-sch-menu li").find("a").each(function() {
+            $(this).click(function() {
+                var text = $(this).text();
+                $("#sch-sort-txt").text(text).attr("data", $(this).attr("value"));
+                $("#sub-sch-menu").addClass("hidden");
+            })
+        });
+        var _T;
+        $('.select-form input').change(function(){
+            clearTimeout(_T);
+            _T = setTimeout(function(){
+                $("#search").click();
+            }, 1000);
+        });
+        $('.time').datetimepicker({
+            format: 'yyyy-mm-dd',
+            language: "zh-CN",
+            minView: 2,
+            autoclose: true
+        });
+
+    </script>
+</block>

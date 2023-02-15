@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <meta name="keywords" content="神秘商店" />
+    <meta name="description" content="神秘商店" />
+	<title>神秘商店</title>
+	<script type="text/javascript" src="/Public/res/Wap/code/js/rem.js"></script>
+	<link rel="stylesheet" href="/Public/res/Wap/code/css/base.css"/>
+	<link rel="stylesheet" href="/Public/res/Wap/code/css/index.css?v=<?php echo time()?>"/>
+</head>
+<body>
+<audio id="jq-audio" class="site-hide" src="<?php echo $music; ?>" preload="preload" autoplay="autoplay" loop="loop" controls="controls">您的浏览器不支持 audio标签。</audio>
+<script type="text/javascript">
+	function autoPlay() {
+	    function browser() {
+	        getPlay(true);
+	        document.body.removeEventListener('touchstart', browser);
+	    }
+	    document.body.addEventListener('touchstart', browser);
+
+	    function weixin() {
+	        getPlay(true);
+	        document.addEventListener("WeixinJSBridgeReady", function () {
+	            getPlay(true);
+	        }, false);
+	        document.removeEventListener('DOMContentLoaded', weixin);
+	    }
+	    document.addEventListener('DOMContentLoaded', weixin);
+	}
+	function getPlay(isPlay) {
+	    var audio = document.getElementById('jq-audio');
+	    if (isPlay && audio.paused) {
+	        audio.play();
+	    }
+	    if (!isPlay && !audio.paused) {
+	        audio.pause();
+	    }
+	}
+	autoPlay();
+</script>
+<div class="site-container">
+	<div id="jq-loading" class="site-loading">
+	    <img src="/Public/res/Wap/code/img/load.gif"/>
+	</div>
+	<section id="jq-container" class="site-audio site-hide">
+		<p class="wrap-ad">
+			<img src="<?php echo $cover; ?>">
+		</p>
+		<div class="wrap-block">
+			<ul class="wrap-bar">
+				<li id="jq-start">00:00:00</li>
+				<li id="jq-progress">
+					<img src="/Public/res/Wap/code/img/bar_load.png">
+					<p></p>
+				</li>
+				<li id="jq-end">00:00:00</li>
+			</ul>
+			<div class="wrap-play">
+				<p class="wrap-img"><img src="<?php echo $cover; ?>"/></p>
+				<dl id="jq-move">
+					<dt><span><?php echo $data['title']; ?></span></dt>
+					<dd><?php echo $data['info']; ?></dd>
+				</dl>
+				<p id="jq-play" class="wrap-btn"><img src="/Public/res/Wap/code/img/load.gif"/></p>
+			<div>
+		</div>
+	</section>
+</div>
+<script type="text/javascript" src="/Public/res/Wap/code/js/zepto.min.js"></script>
+<script type="text/javascript" src="/Public/res/Wap/code/js/index.js?v=<?php echo time()?>"></script>
+</body>
+</html>

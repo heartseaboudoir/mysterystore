@@ -1,0 +1,174 @@
+<extend name="Public/base" />
+
+<block name="body">
+	<!-- 标题栏 -->
+	<div class="main-title">
+		<h2>{$meta_title}</h2>
+	</div>
+        <div class="tab-content">
+            <!-- 数据列表 -->
+            <form id="form" action="{:addons_url('Goods://GoodsStoreAdmin:/push_update')}" method="post" class="form-horizontal">
+                <div class="form-item cf">
+                    <label class="item-label">操作方式</label>
+                    <div class="controls">
+                        <label><input type="radio" name="type" value="all" /> 所有商品</label>
+                        <label><input type="radio" name="type" value="goods_by_cid" /> 指定分类的商品</label>
+                    </div>
+                </div>
+                <div class="form-item cf goods_by_cid hidden">
+                    <label class="item-label">可选分类<span class="check-tips">（按住ctrl可多选）</span></label>
+                    <div class="controls">
+                        <select name="id[]" multiple="multiple" rows="2">
+                            <volist name="category" id="lv">
+                                <option value="{$lv.id}">{$lv.title}</option>
+                            </volist>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <button id="submit" class="btn submit-btn ajax-post-push hidden no-refresh" target-form="form-horizontal" type="submit">提 交 同 步</button>
+                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                </div>
+            </form>
+        </div>
+</block>
+<block name="script">
+   
+
+	<script type="text/javascript">
+		$(function(){
+                    highlight_subnav('{:addons_url('Goods://GoodsStoreAdmin:/push_update')}');
+                    $('[name="type"]').change(function(){
+                        var val = $('[name="type"]:checked').val();
+                        if(val == 'goods_by_cid'){
+                            $('.goods_by_cid').show();
+                        }else{
+                            $('.goods_by_cid').hide();
+                        }
+                        switch(val){
+                            case 'goods_by_cid':
+                                $('#form').attr('action', "{:addons_url('Goods://GoodsStoreAdmin:/push_update', array('type' => 'goods_by_cid'))}");
+                                return;
+                            case 'all':
+                                $('#form').attr('action', "{:addons_url('Goods://GoodsStoreAdmin:/push_update', array('type' => 'all'))}");
+                                return;
+                        }
+                    });
+		});
+
+
+        var push_txt = '提交同步';
+        var c = 60;
+        var t;
+        function timedCount()
+        {
+            if (c > 0) {
+                c--;
+                $('.ajax-post-push').text(push_txt + ' ' + c + 'S');
+                t = setTimeout("timedCount()", 1000)
+            } else {
+                $('#top-alert').find('button').click();
+                $('.ajax-post-push').text(push_txt);
+                $('.ajax-post-push').removeClass('disabled').prop('disabled',false);                            
+            }
+        }
+
+    
+
+
+
+    //ajax post submit请求
+    $(function(){
+        $('.ajax-post-push').click(function(){
+            var target,query,form;
+            var target_form = $(this).attr('target-form');
+            var that = this;
+            var nead_confirm=false;
+            if( ($(this).attr('type')=='submit') || (target = $(this).attr('href')) || (target = $(this).attr('url')) ){
+                form = $('.'+target_form);
+
+                if ($(this).attr('hide-data') === 'true') {
+                    form = $('.hide-data');
+                    query = form.serialize();
+                } else if (form.get(0) == undefined) {
+                    return false;
+                } else if ( form.get(0).nodeName=='FORM' ){
+                    if ( $(this).hasClass('confirm') ) {
+                        if(!confirm('确认要执行该操作吗?')){
+                            return false;
+                        }
+                    }
+                    if($(this).attr('url') !== undefined){
+                        target = $(this).attr('url');
+                    }else{
+                        target = form.get(0).action;
+                    }
+                    query = form.serialize();
+                }else if( form.get(0).nodeName=='INPUT' || form.get(0).nodeName=='SELECT' || form.get(0).nodeName=='TEXTAREA') {
+                    form.each(function(k,v){
+                        if(v.type=='checkbox' && v.checked==true){
+                            nead_confirm = true;
+                        }
+                    })
+                    if ( nead_confirm && $(this).hasClass('confirm') ) {
+                        if(!confirm('确认要执行该操作吗?')){
+                            return false;
+                        }
+                    }
+                    query = form.serialize();
+                }else{
+                    if ( $(this).hasClass('confirm') ) {
+                        if(!confirm('确认要执行该操作吗?')){
+                            return false;
+                        }
+                    }
+                    query = form.find('input,select,textarea').serialize();
+                }
+                $(that).addClass('disabled').attr('autocomplete','off').prop('disabled',true);
+                $.post(target,query).success(function(data){
+                    if (data.status==1) {
+                        if (data.url) {
+                            updateAlert(data.info + ' 页面即将自动跳转~','alert-success');
+                        }else{
+                            updateAlert(data.info ,'alert-success');
+                        }
+                        
+                        
+
+                        timedCount();
+
+                        
+
+                        
+                        /*
+                        setTimeout(function(){
+                            if (data.url) {
+                                location.href=data.url;
+                            }else if( $(that).hasClass('no-refresh')){
+
+                            }else{
+                                location.reload();
+                            }
+                        },1500);
+                        */
+                    }else{
+                        updateAlert(data.info);
+                        setTimeout(function(){
+                            if (data.url) {
+                                location.href=data.url;
+                            }else{
+                                $('#top-alert').find('button').click();
+                                $(that).removeClass('disabled').prop('disabled',false);
+                            }
+                        },1500);
+                    }
+                });
+            }
+            return false;
+        });     
+    
+    
+    });
+       
+	</script>
+</block>

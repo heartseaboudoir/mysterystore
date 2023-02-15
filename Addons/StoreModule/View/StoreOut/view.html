@@ -1,0 +1,246 @@
+<extend name="Public/base" />
+<block name="body">
+    <div id="jq-content" class="site-content">
+        <div class="main-title">
+            <h2>出库验货单查看</h2>
+        </div>
+        <a id="jq-download" class="btn" href="javascript:void(0);">导出Excel</a>
+        <form class="form-horizontal">
+            <div id="jq-list" class="tab-pane in tab1"></div>
+            <div class="data-table table-striped">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>商品ID</th>
+                            <th>商品名称</th>
+                            <th>商品类型</th>
+                            <th>商品条码</th>
+                            <th>售价金额</th>
+                            <th>库存数量</th>
+                            <th>申请数量</th>
+                            <th>有货数量</th>
+                            <th>缺货数量</th>
+                            <th>备注</th>
+                        </tr>
+                    </thead>
+                    <tbody id="jq-child"></tbody>
+                </table>
+            </div>
+            <button id="jq-submit" type="submit" class="btn submit-btn hidden">修改出库验货单</button>
+        </form>
+    </div>
+    <script id="temp-list" type="text/html">
+        <div class="form-item cf">
+            <div class="controls goods_div">
+                <label>验货单号：{{items.s_out_sn}}</label>
+                <label>创建日期：{{items.ctime}}</label>
+                <label>商品种类：{{items.g_type}}种</label>
+                <label>商品数量：{{items.g_nums}}</label>
+                <label>售价金额：{{items.g_amounts}}</label>
+            </div>
+            <div class="controls goods_div1">
+                <label>创建人：{{items.admin_nickname}}</label>
+                <label>申请门店：{{items.store_name1}}</label>
+                <label>发货门店：{{items.store_name2}}</label>
+            </div>
+            <div class="controls goods_div2">
+                <label>来源：<span class="wrap-empty">{{items.s_out_type_name}}</span></label>
+                <label>关联单号：{{items.rel_orders}}</label>
+            </div>
+            <div class="controls goods_div3">
+                <label>单据状态：<span class="wrap-highlight">{{items.s_out_status_name}} </span></label>
+            </div>
+            <div class="controls goods_div4">
+                <label>备注：
+                {{if items.s_out_status == 0}} 
+                    <input type="text" class="text input-min remark" style="width: 200px;" name="remark" value="{{items.remark}}" />
+                    <a id="jq-receiving" class="btn" href="javascript:void(0);">全部有货</a>
+                    <a id="jq-returns" class="btn" href="javascript:void(0);">全部缺货</a>
+                {{else}}
+                    {{items.remark}}
+                {{/if}}
+                </label>
+            </div>
+        </div>
+    </script>
+    <script id="temp-child" type="text/html">
+        {{each items as list index}}
+        <tr class="data_list">
+            <input type="hidden" name="s_out_d_id" value="{{list.s_out_d_id}}"/>
+            <td>{{list.goods_id}}</td>
+            <td title="{{list.goods_name}}"><a href="{:addons_url('Goods://GoodsInfo:/index')}?id={{list.goods_id}}" target="_blank">
+            {{if list.goods_name != null}}
+                {{if list.goods_name.length > 19}}
+                    {{list.goods_name.slice(0,18) + '...'}}
+                {{else}}
+                    {{list.goods_name}}
+                {{/if}}
+                {{/if}}</a>
+            </td>
+            <td>{{list.cate_name}}</td>
+            <td title="{{list.bar_code}}">
+            {{if list.bar_code != null}}
+                {{if list.bar_code.length > 15}}
+                    {{list.bar_code.slice(0,14) + '...'}}
+                {{else}}
+                    {{list.bar_code}}
+                {{/if}}
+            {{/if}}
+            </td>
+            <td>{{list.sell_price}}</td>
+            <td>{{list.stock_num}}</td>
+            <td class="temp-sum">{{list.g_num}}</td>
+            <td>
+                <input type="text" name="in_num" value="{{list.in_num}}" num/>
+            </td>
+            <td>
+                <input type="text" name="out_num" value="{{list.out_num}}" num/>
+            </td>
+            <td title="{{list.remark}}">
+                <input type="text" name="remark" value="{{list.remark}}">
+            </td>
+        </tr>
+        {{/each}}
+    </script>
+</block>
+<block name="script">
+    <script type="text/javascript">
+    layui.use(['main'], function() {
+        var $ = layui.jquery,
+            layer = layui.layer;
+
+        var Global = {
+              listUrl: '/Erp/StoreOut/getSingleStoreOutInfo',
+              fileUrl: '/Erp/StoreOut/exportViewExcel',
+            submitUrl: '/Erp/StoreOut/updateStoreOutDetailInfo',
+            jump: window.location.pathname.match(/(\D*)view/)[1],
+            submitFlag: true
+        }
+        $("a[href$='" + Global.jump + "index.html']").parent().addClass('layui-this');
+
+        var passData = {
+            s_out_id: window.location.pathname.match(/\/(\w+).html/)[1]
+        }
+        var data = $.parseJson( passData );
+        
+        $.getData({
+             url: Global.listUrl + '?' + data,
+            load: true
+        }, function(res){
+            dataShow(res);
+        });
+        function dataShow(res){
+            $('#jq-list').html(template('temp-list', { items: res.content.maindata }));
+            $('#jq-child').html(template('temp-child', { items: res.content.list }));
+            
+            $('#jq-child').find('tr').each(function(){
+                var oIn = $(this).find('[name="in_num"]'),
+                   oOut = $(this).find('[name="out_num"]'),
+                   vSum = parseInt( $(this).find('.temp-sum').html() ),
+                remark = $(this).find('[name="remark"]');
+
+                if( res.content.maindata.s_out_status != 0 ){
+                    oIn.parents('td').html( oIn.val() );
+                    oOut.parents('td').html( oOut.val() );
+                    var context = remark.val().length > 10 ? remark.val().slice(0,9) + '...' : remark.val();
+                    remark.parents('td').html( context );
+                    $('#jq-submit').hide();
+                }
+                
+                $(this).verifyForm(); 
+                $(this).find(':input').keyup(function(){
+                    if( $(this).attr('num') == '' ){
+                        if( parseInt( $(this).val() ) > vSum ){
+                            $(this).val( vSum );
+                        }
+                    }
+                }).blur(function(){
+                    if( $(this).attr('num') == '' ){
+                        var oName = $(this).context.name == 'out_num' ? 'in_num' : 'out_num';
+                        $(this).parents('tr').find('[name="'+oName+'"]').val( vSum - $(this).val() );
+                    }
+                });
+
+                $('#jq-receiving').on({
+                    click:function(){
+                        oIn.val( vSum );
+                        oOut.val( 0 );
+                    }
+                });
+                $('#jq-returns').on({
+                    click:function(){
+                        oOut.val( vSum );
+                        oIn.val( 0 );
+                    }
+                });
+            });
+        }
+
+        $('#jq-download').fileDown({
+             url: Global.fileUrl + '?' + data,
+        });
+
+        $('#jq-submit').on({
+            click: function() {
+                var arr = [],
+                 verify = true;
+                $('#jq-child').find('tr').each(function(){
+                    var oIn = $(this).find('[name="in_num"]'),
+                       oOut = $(this).find('[name="out_num"]'),
+                    vSumf = $(this).find('.temp-sum').html();
+                    if( oIn.val() == '' ){
+                        layer.msg( '请输入验收数量', {
+                            time: 1500
+                        });
+                        oIn.focus();
+                        verify = false;
+                        return false;
+                    }
+                    if( oOut.val() == '' ){
+                        layer.msg( '请输入退货数量', {
+                            time: 1500
+                        });
+                        oOut.focus();
+                        verify = false;
+                        return false;
+                    }
+                    if( oIn.val() == 0 && oOut.val() == 0 && vSumf != 0){
+                        var test = '验收数量 + 退货数量 不等于 申请数量';
+                        layer.msg( test, {
+                            time: 1500
+                        });
+                        oIn.focus();
+                        verify = false;
+                        return false;
+                    }
+                    
+                    var data = $(this).find('input').serialize().replace(/\=/g,"\"\:\"").replace(/\&/g,"\",\"");
+                        data = JSON.parse( '{"' + decodeURIComponent(data,true) + '"}' );
+                    arr.push( data );
+                });
+                if( verify && Global.submitFlag ){
+                    Global.submitFlag = false;
+                    var data = {
+                        s_out_id: passData.s_out_id,
+                        info_json: arr,
+                        remark: $('#jq-list').find('[name="remark"]').val()
+                    }
+                    $.postData({
+                         url: Global.submitUrl,
+                        data: data
+                    }, function(res){
+                        layer.msg(res.content, {
+                            time: 1500
+                        });
+                        window.location.href = Global.jump + 'index.html';
+                    }, function(){
+                        Global.submitFlag = true;
+                    });
+                }
+                return false;
+            }
+        });
+
+    });
+    </script>
+</block>

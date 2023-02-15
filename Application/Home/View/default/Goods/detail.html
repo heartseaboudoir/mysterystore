@@ -1,0 +1,20 @@
+<extend name="Base/common"/>
+
+<block name="header">
+    <header class="jumbotron subhead" id="overview">
+		<div class="container">
+			<h2>{$info.title}</h2>
+		</div>
+	</header>
+</block>
+
+<block name="body">
+    <div class="main-content">
+		<hr>
+		<div style="margin:5px 0; text-align:center;"> 
+		<h3>商品图片</h3>
+			<img src="{$info.cover_id|get_cover_url}" style="max-width:60%;">
+		</div>
+		<hr>
+    </div>
+</block>

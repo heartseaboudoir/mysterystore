@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <meta name="keywords" content="神秘商店" />
+    <meta name="description" content="神秘商店" />
+	<title>神秘商店</title>
+	<script type="text/javascript" src="/Public/res/Wap/code/js/rem.js"></script>
+	<link rel="stylesheet" href="/Public/res/Wap/code/css/base.css"/>
+	<link rel="stylesheet" href="/Public/res/Wap/code/css/index.css?v=<?php echo time()?>"/>
+</head>
+<body>
+<div class="site-container">
+	<div id="jq-loading" class="site-loading">
+	    <img src="/Public/res/Wap/code/img/load.gif"/>
+	</div>
+	<section id="jq-container" class="site-article site-hide">
+		<h1><?php echo $data['title']; ?></h1>
+		<p class="wrap-des">
+			<span>文/<?php echo $data['author']; ?></span>
+			<span><?php echo date('Y-m-d', $data['author']); ?></span>
+		</p>
+		<div class="wrap-test"><?php echo $data['content']; ?></div>
+	</section>
+</div>
+<script type="text/javascript">
+	document.getElementById('jq-container').style.display = 'block';
+	document.getElementById('jq-loading').style.display = 'none';
+</script>
+</body>
+</html>

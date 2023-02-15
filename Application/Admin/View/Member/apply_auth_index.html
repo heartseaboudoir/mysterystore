@@ -1,0 +1,81 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <style>
+        .btn.active{
+            background:#060;
+            color:#fff;
+        }
+    </style>
+    状态：
+    <a href="{:U('Member/apply_auth_index', array('type'=> 'wait'))}" class="btn <eq name="_GET[type]" value="wait">active</eq>">待审核</a>
+    <a href="{:U('Member/apply_auth_index', array('type'=> 'is_pub'))}" class="btn <eq name="_GET[type]" value="is_pub">active</eq>">已通过</a>
+    <a href="{:U('Member/apply_auth_index', array('type'=> 'no_pub'))}" class="btn <eq name="_GET[type]" value="no_pub">active</eq>">未通过</a>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table class="">
+            <thead>
+                <tr>
+                    <th class="">UID</th>
+                    <th class="">昵称</th>
+                    <th class="">申请时间</th>
+                    <th class="">状态</th>
+                    <th class="">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+            <notempty name="_list">
+                <volist name="_list" id="vo">
+                    <tr>
+                        <td>{$vo.uid} </td>
+                        <td>{$vo.uid|get_nickname}</td>
+                        <td><span>{$vo.create_time|time_format}</span></td>
+                        <td><switch name="vo.status"><case value="1">待审核</case><case value="2">已通过</case><case value="3">不通过</case></switch></td>
+                        <td>
+                            <a href="{:U('Member/apply_auth_show?id='.$vo['id'])}">查看详细</a>
+                        </td>
+                    </tr>
+                </volist>
+                <else/>
+                <td colspan="9" class="text-center"> 暂时还没有人申请! </td>
+            </notempty>
+            </tbody>
+        </table>
+    </div>
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+
+<block name="script">
+    <script src="__STATIC__/thinkbox/jquery.thinkbox.js"></script>
+
+    <script type="text/javascript">
+        //搜索功能
+        $("#search").click(function () {
+            var url = $(this).attr('url');
+            var query = $('.search-form').find('input').serialize();
+            query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g, '');
+            query = query.replace(/^&/g, '');
+            if (url.indexOf('?') > 0) {
+                url += '&' + query;
+            } else {
+                url += '?' + query;
+            }
+            window.location.href = url;
+        });
+        //回车搜索
+        $(".search-input").keyup(function (e) {
+            if (e.keyCode === 13) {
+                $("#search").click();
+                return false;
+            }
+        });
+        //导航高亮
+        highlight_subnav('{:U('Member/apply_auth_index')}');
+    </script>
+</block>

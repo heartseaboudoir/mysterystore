@@ -1,0 +1,49 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <a class="btn" href="{:addons_url('Goods://GoodsTagAdmin:/save')}">添加</a>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+                <tr>
+                    <th>关键词</th>
+                    <th>拼音</th>
+                    <th>首字母</th>
+                    <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td>{$lv.title}</td>
+                    <td>{$lv.pinyin}</td>
+                    <td>{$lv.fir_letter}</td>
+                    <td>
+                        <a class="confirm ajax-get" href="{:addons_url('Goods://GoodsCateAdmin:/delete?id='.$lv['id'])}" data-id="{$lv.id}">删除</a>
+                    </td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $(function() {
+            highlight_subnav('{:addons_url('Goods://GoodsTagAdmin:/index')}');
+            //全选节点
+            $('.check-all').on('change', function() {
+                $('.ids').prop('checked', this.checked);
+            });
+        })
+    </script>
+</block>

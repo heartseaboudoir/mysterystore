@@ -1,0 +1,55 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table class="">
+            <thead>
+                <tr>
+                    <th class="">昵称</th>
+                    <th class="" style="width:150px;">关注时间</th>
+                    <th class="" style="width:150px;">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+            <notempty name="list">
+                <volist name="list" id="vo">
+                    <tr>
+                        <td>
+                            <eq name="_GET.type" value="1">
+                            <img src="{$vo.fid|get_header_pic}" class="header_pic" />{$vo.fid|get_nickname}
+                            <else/>
+                            <img src="{$vo.uid|get_header_pic}" class="header_pic" />{$vo.uid|get_nickname}
+                            </eq>
+                        </td>
+                        <td>{$vo.create_time|time_format}</td>
+                        <td>
+                            <eq name="_GET.type" value="1">
+                            <a href="{:U('Member/show?id='.$vo['fid'])}" class="">查看</a>
+                            <else/>
+                            <a href="{:U('Member/show?id='.$vo['uid'])}" class="">查看</a>
+                            </eq>
+                        </td>
+                    </tr>
+                </volist>
+                <else/>
+                <td colspan="9" class="text-center"> aOh! 暂时还没有内容! </td>
+            </notempty>
+            </tbody>
+        </table>
+    </div>
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+
+<block name="script">
+    <script src="__STATIC__/thinkbox/jquery.thinkbox.js"></script>
+    <script type="text/javascript">
+        highlight_subnav("{:U('Member/index')}");
+    </script>
+</block>

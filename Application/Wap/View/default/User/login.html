@@ -1,0 +1,135 @@
+<extend name="Base/common"/>
+<block name="body">
+<div class="weui_tab">
+    <div class="weui_tab_bd">
+        <div></div><!-- weui_cells_h2-->
+        <div class="weui_cells_title">
+            <h2>为方便记录您的会员的等级,请验证手机</h2>
+        </div>
+        <div class="weui_cells weui_cells_form">
+            <div class="weui_cell weui_vcode">
+                <div class="weui_cell_bd weui_cell_primary">
+                    <input class="weui_input" type="number" pattern="1[0-9]*" placeholder="请输入手机号" name="mobile" maxlength="11"/>
+                </div>
+                <div class="weui_cell_ft">
+                    <a class="weui_btn weui_btn_plain_default getVildCode" href="#" id="send">获取验证码</a>
+                </div>
+            </div>
+            <div class="weui_cell weui_vcode_noft">
+                <div class="weui_cell_bd weui_cell_primary">
+                    <input class="weui_input" type="number" placeholder="请输入验证码" name="sms_code" maxlength="6"/>
+                </div>
+            </div>
+        </div>
+        <div href="999999" class="agreement">点击-开始,即表示您同意<a href="{:U('Document/show', array('name' => 'legal_privacy'))}">《法律声明及隐私政策》</a></div>
+    </div>
+</div>
+<a href="javascript:;" class="weui_btn weui_btn_warn weui_btn_pay mt15" id="sub_btn">开始</a>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        
+        function getTimer($el, duration) {
+            var timer = new Timer({
+                duration: duration,
+                format: '重新发送(ss秒)'
+            })
+
+            var text = $el.text()
+
+            timer.on('change', function () {
+                $el.text('重新发送(' + this.duration / 1000 + '秒)')
+            })
+
+            timer.on('start', function () {
+                this.duration = duration
+                $el.addClass('disable')
+            })
+
+            timer.on('end', function () {
+                $el.text(text)
+                $el.removeClass('disable')
+            })
+
+            timer.duration = 0
+
+            return timer
+        }
+
+        var $getVildCode = $('#send');
+        var timer = getTimer($getVildCode, 60 * 1000);
+        
+        $('#send').click(function(){
+            if($(this).hasClass('disable')) return false;
+            var mobile = $("[name='mobile']").val();
+            var url = '{:U("User/get_login_code")}';
+            Loading.show({
+                msg: '正在发送',
+                isLoading: true
+            });
+            $.ajax({
+                type:'get',
+                url :url,
+                data : {mobile:mobile},
+                dataType:'json',
+                success:function(data){
+                    Loading.hide();
+                    if(data.status == 1){
+                        if (timer.duration === 0) {
+                            timer.start();
+                        }
+                    }
+                    Loading.show({
+                        msg: data.info,
+                        autoClose:2000,
+                        isLoading: false
+                    });
+                }
+            });
+        });
+        $("#sub_btn").click(function () {
+            if ($(this).data('act') == 1) {
+                //return false;
+            }
+            var mobile = $("[name='mobile']").val();
+            var sms_code = $("[name='sms_code']").val();
+            if (mobile == '') {
+                Loading.show({
+                    msg: '请输入手机号码',
+                    autoClose:2000,
+                    isLoading: false
+                });
+                return false;
+            }
+            if (sms_code == '') {
+                Loading.show({
+                    msg: '请输入验证码',
+                    autoClose:2000,
+                    isLoading: false
+                });
+                return false;
+            }
+            $(this).data('act', 1);
+            var url = "{:U('User/login')}";
+            $.post(url, {mobile: mobile, sms_code: sms_code}, success, "json");
+            return false;
+
+            function success(data) {
+                if (data.status) {
+                    Loading.show({
+                        msg: data.info,
+                        isLoading: true
+                    });
+                    window.location.href = data.url;
+                } else {
+                    Loading.show({
+                        msg: data.info,
+                        autoClose:2000,
+                        isLoading: false
+                    });
+                    $("#sub_btn").data('act', 0);
+                }
+            }
+        });
+    </script>
+</block>

@@ -1,0 +1,54 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+                <tr>
+                    <th>标题</th>
+                    <th>标识</th>
+                    <th>每天最多可得蜜糖</th>
+                    <th>最多可得蜜糖</th>
+                    <th>操作方式</th>
+                    <th>更新时间</th>
+                    <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td>{$lv.title}</td>
+                    <td>{$lv.name}</td>
+                    <td><eq name="lv.day_score" value="0">不限<else/>{$lv.day_score}</eq></td>
+                    <td><eq name="lv.all_score" value="0">不限<else/>{$lv.all_score}</eq></td>
+                    <td><switch name="lv.type"><case value="1">增加</case><case value="2">减少</case><default/>-</switch></td>
+                    <td>{$lv.update_time|time_format="Y-m-d H:i"}</td>
+                    <td>
+                        <a class="update" href="{:addons_url('Scorebox://ScoreboxConfigAdmin:/save?id='.$lv['id'])}" data-id="{$lv.id}">编辑</a>
+                    </td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $(function() {
+            highlight_subnav('{:addons_url('Scorebox://ScoreboxConfigAdmin:/index')}');
+            //全选节点
+            $('.check-all').on('change', function() {
+                $('.ids').prop('checked', this.checked);
+            });
+        })
+    </script>
+</block>

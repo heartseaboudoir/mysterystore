@@ -1,0 +1,52 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <style>
+        .in_cur{background:#170; color:#fff;}
+    </style>
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            
+            <thead>
+                <tr>
+                    <th>优惠券码</th>
+                    <th>类型</th>
+                    <th>金额/折扣</th>
+                    <th>领取人</th>
+                    <th width="150">领取时间</th>
+                    <th width="150">最晚使用时间</th>
+                    <th>状态</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td>{$lv.code}</td>
+                    <td><switch name="lv.type"><case value="1">满减券</case><case value="2">折扣券</case></switch></td>
+                    <td><switch name="lv.type"><case value="1">￥{$lv.money}</case><case value="2">{$lv.discount}折</case></switch></td>
+                    <td>{$lv.uid|get_nickname}</td>
+                    <td><span>{$lv.create_time|time_format}</span></td>
+                    <td><span><gt name="lv.last_time" value="0">{$lv.last_time|time_format="Y-m-d"}<else/>无限</gt></span></td>
+                    <td><switch name="lv.status"><case value="1">正常</case><case value="2">已使用</case><case value="3">已过期</case><case value="4">已作废</case></switch></td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $(function() {
+            highlight_subnav('{:addons_url('CashCoupon://CashCouponAdmin:/user_lists')}');
+        })
+    </script>
+</block>

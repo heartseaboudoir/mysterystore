@@ -1,0 +1,95 @@
+<extend name="Public/base" />
+
+<block name="body">
+        <script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+	<!-- 标题栏 -->
+	<div class="main-title">
+		<h2>{$meta_title}</h2>
+	</div>
+        <div class="tab-content">
+            <!-- 数据列表 -->
+            <form id="form" action="" method="post" class="form-horizontal">
+                <div class="tab-pane in tab1">
+                        <div class="form-item cf">
+                            <label class="item-label">订单号</label>
+                            <div class="controls">
+                                <a href="{:addons_url('Order://ShopOrder:/show?', array('order_sn' => $data['order_sn']))}">{$data.order_sn}</a>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">申请人<span class="check-tips"></span></label>
+                            <div class="controls">
+                                {$data.uid|get_nickname} <eq name="data.is_system" value="1">（系统退款）</eq>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">申请理由<span class="check-tips"></span></label>
+                            <div class="controls">
+                                {$data.reason}
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">图片凭证<span class="check-tips"></span></label>
+                            <div class="controls">
+                                <notempty name="data.pics">
+                                <php>
+                                    $pics = explode(',', $data['pics']);
+                                </php>
+                                <volist name="pics" id="lv">
+                                    <div class="upload-img-box">
+                                        <div class="upload-pre-item"><img src="{$lv|get_cover=path}"/></div>
+                                    </div>
+                                </volist>
+                                </notempty>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">申请时间<span class="check-tips"></span></label>
+                            <div class="controls">
+                                {$data.create_time|time_format="Y-m-d H:i"}
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">状态<span class="check-tips"></span></label>
+                            <div class="controls">
+                                <switch name="data.status">
+                                    <case value="1">新申请</case>
+                                    <case value="2">已同意</case>
+                                    <case value="3">已拒绝</case>
+                                    <case value="4">已取消</case>
+                                </switch>
+                            </div>
+                        </div>
+                        <eq name="data.status" value="3">
+                        <div class="form-item cf">
+                            <label class="item-label">卖家拒绝理由<span class="check-tips"></span></label>
+                            <div class="controls">
+                                {$data.seller_reason}
+                            </div>
+                        </div>
+                        </eq>
+                        <div class="form-item cf">
+                            <label class="item-label">最后更新时间<span class="check-tips"></span></label>
+                            <div class="controls">
+                                {$data.update_time|time_format="Y-m-d H:i"}
+                            </div>
+                        </div>
+                </div>
+                <div class="form-item cf">
+                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                </div>
+            </form>
+        </div>
+</block>
+<block name="script">
+	<script type="text/javascript">
+		$(function(){
+                    highlight_subnav('{:addons_url('Order://OrderRefundAdmin:/index')}');
+                    //全选节点
+                    $('.check-all').on('change',function(){
+                        $('.ids').prop('checked',this.checked);
+                    });showTab();
+		})
+                
+	</script>
+</block>

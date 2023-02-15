@@ -1,0 +1,287 @@
+<extend name="Public/base" />
+
+<block name="body">
+        <script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+	<!-- 标题栏 -->
+	<div class="main-title">
+		<h2>{$meta_title}</h2>
+	</div>
+        <ul class="tab-nav nav">
+            <li class="current" data-tab="tab1"><a href="javascript:void(0);">基础</a></li>
+        </ul>
+        <div class="tab-content">
+            <!-- 数据列表 -->
+            <form id="form"  action="{:addons_url('Goods://GoodsAdmin:/update')}" method="post" class="form-horizontal">
+                <div class="tab-pane in tab1">
+                        <div class="form-item cf">
+                            <label class="item-label">商品分类</label>
+                            <div class="controls">
+                                <select name="cate_id">
+                                    <option value="0">请选择分类</option>
+                                    <volist name="category_list" id="_lc">
+                                        <option value="{$_lc.id}" <eq name="_lc[pid]" value="0"></eq> <eq name="_lc[id]" value="$data['cate_id']">selected=""</eq>>{$_lc.title}</option>
+                                    </volist>
+                                </select>
+                            </div>
+                        </div>
+						
+	                        <div class="form-item cf">
+	                            <label class="item-label">商品属性</label>
+	                         <neq name="data.id" value=''>
+		                               <volist name="attr_value" id="_lc">
+		                               <div class="controls">
+			                                 	<input type="text"  class="text input-large"  placeholder="请输入属性名"  name="value_name_attr" value="{$_lc.value_name}" />&nbsp;
+			                                 	<label class="item-label">商品条形码<span class="check-tips">（一行为一个条形码，条形码不可重复）</span></label>
+					                    
+					                            
+					                            	<div class="controls">
+					                               		 <textarea name="bar_code_attr" class="textarea input-large" style="height:{$_lc['num']*25 + 30}px;">{$_lc.bar_code}</textarea>
+					                            	</div>
+											
+										
+					                              
+												<span class="btn submit-btn ajax-post hidden"  value_id_attr="{$_lc.value_id}" onclick="edit_attr(this)" type="submit" style="padding: 5px 35px;">编辑</span>
+												<span class="btn submit-btn ajax-post hidden"  value_id_attr="{$_lc.value_id}" onclick="del_attr(this)" type="submit" style="padding: 5px 35px;">删除</span>
+												<!-- <input  type="checkbox" value="{$_lc.value_id}" a="{$_lc.status}" <eq name="_lc[status]" value="1">checked="checked"</eq><eq name="_lc[status]" value="0"></eq> lay-text="启用|停用" name="switch" lay-skin="switch" lay-filter="switch"> -->		
+			                                  	<!-- <label class="item-label"><span id='tishi-{$_lc.value_id}' class="check-tips">（如果该属性仓库库存还有剩余不允许删除）</span></label> -->
+			                            </div>
+		                               </volist>
+
+		                            <div class="controls">
+			                               <input type="text" placeholder="请输入属性名" class="text input-large" name="value_name_attr" value="" />&nbsp;
+			                                 <label class="item-label">商品条形码<span class="check-tips">（一行为一个条形码，条形码不可重复）</span></label>
+					                            <div class="controls">
+					                                <textarea name="bar_code_attr" class="textarea input-large" style="height:60px;"></textarea>
+					                            </div>
+			                                <span class="btn submit-btn ajax-post hidden" onclick="add_attr(this)"  style="padding: 5px 35px;">新增</span>
+		                            </div>
+		                            
+	                            </neq>
+		                    <eq name="data.id" value=''>        
+		                            <div class="controls">
+			                               <input type="text" placeholder="请输入属性名" class="text input-large" name="value_name_attr" value="" />&nbsp;
+			                                  <label class="item-label">商品条形码<span class="check-tips">（一行为一个条形码，条形码不可重复）</span></label>
+					                            <div class="controls">
+					                                <textarea name="bar_code_attr" class="textarea input-large" style="height:60px;"></textarea>
+					                            </div>
+		                           	 </div>
+							</eq>
+	                        </div>
+						
+						
+						
+                        <div class="form-item cf">
+                            <label class="item-label">销售途径<span class="check-tips">（勾选后，对应的销售途径才能被购买）</span></label>
+                            <div class="controls">
+                                <label><input type="checkbox" name="sell_outline" value="1" <eq name="data.sell_outline" value="1">checked</eq> /> 线下销售<span class="check-tips" style="margin-left:0;">（线下门店）</span></label>
+                                <label><input type="checkbox" name="sell_online" value="1" <eq name="data.sell_online" value="1">checked</eq>  /> 线上销售<span class="check-tips" style="margin-left:0;">（线上商城）</span></label>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">商品名<span class="check-tips">（最多填写40个字）</span></label>
+                            <div class="controls">
+                                <input type="text" class="text input-large" name="title" value="{$data.title}" maxlength="40" />
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">是否热销<span class="check-tips"></span></label>
+                            <div class="controls">
+                                <label><input type="radio" name="is_hot" value="0" checked="" /> 否</label>
+                                <label><input type="radio" name="is_hot" value="1" <eq name="data[is_hot]" value="1">checked=""</eq> /> 是</label>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">商品编号<span class="check-tips">（唯一性）</span></label>
+                            <div class="controls">
+                                <input type="text" class="text input-large" name="code" value="{$data.code}" />
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">默认售价<span class="check-tips">（单位：元， 格式：保留小数点后两位，如 0.00）</span></label>
+							<div class="controls">								
+								<if condition="!empty($data)">
+								{$data.sell_price} &nbsp;&nbsp;
+                                <button class="btn submit-btn"  onclick="window.location.href='{:addons_url('Goods://GoodsAdmin:/goods_selling_price_set?id='.$data['id'])}'" type="button"  style="padding: 5px 35px;">设置销售价</button>
+								<else />
+                                <input type="text" class="text input-min" name="sell_price" value="{$data.sell_price}"/>
+								</if>
+                                </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">计件单位<span class="check-tips"></span></label>
+                            <div class="controls">
+                                <input type="text" class="text input-min" name="unit" value="{$data.unit}" />
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <div class="form-item cf">
+                                <label class="item-label">展示图<span class="check-tips"></span></label>
+                                <div class="controls">
+                                    <input type="file" id="upload_picture_cover_id">
+                                    <input type="hidden" name=cover_id id=cover_id value="{$data[cover_id]}"/>
+                                    <div class="upload-img-box">
+                                        <notempty name="data[cover_id]">
+                                            <div class="upload-pre-item"><img src="{$data[cover_id]|get_cover='path'}"/></div>
+                                        </notempty>
+                                    </div>
+                                    <script type="text/javascript">
+                                    //上传图片
+                                    /* 初始化上传插件 */
+                                    $("#upload_picture_cover_id").uploadify({
+                                        "height"          : 30,
+                                        "swf"             : "__STATIC__/uploadify/uploadify.swf",
+                                        "fileObjName"     : "download",
+                                        "buttonText"      : "上传图片",
+                                        "uploader"        : "{:U('File/uploadPicture',array('session_id'=>session_id()))}",
+                                        "width"           : 120,
+                                        'removeTimeout'	  : 1,
+                                        'fileTypeExts'	  : '*.jpg; *.png; *.gif;',
+                                        "onUploadSuccess" : uploadPicturecover_id,
+                                        'onFallback' : function() {
+                                            alert('未检测到兼容版本的Flash.');
+                                        }
+                                    });
+                                    function uploadPicturecover_id(file, data){
+                                        var data = $.parseJSON(data);
+                                        var src = '';
+                                        if(data.status){
+                                                $("#cover_id").val(data.id);
+                                                src = data.url || '__ROOT__' + data.path
+                                                $("#cover_id").parent().find('.upload-img-box').html(
+                                                        '<div class="upload-pre-item"><img src="__ROOT__' + src + '"/></div>'
+                                                );
+                                        } else {
+                                                updateAlert(data.info);
+                                                setTimeout(function(){
+                                                $('#top-alert').find('button').click();
+                                                $(that).removeClass('disabled').prop('disabled',false);
+                                            },1500);
+                                        }
+                                    }
+                                    </script>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">运费<span class="check-tips">（保留两位小数。大于0时，运费优先使用当前设置值）</span></label>
+                            <div class="controls">
+                                <input type="text" class="text input-mini" name="express_money" value="{$data.express_money}" />
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">备注【自己人看】<span class="check-tips"></span></label>
+                            <div class="controls">
+                                <textarea class="textarea input-large" style="height:300px;" name="content">{$data['content']}</textarea>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">描述【商品描述】<span class="check-tips"></span></label>
+                            <div class="controls">
+                                <textarea class="textarea input-large" style="height:300px;" name="goods_remark">{$data['goods_remark']}</textarea>
+                            </div>
+                        </div>
+                    <div class="form-item cf">
+                        <label class="item-label">保质期(天)<span class="check-tips"></span></label>
+                        <div class="controls">
+                            <input type="text" class="text input-mini" name="expired_days" value="{$data.expired_days}" />
+                        </div>
+                    </div>
+                        <div class="form-item cf">
+                            <label class="item-label">状态</label>
+                            <div class="controls">
+                                <label><input type="radio" name="status" value="1" checked="" /> 上架</label>
+                                <label><input type="radio" name="status" value="2" <eq name="data[status]" value="2">checked=""</eq> /> 下架</label>
+                            </div>
+                        </div>
+                        <notempty name="data.id">
+                        <div class="form-item cf">
+                            <label class="item-label">添加时间<span class="check-tips"></span></label>
+                            <div class="controls">
+                                {$data.create_time|time_format="Y-m-d H:i:s"}
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">最后更新时间<span class="check-tips"></span></label>
+                            <div class="controls">
+                                {$data.update_time|time_format="Y-m-d H:i:s"}
+                            </div>
+                        </div>
+                        </notempty>
+                </div>
+                <div class="form-item cf">
+                    <button id="submit" class="btn submit-btn ajax-post hidden" target-form="form-horizontal" type="submit">确 定</button>
+                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                    <input type="hidden" value="{$data.id}" name="id" />
+                </div>
+            </form>
+        </div>
+</block>
+<block name="script">
+	<script type="text/javascript">
+		$(function(){
+			        
+                    highlight_subnav('{:addons_url('Goods://GoodsAdmin:/index')}');
+                    //全选节点
+                    $('.check-all').on('change',function(){
+                        $('.ids').prop('checked',this.checked);
+                    });showTab();
+                    
+                    
+                    
+                  
+                    
+		});
+		//新增属性
+      function add_attr(obj){
+            var parent = $(obj).parent();
+            var value_name_attr = parent.find(":input[name='value_name_attr']").val();
+            var bar_code_attr = parent.find('div').find("[name='bar_code_attr']").val();
+            var goods_id_attr = $(":input[name='id']").val();
+            $.post("{:addons_url('Goods://GoodsAttribute:/attrvalueupdate')}",{value_name:value_name_attr,bar_code:bar_code_attr,goods_id:goods_id_attr}, function(res){
+             		if(res.code == 200){
+                		 window.location.reload();
+             		}
+            	   alert(res.content);
+               
+           },'json');
+           		
+     } 
+     //修改
+	function edit_attr(obj){
+		var parent = $(obj).parent();
+        var value_name_attr = parent.find(":input[name='value_name_attr']").val();
+        var bar_code_attr = parent.find('div').find("[name='bar_code_attr']").val();
+        var value_id_attr = $(obj).attr('value_id_attr');
+        $.post("{:addons_url('Goods://GoodsAttribute:/attrvalueupdate')}",{value_name:value_name_attr,bar_code:bar_code_attr,value_id:value_id_attr}, function(res){
+         	alert(res.content);
+           
+        },'json'); 
+	}
+	function del_attr(obj){
+		   //利用对话框返回的值 （true 或者 false）  
+        if (confirm("你确定要删除吗？")) { 
+        	//这是删除
+            var value_id_attr = $(obj).attr('value_id_attr');
+            var goods_id_attr = $(":input[name='id']").val();
+            var status_attr = 2; 
+            $.post( "{:addons_url('Goods://GoodsAttribute:/attrvaluedelete')}", {value_id:value_id_attr,goods_id:goods_id_attr,status:status_attr}, function(res) {
+            	  if(res.code == 2){
+            		  alert(res.content.w_name+'--等 '+res.content.w_count+' 间仓库有 '+res.content.num+' 件库存 请清空库存后再删除');
+             		 return false;
+             	  }
+            	if(res.code != 200){
+            		alert(res.content);
+            		return false;
+            	}
+          		$(obj).parent().remove();
+            }, 'json');
+        }  
+        else {  
+            return false;
+        }
+		
+	
+	}
+	
+	</script>
+</block>

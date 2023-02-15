@@ -1,0 +1,114 @@
+<extend name="Public/base" />
+
+<block name="body">
+        <script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+	<!-- 标题栏 -->
+	<div class="main-title">
+		<h2>{$meta_title}</h2>
+	</div>
+        <ul class="tab-nav nav">
+            <li class="current" data-tab="tab1"><a href="javascript:void(0);">基础</a></li>
+        </ul>
+        <div class="tab-content">
+            <!-- 数据列表 -->
+            <form id="form" action="{:addons_url('Store://MemberAdmin:/update')}" method="post" class="form-horizontal">
+                <div class="tab-pane in tab1">
+                    <eq name="_type" value="2">
+                        <div class="form-item cf">
+                            <label class="item-label">所属区域</label>
+                            <div class="controls">
+                                <select name="store_id">
+                                    <option value="0"> - 请选择区域 - </option>
+                                    <volist name="store_ls" id="lv">
+                                        <option value="{$key}" <eq name="_GET[store_id]" value="$key">selected</eq>>{$lv}</option>
+                                    </volist>
+                                </select>
+                            </div>
+                        </div>
+                    <else/>
+                        <div class="form-item cf">
+                            <label class="item-label">所属门店</label>
+                            <div class="controls">
+                                <select name="store_id">
+                                    <option value="0"> - 请选择门店 - </option>
+                                    <volist name="store_ls" id="lv">
+                                        <option value="{$key}" <eq name="_GET[store_id]" value="$key">selected</eq>>{$lv}</option>
+                                    </volist>
+                                </select>
+                            </div>
+                        </div>
+                    </eq>
+                        <div class="form-item cf">
+                            <label class="item-label">所属管理员类型 </label>
+                            <div class="controls">
+                                <select name="group">
+                                    <option value="0"> - 请选择类型 - </option>
+                                    <eq name="_type" value="2">
+                                    <option value="2" <eq name="_GET[group]" value="2">selected</eq>>社区管理员</option>
+                                    <option value="3" <eq name="_GET[group]" value="3">selected</eq>>社区财务管理员</option>
+                                    <option value="10" <eq name="_GET[group]" value="10">selected</eq>>社区合作载体管理员</option>
+                                    <option value="15" <eq name="_GET[group]" value="15">selected</eq>>采购管理员</option>
+                                    <option value="17" <eq name="_GET[group]" value="17">selected</eq>>加盟商</option>
+                                    <else/>
+                                    <option value="2" <eq name="_GET[group]" value="2">selected</eq>>门店管理员</option>
+                                    <option value="3" <eq name="_GET[group]" value="3">selected</eq>>门店财务管理员</option>
+                                    <option value="4" <eq name="_GET[group]" value="4">selected</eq>>设备管理员</option>
+                                    <option value="10" <eq name="_GET[group]" value="10">selected</eq>>合作载体管理员</option>
+                                    <option value="15" <eq name="_GET[group]" value="15">selected</eq>>采购管理员</option>
+                                    <option value="17" <eq name="_GET[group]" value="17">selected</eq>>加盟商</option>
+                                    </eq>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">管理员勾选</label>
+                            <div class="controls" id="user_div"></div>
+                        </div>
+                </div>
+                <div class="form-item cf">
+                    <button id="submit" class="btn submit-btn ajax-post hidden" target-form="form-horizontal" type="submit">确 定</button>
+                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                    <input type="hidden" value="{$_type}" name="type" />
+                </div>
+            </form>
+        </div>
+</block>
+<block name="script">
+	<script type="text/javascript">
+		$(function(){
+                    highlight_subnav("{:!empty($_GET['type']) && $_GET['type'] == 2 ? addons_url('Store://ShequAdmin:/index') : addons_url('Store://StoreAdmin:/index')}");
+                    //全选节点
+                    $('.check-all').on('change',function(){
+                        $('.ids').prop('checked',this.checked);
+                    });showTab();
+		});
+                function get_u(){
+                    var obj = $('#user_div');
+                    var store_id = $('[name="store_id"]').val();
+                    var group = $('[name="group"]').val();
+                    var type = $('[name="type"]').val();
+                    obj.html('正在获取管理员...');
+                    $.ajax({
+                        type:'get',
+                        url : "{:addons_url('Store://MemberAdmin:/get_lists')}",
+                        data:{group:group, store_id:store_id, type:type},
+                        dataType:'json',
+                        success:function(data){
+                            var l = '';
+                            $.each(data, function(x, y){
+                                l += '<label style="display:inline-block;"><input type="checkbox" name="user[]" value="'+y.uid+'"/> '+y.nickname+'</label>';
+                            });
+                            if(l != ''){
+                                obj.html(l);
+                            }else{
+                                obj.html('无管理员可添加，请先在用户管理处添加新管理员');
+                            }
+                        }
+                    });
+                } 
+                get_u();
+                $('[name="store_id"],[name="group"]').change(function(){
+                    get_u();
+                });
+	</script>
+</block>

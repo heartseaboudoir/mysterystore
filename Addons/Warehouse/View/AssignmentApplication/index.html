@@ -1,0 +1,159 @@
+<extend name="Public/base"/>
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <!-- 高级搜索 -->
+    <div class="search-form fr cf">
+        <form id="search-form" onsubmit="return false;">
+            <div class="search-form fr cf">
+                <label id="msg" name="msg"></label>
+                <div class="sleft">
+                    <input type="text" name="s_date" class="text input-text search-input time" value="{$s_date}"
+                           placeholder="请选择开始日期"/>
+                    <input type="text" name="e_date" class="text input-text search-input time" value="{$e_date}"
+                           placeholder="请选择结束日期"/>
+                    <a class="sch-btn" href="javascript:;" id="search"
+                       url="{:addons_url('Warehouse://AssignmentApplication:/index')}?v={$v}"><i class="btn-search"></i></a>
+                </div>
+            </div>
+        </form>
+    </div>
+    <a class="btn" href="{:addons_url('Warehouse://AssignmentApplication:/index')}?isprint=1">导出Excel</a>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+            <tr>
+                <th>序号</th>
+                <th>调拨申请单号</th>
+                <th>申请日期</th>
+                <th>申请种类</th>
+                <th>申请数量</th>
+                <th>申请人</th>
+                <th>申请仓库</th>
+                <th>调拨仓库</th>
+                <th style="display:none;">库存数量</th>
+                <th>售价金额</th>
+                <th>申请结果</th>
+                <th>备注</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php $i=0; ?>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <?php $i++; ?>
+                    <td>{$i}</td>
+                    <td>{$lv.w_r_sn}</td>
+                    <td>{$lv.ctime}</td>
+                    <td>{$lv.g_type}种</td>
+                    <td>{$lv.g_nums}</td>
+                    <td>{$lv.nickname}</td>
+                    <td>{$lv.warehouse_name1}</td>
+                    <td>{$lv.warehouse_name2}</td>
+                    <td style="display:none;">{$lv.stock_num}</td>
+                    <td>{$lv.g_amounts}</td>
+                    <!--
+                     $pass_num = $lv["pass_num"];
+                            $g_type = $lv["g_type"];
+                            if($pass_num == 0){echo "新增";}
+                            elseif($pass_num == $g_type*2){echo "全部通过";}
+                            elseif($pass_num == $g_type){echo "全部拒绝";}
+                            else{echo "部分处理";}
+                     -->
+                    <td>
+                        <?php
+                           //echo $lv["w_r_status"];
+                           if($lv["w_r_status"]==0){echo "新增";}
+                           elseif($lv["w_r_status"]==1){echo "已审核申请";}
+                           elseif($lv["w_r_status"]==2){echo "部分审核";}
+                           elseif($lv["w_r_status"]==3){echo "全部拒绝";}
+                           elseif($lv["w_r_status"]==4){echo "作废";}
+                        ?>
+                    </td>
+                    <td>{$lv.remark|subtext=18}</td>
+                    <td>
+                        <a class="" href="{:addons_url('Warehouse://AssignmentApplication:/view?id='.$lv['w_r_id'])}"
+                           data-id="{$lv.id}">查看</a> |
+                        <a class="jq-confirm" href="{:addons_url('Warehouse://AssignmentApplication:/again?id='.$lv['w_r_id'])}"
+                           data-id="{$lv.id}">再次申请</a>
+                    </td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <link href="__STATIC__/datetimepicker/css/datetimepicker.css" rel="stylesheet" type="text/css">
+    <link href="__STATIC__/datetimepicker/css/dropdown.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"
+            charset="UTF-8"></script>
+    <script type="text/javascript">
+        highlight_subnav('{:addons_url('Warehouse://AssignmentApplication:/index')}');
+            //搜索功能
+            $('.search-form input').focus(function () {
+                $(document).keypress(function (e) {
+                    // 回车键事件
+                    if (e.which == 13) {
+                        $("#search").click();
+                    }
+                });
+            });
+        $("#search").click(function () {
+            var url = $(this).attr('url');
+            var query = $('.search-form').find('input').serialize();
+            query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g, '');
+            query = query.replace(/^&/g, '');
+            if (url.indexOf('?') > 0) {
+                url += '&' + query;
+            } else {
+                url += '?' + query;
+            }
+            var query2 = $('#select-form').serialize();
+            if (url.indexOf('?') > 0) {
+                url += '&' + query2;
+            } else {
+                url += '?' + query2;
+            }
+            window.location.href = url;
+        });
+
+        // 状态搜索子菜单
+        $(".search-form").find(".drop-down").hover(function () {
+            $("#sub-sch-menu").removeClass("hidden");
+        }, function () {
+            $("#sub-sch-menu").addClass("hidden");
+        });
+        $("#sub-sch-menu li").find("a").each(function () {
+            $(this).click(function () {
+                var text = $(this).text();
+                $("#sch-sort-txt").text(text).attr("data", $(this).attr("value"));
+                $("#sub-sch-menu").addClass("hidden");
+            })
+        });
+        var _T;
+        $('#select-form input').change(function () {
+            clearTimeout(_T);
+            _T = setTimeout(function () {
+                $("#search").click();
+            }, 1000);
+        });
+        $('.time').datetimepicker({
+            format: 'yyyy-mm-dd',
+            language: "zh-CN",
+            minView: 2,
+            autoclose: true
+        });
+    </script>
+
+</block>

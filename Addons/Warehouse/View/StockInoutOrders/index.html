@@ -1,0 +1,183 @@
+<extend name="Public/base" />
+<block name="body">
+    <div id="jq-content" class="site-content">
+        <div class="main-title">
+            <h2>订单出入库流水</h2>
+        </div>
+        <div class="search-form fr cf">
+            <form id="jq-search-form">
+                <div class="sleft">
+                    <input type="text" name="s_date" class="text input-text search-input time" placeholder="请选择开始日期" />
+                    <input type="text" name="e_date" class="text input-text search-input time" placeholder="请选择结束日期" />
+                    <a id="jq-search-btn" class="sch-btn" href="javascript:void(0);"><i class="btn-search"></i></a>
+                </div>
+            </form>
+        </div>
+        <a id="jq-url" class="btn" href="javascript:void(0);">商品出入库流水</a>
+        <a id="jq-download" class="btn" href="javascript:void(0);">导出Excel</a>
+        <div class="data-table table-striped">
+            <table>
+                <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>单号</th>
+                        <th>日期</th>
+                        <th>商品种类</th>
+                        <th>商品数量</th>
+                        <th>创建人</th>
+                        <th>入库仓库/门店</th>
+                        <th>发货仓库/门店/供应商</th>
+                        <th>来源</th>
+                        <th>类型</th>
+                        <th>备注</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="jq-list"></tbody>
+            </table>
+        </div>
+        <div id="jq-page" class="page"></div>
+    </div>
+    <script id="temp-list" type="text/html">
+        {{each items as list index}}
+        <tr data-id="{{list.id}}">
+            <td class="temp-id">{{index+1}}</td>
+            <td>{{list.sn}}</td>
+            <td>{{list.ptime}}</td>
+            <td>{{list.g_type}}种</td>
+            <td>{{list.g_nums}}</td>
+            <td>{{list.admin_nickname}}</td>
+            <td>{{if list.ruku_store_name == ''}}
+            		{{list.ruku_warehouse_name}}
+				{{else}}
+					{{list.ruku_store_name}}
+				{{/if}}
+            </td>
+            <td class="temp-ship"></td>
+            <td class="wrap-empty">{{list.s_type_name}}</td>
+            <td class="wrap-highlight">{{list.type_name}}</td>
+            <td title="{{list.remark}}">
+            {{if list.remark != null}}
+                {{if list.remark.length > 10 }}
+                    {{list.remark.slice(0,9) + '...'}}
+                {{else}}
+                    {{list.remark}}
+                {{/if}}
+            {{/if}}
+            </td>
+            <td>
+                <a class="temp-view" href="javascript:void(0);">查看</a>
+            </td>
+        </tr>
+        {{/each}}
+    </script>
+</block>
+<block name="script">
+    <script type="text/javascript">
+    layui.use(['main'], function() {
+        var $ = layui.jquery,
+            layer = layui.layer;
+ 
+        var Global = {
+            listUrl: '/Erp/StockInOutOrders/warehouseinoutstockorders',
+            fileUrl: '/Erp/StockInOutOrders/exportWarehouseInoutStockOrders',
+            jump: window.location.pathname.match(/(\D*)index/)[1],
+            passId: 'id'
+        }
+        $("a[href$='" + Global.jump + "index2.html']").parent().addClass('layui-this');
+        $('#jq-url').attr('href',Global.jump+'index2.html');
+
+        var passData = $.dataJson(); 
+        var data = $.parseJson( passData );
+        
+        $.getData({
+             url: Global.listUrl + '?' + data,
+            load: true
+        }, function(res){
+            dataShow(res);
+        });
+        function dataShow(res,callback){
+            var oDownload = $('#jq-download'),
+                    oList = $('#jq-list'),
+                    oPage = $('#jq-page');
+
+            oDownload.attr('href','javascript:void(0);').unbind();
+
+            if( res.content.data == null || res.content.data.length == 0 ){
+                oList.html('<tr><td class="wrap-empty">暂无内容！</td></tr>');
+                oDownload.css('cursor','default');
+            }else{
+                oList.html(template('temp-list', { items: res.content.data }));
+                $.each( res.content.data,function(i,items){
+                    var url = Global.jump + 'view/'+Global.passId+'/'+items[Global.passId]+'.html',
+                        oId = $('[data-id='+items[Global.passId]+']'),
+                      oView = oId.find('.temp-view');
+                    switch( parseInt(items.type) ){
+                    	case 1:
+                    	oView.attr('href',url.replace('StockInoutOrders','WarehouseInStock') );
+                    	break;
+                    	case 2:
+                    	oView.attr('href',url.replace('StockInoutOrders','WarehouseOutStock') );
+                    	break;
+                    	case 3:
+                    	oView.attr('href',url.replace('StockInoutOrders','WarehouseLoss').replace('view/id','view2/s_o_out_id') );
+                    	break;
+                    	case 4:
+                    	oView.attr('href',url.replace('StockInoutOrders','WarehouseLoss') );
+                    	break;
+                    }
+
+                    var name = '';
+                    if( items.fahuo_supply_name == '' && items.fahuo_warehouse_name == '' ){
+                    	name = items.fahuo_store_name;
+                    }else if( items.fahuo_store_name == '' && items.fahuo_warehouse_name == '' ){
+                    	name = items.fahuo_supply_name;
+                    }else{
+                    	name = items.fahuo_warehouse_name;
+                    }
+                    oId.find('.temp-ship').html( name );
+
+                    if( passData.p > 1 && callback == undefined ){
+                        var id = parseInt( oId.find('.temp-id').html() ),
+                           sum = passData.p * passData.pageSize -  passData.pageSize;
+                        oId.find('.temp-id').html( id + sum );
+                    }else{
+                        oId.find('.temp-id').html( id );
+                    }
+
+                });
+
+                var data = $('#jq-search-form').find('input').serialize();
+                oDownload.fileDown({
+                     url: Global.fileUrl + '?' + data
+                }).removeAttr('style');
+
+            }
+
+            if( res.content.recordCount > res.content.pageSize ){
+                var total = '<span class="rows">共'+res.content.recordCount+'条记录</span>';
+                oPage.html( res.content.pager.replace( new RegExp(Global.listUrl,'g'),Global.jump+'index' ) + total );
+            }else{
+                oPage.html( res.content.pager );
+            }
+        }
+
+        $('#jq-search-btn').off().on({
+            click: function() {
+                var data = $('#jq-search-form').find('input').serialize() + '&pageSize='+passData.pageSize; 
+                $.getData({
+                    url: Global.listUrl + '?' + data
+                }, function(res){
+                    dataShow(res,true);
+                    window.history.pushState( {},'',Global.jump+'index.html' );
+                });
+            }
+        });
+        $(document).keydown(function(e) {
+            if (e.which == 13) {
+                $('#jq-search-btn').click();
+            }
+        });
+    });
+    </script>
+</block>

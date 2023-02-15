@@ -1,0 +1,292 @@
+<extend name="Public/base" />
+<block name="body">
+    <div id="jq-content" class="site-content">
+        <div class="main-title">
+            <h2>寄售入库单查看</h2>
+        </div>
+        <a id="jq-download" class="btn" href="javascript:void(0);">导出Excel</a>
+        <form class="form-horizontal">
+            <div id="jq-list" class="tab-pane in tab1"></div>
+            <div class="data-table table-striped">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>商品ID</th>
+                            <th>商品名称</th>
+                            <th>商品类型</th>
+                            <th>商品属性</th>
+                            <th>商品条码</th>
+                            <!--<th>售价金额</th>-->
+                            <th>库存数量</th>
+                            <!--<th>箱规(个)</th>
+                            <th>箱数</th>
+                            <th>每箱价格</th>-->
+                            <th>数量</th>
+                            <th>单价</th>
+                            <th>备注</th>
+                        </tr>
+                    </thead>
+                    <tbody id="jq-child"></tbody>
+                </table>
+            </div>
+            <button id="jq-submit" type="submit" class="btn submit-btn hidden">修改寄售单</button>
+        </form>
+    </div>
+    <script id="temp-select-ship" type="text/html">
+        {{each items as list index}}
+        <option value="{{list.s_id}}">{{list.s_name}}</option>
+        {{/each}}
+    </script>
+    <script id="temp-list" type="text/html">
+        <div class="form-item cf">
+            <div class="controls goods_div">
+                <label>寄售入库单号：{{items.c_in_sn}}</label>
+                <label>创建日期：{{items.ctime}}</label>
+                <label>商品种类：{{items.g_type}}种</label>
+                <label>商品数量：{{items.g_nums}}</label>
+                <label>售价金额：{{items.g_amounts}}</label>
+                <label>寄售金额：{{items.b_amounts}}</label>
+            </div>
+            <div class="controls goods_div1">
+                <label>创建人：{{items.admin_nickname}}</label>
+                <label>寄售门店：{{items.store_name}}</label>
+                <label>供应商名称：
+                {{if items.c_in_status == 0}} 
+					<select id="jq-select-ship" name="supply_id">
+                        <option value="">请选择供应商</option>
+                    </select> 
+                {{else}}
+                    {{items.supply_name}}
+                {{/if}}
+                </label>
+            </div>
+            <div class="controls goods_div3">
+                <label>单据状态：<span class="wrap-highlight">{{items.c_in_status_name}} </span></label>
+            </div>
+            <div class="controls goods_div4">
+                <label>备注：
+                {{if items.c_in_status == 0}} 
+                    <input type="text" class="text input-min remark" style="width: 200px;" name="remark" value="{{items.remark}}" />
+                {{else}}
+                    {{items.remark}}
+                {{/if}}
+                </label>
+            </div>
+        </div>
+    </script>
+    <script id="temp-child" type="text/html">
+        {{each items as list index}}
+        <tr class="data_list">
+            <input type="hidden" name="c_in_d_id" value="{{list.c_in_d_id}}"/>
+            <td>{{list.goods_id}}</td>
+            <td title="{{list.goods_name}}"><a href="{:addons_url('Goods://GoodsInfo:/index')}?id={{list.goods_id}}" target="_blank">
+            {{if list.goods_name != null}}
+                {{if list.goods_name.length > 19}}
+                    {{list.goods_name.slice(0,18) + '...'}}
+                {{else}}
+                    {{list.goods_name}}
+                {{/if}}
+                {{/if}}</a>
+            </td>
+            <td>{{list.cate_name}}</td>
+            <td>{{list.value_name}}</td>
+            <td title="{{list.bar_code}}">
+            {{if list.bar_code != null}}
+                {{if list.bar_code.length > 15}}
+                    {{list.bar_code.slice(0,14) + '...'}}
+                {{else}}
+                    {{list.bar_code}}
+                {{/if}}
+            {{/if}}
+            </td>
+            <!--<td>{{list.sell_price}}</td>-->
+            <td>{{list.stock_num}}</td>
+            <!--<td>
+                <input type="text" name="b_n_num" value="{{list.b_n_num}}" num>
+            </td>
+            <td>
+                <input type="text" name="b_num" value="{{list.b_num}}" num>
+            </td>
+            <td>
+                <input type="text" name="b_price" value="{{list.b_price}}" decimal>
+            </td>-->
+            <td>
+                <input type="text" name="g_num" value="{{list.g_num}}" num>
+            </td>
+            <td>
+                <input type="text" name="g_price" value="{{list.g_price}}" readonly>
+            </td>
+            <td title="{{list.remark}}">
+                <input type="text" name="remark" value="{{list.remark}}">
+            </td>
+        </tr>
+        {{/each}}
+    </script>
+</block>
+<block name="script">
+    <script type="text/javascript">
+    layui.use(['main'], function() {
+        var $ = layui.jquery,
+            layer = layui.layer;
+
+        var Global = {
+        	selectUrl: '/Erp/StoreConsign/supplylist',
+              listUrl: '/Erp/StoreConsign/view',
+              fileUrl: '/Erp/StoreConsign/exportViewExcel',
+            submitUrl: '/Erp/StoreConsign/updateConsignment',
+            jump: window.location.pathname.match(/(\D*)view/)[1],
+            submitFlag: true
+        }
+        $("a[href$='" + Global.jump + "index.html']").parent().addClass('layui-this');
+
+        var passData = {
+            c_in_id: window.location.pathname.match(/\/(\w+).html/)[1]
+        }
+        var data = $.parseJson( passData );
+        
+        $.getData({
+             url: Global.listUrl + '?' + data,
+            load: true
+        }, function(res){
+            dataShow(res);
+        });
+        function dataShow(res){
+            $('#jq-list').html(template('temp-list', { items: res.content.maindata }));
+            $('#jq-child').html(template('temp-child', { items: res.content.list }));
+
+            if( res.content.maindata.c_in_status == 0 ){
+                $.getData({
+                     url: Global.selectUrl,
+                }, function(data){
+                    $('#jq-select-ship').append(template('temp-select-ship', { items: data.content }));
+                    $('#jq-select-ship option[value="'+res.content.maindata.supply_id+'"]').attr('selected',true);
+                });
+            }
+            
+            $('#jq-child').find('tr').each(function(){
+                /*var b_n_num = $(this).find('[name="b_n_num"]'),
+                      b_num = $(this).find('[name="b_num"]'),
+                    b_price = $(this).find('[name="b_price"]'),*/
+                  var g_num = $(this).find('[name="g_num"]'),
+                    g_price = $(this).find('[name="g_price"]'),
+                     remark = $(this).find('[name="remark"]');
+
+                if( res.content.maindata.c_in_status != 0 ){
+                    /*b_n_num.parents('td').html( b_n_num.val() );
+                    b_num.parents('td').html( b_num.val() );
+                    b_price.parents('td').html( b_price.val() );*/
+                    g_num.parents('td').html( g_num.val() );
+                    g_price.parents('td').html( g_price.val() );
+                    var context = remark.val().length > 10 ? remark.val().slice(0,9) + '...' : remark.val();
+                    remark.parents('td').html( context );
+                    $('#jq-submit').hide();
+                }
+
+                $(this).verifyForm();
+            });
+        }
+
+        $('#jq-download').fileDown({
+             url: Global.fileUrl + '?' + data,
+        });
+
+        $('#jq-submit').on({
+            click: function() {
+                $('#jq-child').find('tr').each(function(){
+                    var oNum = $(this).find('[name="g_num"]'),
+                        vNum = oNum.val();
+                     /*oBoxNum = $(this).find('[name="b_num"]'),
+                      oPrice = $(this).find('[name="b_price"]'),
+                   oPriceAnd = $(this).find('[name="g_price"]'),
+                     vBoxNum = oBoxNum.val(),
+                      vPrice = oPrice.val(),
+                   vPriceAnd = oPriceAnd.val(),
+                         reg = /^[1-9]+\.{0,1}([0-9]+)?$|0\.0*d*[1-9]+|0\.d*[1-9]+?$/,
+                    regPrice = reg.test( parseFloat(vPrice) ),
+                 regPriceAnd = reg.test( parseFloat(vPriceAnd) );*/
+
+                    if( vNum <= 0 ){ 
+                        verifyShow({
+                            text: '数量须大于0',
+                              id: oNum
+                        });
+                        return false;
+                    }
+                    /*if( vBoxNum <= 0 ){ 
+                        verifyShow({
+                            text: '采购箱数须大于0',
+                              id: oBoxNum
+                        });
+                        return false;
+                    }
+                    if( !regPrice ){ 
+                        verifyShow({
+                            text: '每箱价格须大于0',
+                              id: oPrice
+                        });
+                        return false;
+                    }
+
+                    if( !regPriceAnd ){ 
+                        verifyShow({
+                            text: '采购价格须大于0',
+                              id: oPrice
+                        });
+                        return false;
+                    }
+                    if( vNum > 0 && vBoxNum > 0 && regPrice && regPriceAnd ){
+                        $(this).find('input').removeAttr('verify');
+                    }*/
+                    if( vNum > 0 ){
+                        $(this).find('input').removeAttr('verify');
+                    }
+                });
+                if( $('#jq-child').find('[verify="true"]').length > 0){
+                    return false;
+                }
+                if( Global.submitFlag ){
+                    Global.submitFlag = false;
+                    var arr = [];
+                    $('#jq-child').find('tr').each(function(){
+                      var c_in_d_id = $(this).find('[name="c_in_d_id"]'),
+                            //b_n_num = $(this).find('[name="b_n_num"]'),
+                              //b_num = $(this).find('[name="b_num"]'),
+                            //b_price = $(this).find('[name="b_price"]'),
+                              g_num = $(this).find('[name="g_num"]'),
+                            g_price = $(this).find('[name="g_price"]'),
+                             remark = $(this).find('[name="remark"]');
+                        arr.push({
+                         c_in_d_id: c_in_d_id.val(),
+                           //b_n_num: b_n_num.val(),
+                             //b_num: b_num.val(),
+                           //b_price: b_price.val(),
+                             g_num: g_num.val(),
+                           g_price: g_price.val(),
+                            remark: remark.val()
+                        });
+                    });
+                    var data = {
+                          c_in_id: passData.c_in_id,
+                        supply_id: $('#jq-select-ship').val(),
+                        info_json: arr,
+                           remark: $('#jq-list').find('[name="remark"]').val()
+                    }
+                    $.postData({
+                         url: Global.submitUrl,
+                        data: data
+                    }, function(res){
+                        layer.msg(res.content, {
+                            time: 1500
+                        });
+                        window.location.href = Global.jump + 'index.html';
+                    }, function(){
+                        Global.submitFlag = true;
+                    });
+                }
+                return false;
+            }
+        });
+
+    });
+    </script>
+</block>

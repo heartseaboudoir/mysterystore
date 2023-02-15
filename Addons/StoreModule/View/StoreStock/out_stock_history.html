@@ -1,0 +1,125 @@
+<extend name="Public/base" />
+<block name="body">
+    <div id="jq-content" class="site-content">
+        <div class="main-title">
+            <h2 id="jq-title"></h2>
+        </div>
+        <a id="jq-download" class="btn" href="javascript:void(0);">导出Excel</a>
+        <form class="form-horizontal">
+            <div id="jq-list" class="tab-pane in tab1"></div>
+            <div class="data-table table-striped">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>出库ID</th>
+                            <th>出库单号</th>
+                            <th>出库时间</th>
+                            <th>出库数量</th>
+                            <!--<th>出库价</th>
+                            <th>出库总额</th>-->
+                            <th>零售价</th>
+                            <th>零售总额</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="jq-child"></tbody>
+                </table>
+            </div>
+        </form>
+    </div>
+    <script id="temp-list" type="text/html">
+        <div class="form-item cf">
+            <div class="controls goods_div">
+                <label>商品ID：{{items.goods_id}}</label>
+                <label>商品种类：{{items.cate_name}}</label>
+                <label>商品名称：{{items.goods_name}}</label>
+                <label>商品条码：{{items.bar_code}}</label> 
+            </div>
+            <div class="controls goods_div1">
+                <label>门店库存：{{items.num}}</label>
+                <label>零售价：{{items.sell_price}}</label>
+                <label>零售总额：{{items.sell_amounts}}</label>
+                <!--<label>平均入库价：{{items.stock_price}}</label>
+                <label>库存金额：{{items.stock_amounts}}</label>-->
+            </div>
+            <!--<div class="controls goods_div2">
+                <label>所有库存：{{items.total_num}}</label>
+            </div>-->
+        </div>
+    </script>
+    <script id="temp-child" type="text/html">
+        {{each items as list index}}
+        <tr data-id="{{list.s_out_s_id}}">
+            <td>{{list.s_out_s_id}}</td>
+            <td>{{list.s_out_s_sn}}</td>
+            <td>{{list.ptime}}</td>
+            <td>{{list.out_num}}</td>
+            <!--<td>{{list.g_price}}</td>
+            <td>{{list.out_amounts}}</td>-->
+            <td>{{list.sell_price}}</td>
+            <td>{{list.g_amounts}}</td>
+            <td>
+                <a class="temp-view" href="javascript:void(0);">查看</a>
+            </td>
+        </tr>
+        {{/each}}
+    </script>
+</block>
+<block name="script">
+    <script type="text/javascript">
+    layui.use(['main'], function() {
+        var $ = layui.jquery,
+            layer = layui.layer;
+
+        var Global = {
+            listUrl: '/Erp/StoreStock/goodsOutStoreHistory',
+            fileUrl: '/Erp/StoreStock/exportSingleGoodsOutStockHistoryExcel',
+            jump: window.location.pathname.match(/(\D*)out_stock_history/)[1],
+            passId: 's_out_s_id',
+            view: '/Admin/Addons/ex_StoreModule/_addons/StoreModule/_controller/StoreOutStock/_action/view/id/'
+        }
+        $("a[href$='" + Global.jump + "index.html']").parent().addClass('layui-this');
+
+        var passData = {
+            goods_id: window.location.pathname.match(/\/(\w+).html/)[1]
+        }
+        var data = $.parseJson( passData );
+        
+        $.getData({
+             url: Global.listUrl + '?' + data,
+            load: true
+        }, function(res){
+            dataShow(res);
+        });
+        function dataShow(res){
+            $('#jq-list').html(template('temp-list', { items: res.content.maindata }));
+            if( res.content.list == null || res.content.list.length == 0 ){
+                $('#jq-child').html('<tr><td class="wrap-empty">暂无内容！</td></tr>');
+            }else{
+                $('#jq-child').html(template('temp-child', { items: res.content.list }));
+                $.each( res.content.list,function(i,items){
+                    var url =  Global.jump + 'view/id/'+items[Global.passId]+'.html',
+                        oId = $('[data-id='+items[Global.passId]+']');
+                    oView = oId.find('.temp-view');
+
+                    switch( parseInt(items.type) ){
+                        case 1:
+                            oView.attr('href',url.replace('StoreStock','StoreOutStock') );
+                            break;
+                        case 2:
+                            oView.attr('href',url.replace('StoreStock','BackToWarehouse').replace('view/id','view/s_back_id')  );
+                            break;
+                    }
+                });
+            }
+
+            var vTitle = '门店库存 > ' + res.content.maindata.cate_name + ' > ' + res.content.maindata.goods_name
+            $('#jq-title').html( vTitle );
+        }
+
+        $('#jq-download').fileDown({
+             url: Global.fileUrl + '?' + data,
+        });
+    });
+    </script>
+</block>

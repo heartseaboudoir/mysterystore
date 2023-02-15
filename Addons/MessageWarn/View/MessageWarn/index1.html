@@ -1,0 +1,164 @@
+<extend name="Public/base" />
+<block name="body">
+    <div id="jq-content" class="site-content">
+        <div class="main-title">
+            <h2>站内消息</h2>
+        </div>
+        <div class="search-form fr cf">
+            <form id="jq-search-form">
+                <div class="sleft">
+                    <input type="text" name="s_date" class="text input-text search-input time" placeholder="请选择开始日期" />
+                    <input type="text" name="e_date" class="text input-text search-input time" placeholder="请选择结束日期" />
+                    <a id="jq-search-btn" class="sch-btn" href="javascript:void(0);"><i class="btn-search"></i></a>
+                </div>
+            </form>
+        </div>
+        <a id="jq-download" class="btn" href="javascript:void(0);">导出Excel</a>
+        <div class="data-table table-striped">
+            <table>
+                <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>日期</th>
+                        <th>标题</th>
+                        <th>内容</th>
+                        <th>来源</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="jq-list"></tbody>
+            </table>
+        </div>
+        <div id="jq-page" class="page"></div>
+    </div>
+    <script id="temp-list" type="text/html">
+        {{each items as list index}}
+        <tr data-id="{{list.m_id}}">
+            <td class="temp-id">{{index+1}}</td>
+            <td>{{list.ctime}}</td>
+            <td>{{list.message_title}}</td>
+            <td title="{{list.message_content}}">
+            	{{if list.message_content.length > 19}}
+                    {{list.message_content.slice(0,18) + '...'}}
+                {{else}}
+                    {{list.message_content}}
+                {{/if}}
+            </td>
+            <td>{{list.m_type_name}}</td>
+            <td>{{list.m_status_name}}</td>
+            <td>
+                <a class="temp-view" href="javascript:void(0);">查看</a>
+            </td>
+        </tr>
+        {{/each}}
+    </script>
+</block>
+<block name="script">
+    <script type="text/javascript">
+    layui.use(['main'], function() {
+        var $ = layui.jquery,
+            layer = layui.layer;
+ 
+        var Global = {
+            listUrl: '/Erp/MessageWarn/messageList',
+            jump: window.location.pathname.match(/(\D*)index/)[1],
+            passId: 's_out_id'
+        }
+        $("a[href$='" + Global.jump + "index.html']").parent().addClass('layui-this');
+
+        var passData = $.dataJson({
+        	m_status: 100,
+        	m_type: 100
+        }); 
+        delete passData.s_date;
+        delete passData.e_date;
+        var data = $.parseJson( passData );
+
+        $.getData({
+             url: Global.listUrl + '?' + data,
+            load: true
+        }, function(res){
+            dataShow(res);
+        });
+        function dataShow(res,callback){
+            var oDownload = $('#jq-download'),
+                    oList = $('#jq-list'),
+                    oPage = $('#jq-page');
+
+            oDownload.attr('href','javascript:void(0);').unbind();
+
+            if( res.content == null || res.content.length == 0 ){
+                oList.html('<tr><td class="wrap-empty">暂无内容！</td></tr>');
+                oDownload.css('cursor','default');
+            }else{
+                console.log(res.content.data);
+                oList.html(template('temp-list', { items: res.content.data }));
+                /*$.each( res.content.data,function(i,items){
+                    var url = Global.jump + 'view/id/'+items[Global.passId]+'.html',
+                        oId = $('[data-id='+items[Global.passId]+']');
+                    oId.find('.temp-view').attr('href',url);
+
+                    if( passData.p > 1 && callback == undefined ){
+                        var id = parseInt( oId.find('.temp-id').html() ),
+                           sum = passData.p * passData.pageSize -  passData.pageSize;
+                        oId.find('.temp-id').html( id + sum );
+                    }else{
+                        oId.find('.temp-id').html( id );
+                    }
+
+                });
+
+                var data = $('#jq-search-form').find('input').serialize();
+                oDownload.fileDown({
+                     url: Global.fileUrl + '?' + data,
+                }).removeAttr('style');
+
+                $('.temp-verify').tempConfirm({
+                    url: Global.verifyUrl,
+                },function(self){
+                    var data = {};
+                    data[Global.passId] = parseInt( self.parents('tr').attr('data-id') );
+                    return data;
+                },function(res){
+                    window.location.reload();
+                });
+
+                $('.temp-reject').tempConfirm({
+                    url: Global.rejectUrl,
+                },function(self){
+                    var data = {};
+                    data[Global.passId] = parseInt( self.parents('tr').attr('data-id') );
+                    return data;
+                },function(res){
+                    window.location.reload();
+                });*/
+            }
+
+            if( res.content.recordCount > res.content.pageSize ){
+                var total = '<span class="rows">共'+res.content.recordCount+'条记录</span>';
+                oPage.html( res.content.pager.replace( new RegExp(Global.listUrl,'g'),Global.jump+'index' ) + total );
+            }else{
+                oPage.html( res.content.pager );
+            }
+        }
+
+        $('#jq-search-btn').off().on({
+            click: function() {
+                var data = $('#jq-search-form').find('input').serialize() + '&pageSize='+passData.pageSize; 
+                $.getData({
+                    url: Global.listUrl + '?' + data
+                }, function(res){
+                    dataShow(res,true);
+                    window.history.pushState( {},'',Global.jump+'index.html' );
+                });
+            }
+        });
+        $(document).keydown(function(e) {
+            if (e.which == 13) {
+                $('#jq-search-btn').click();
+            }
+        });
+    });
+    </script>
+</block>

@@ -1,0 +1,90 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>会员列表</h2>
+    </div>
+    <div class="cf">
+        <div class="fl">
+        </div>
+
+        <!-- 高级搜索 -->
+        <div class="search-form fr cf">
+            <div class="sleft">
+                <input type="text" name="nickname" class="search-input" value="{:I('nickname')}" placeholder="可输入昵称、ID、手机号">
+                <a class="sch-btn" href="javascript:;" id="search" url="{:U('index')}"><i class="btn-search"></i></a>
+            </div>
+        </div>
+    </div>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table class="">
+            <thead>
+                <tr>
+                    <th class="" style="width:60px;">UID</th>
+                    <th class="">昵称</th>
+                    <th class="" style="width:80px;">实名认证</th>
+                    <th class="" style="width:60px;">状态</th>
+                    <th class="" style="width:150px;">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+            <notempty name="_list">
+                <volist name="_list" id="vo">
+                    <tr>
+                        <td>{$vo.uid} </td>
+                        <td><img src="{$vo.uid|get_header_pic}" class="header_pic" />{$vo.nickname}</td>
+                        <td><eq name="vo.is_auth" value="1"><span style="border:1px solid #999; padding:5px 10px; border-radius: 10px; background:#eee;">已认证</span><else/>未认证</eq></td>
+                        <td>{$vo.status_text}</td>
+                        <td>
+                            <a href="{:U('Member/show?id='.$vo['uid'])}" class="">查看</a> |
+                            <a href="{:U('Member/edit?id='.$vo['uid'])}" class="">编辑</a> |
+                            <eq name="vo.status" value="1">
+                            <a href="{:U('User/changeStatus?method=forbidUser&id='.$vo['uid'])}" class="ajax-get">禁用</a> |
+                            <else/>
+                            <a href="{:U('User/changeStatus?method=resumeUser&id='.$vo['uid'])}" class="ajax-get">启用</a> |
+                            </eq>
+                            <a href="{:U('User/changeStatus?method=deleteUser&id='.$vo['uid'])}" class="confirm ajax-get">删除</a>
+                        </td>
+                    </tr>
+                </volist>
+                <else/>
+                <td colspan="9" class="text-center"> aOh! 暂时还没有内容! </td>
+            </notempty>
+            </tbody>
+        </table>
+    </div>
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+
+<block name="script">
+    <script src="__STATIC__/thinkbox/jquery.thinkbox.js"></script>
+
+    <script type="text/javascript">
+        //搜索功能
+        $("#search").click(function () {
+            var url = $(this).attr('url');
+            var query = $('.search-form').find('input').serialize();
+            query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g, '');
+            query = query.replace(/^&/g, '');
+            if (url.indexOf('?') > 0) {
+                url += '&' + query;
+            } else {
+                url += '?' + query;
+            }
+            window.location.href = url;
+        });
+        //回车搜索
+        $(".search-input").keyup(function (e) {
+            if (e.keyCode === 13) {
+                $("#search").click();
+                return false;
+            }
+        });
+        //导航高亮
+        highlight_subnav('{:U('User / index')}');
+    </script>
+</block>

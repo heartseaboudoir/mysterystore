@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" name="viewport">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="black" name="apple-mobile-web-app-status-bar-style">
+    <meta content="telephone=no" name="format-detection">
+    <meta content="email=no" name="format-detection">
+    <title>{$info.title}</title>
+    <link rel="stylesheet" href="__CSS__/normalize2.css?v=0.2">
+    <meta name="Alipay:title" content="{$info.title}"/>
+    <meta name="Alipay:imgUrl" content="{$info.pic_url}"/>
+    <meta name="Alipay:desc" content="{:msubstr($info['content'], 0, 50, 'utf-8')}"/>
+    <script src="__JS__/jquery-2.1.4.js"></script>
+    <style type="text/css">
+.buy-wrap2{
+    background: #fff;
+    padding: 0.75rem;
+    display: flex;
+    display: -flex-box;
+    display: -moz-box;
+    display: -webkit-flex;    
+    display: -webkit-box; 
+    display: -ms-box;
+    display: -o-box;
+    display: box;
+    align-content: center;
+    align-items: center;
+    position: fixed;
+    width: 100%;
+    left: 0;
+    bottom: 0;
+    border-bottom: 0.38rem solid #f6f6f6;
+    z-index: 9;
+}
+.buy-wrap2 .pro-img{
+    width: 5.25rem;
+    height: 5.25rem;
+    overflow: hidden;
+
+    margin-right: 0.53rem;
+}
+.buy-wrap2 .pro-img img{
+    width: 100%;
+    height: 100%;
+  
+}
+.buy-wrap2 .pro-detail{
+    margin-left: 0.63rem;
+}
+.buy-wrap2 .pro-detail .tit{
+    color: #2c2c2c;
+    font-size: 0.94rem;
+    margin-bottom: 0.94rem;
+}
+.buy-wrap2 .pro-detail .pro-price{
+    color: #ff3f00;
+    font-size: 0.78rem;
+}
+.buy-wrap2 .buy-btn{
+    width: 3.25rem;
+    height: 1.5rem;
+    line-height: 1.5rem;
+    background: #000000;
+    text-align: center;
+    color: #fff;
+    font-size: 0.72rem;
+    position:absolute;
+    right:0.75rem;
+    bottom:50%;
+    transform:translate(0,50%);
+}    
+    
+#testitem0{
+  margin: 1.44rem auto 0;
+  padding-bottom: 1.34rem;
+   display: flex;
+    display: -flex-box;
+    display: -moz-box;
+    display: -webkit-box; 
+   display: -webkit-flex; 
+    display: -ms-box;
+    display: -o-box;
+    display: box;
+    flex-wrap: wrap;
+}
+
+#testitem{
+    margin-right: 0.53rem;
+    width: 5.25rem;
+    height: 5.25rem;
+    margin-bottom: 0.53rem;
+    position: relative;
+    overflow:hidden;
+    background: url("../images/loading.gif") no-repeat center center;
+    background-size:2rem auto;
+}
+#testitem img{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -moz-transform:translate3D(-50%,-50%,0);
+    -ms-transform: translate3D(-50%,-50%,0);
+    -webkit-transform:translate3D(-50%,-50%,0);
+    transform: translate3D(-50%,-50%,0);
+    display: block;
+}
+    
+    </style>
+</head>
+<body ontouchstart>
+    <div class="top_fixed">
+        <div class="app-img"><img src="__IMG__/applogo.png" alt=""></div>
+        <div class="app-detail">
+            <h4 class="tit">神秘商店</h4>
+            <div class="app-desc">小小信任行为，堆砌信任之城</div>
+        </div>
+        <a href="javascript:;" class="open-app-btn open_app">打开APP</a>
+    </div>
+	
+    <div class="container">
+        <notempty name="info.pic_url">
+        <div class="top-banner"><img src="{$info.pic_url}" alt=""></div>
+        </notempty>
+        <div class="main-content">
+            <h4 class="tit">{$info.title}</h4>
+            <div class="divider-line"></div>
+            <div class="detail-txt">
+                <?php echo str_replace(array("\r", "\n", "\r\n"), '<br>',  $info['content'])?>
+            </div>
+            <div class="pic-wrap">
+                <volist name="info.pics_data" id="lv">
+                <div class="item"><img src="{$lv}" alt="" class="imgc"></div>
+                </volist>
+            </div>
+        </div>
+    </div>
+    <div class="buy-wrap2" style="position: relative;">
+            <div id="testitem" class="pro-img"><img id="testimg" src="{$info.goods.pic}" alt=""></div>
+            <div class="pro-detail" style="padding-right:100px;">
+                    <h2 class="tit">{$info.goods.title}</h2>
+                    <div class="pro-price">&yen;{$info.goods.price}</div>
+            </div>
+            <a class="buy-btn open_app" href="javascript:;">去购买</a>
+    </div>
+    <!--
+    <div id="testitem">
+    <img id="testimg" src="{$info.goods.pic}" alt="">
+    </div>
+    -->
+        <eq name="APP_TYPE" value="wechat">
+            <script>
+                var wx_appId = '{$js_api.appId}';
+                var wx_timestamp = '{$js_api.timestamp}';
+                var wx_nonceStr = '{$js_api.nonceStr}';
+                var wx_signature = '{$js_api.signature}';
+            </script>
+            <script src='https://res.wx.qq.com/open/js/jweixin-1.2.0.js'></script>
+            <script src="__JS__/WxShare.js?={:date('ymdhi')}"></script>
+            </eq>
+        <if condition="APP_TYPE eq 'alipay'">
+        <!--引入jsAPI的功能js-->
+        <script src="https://as.alipayobjects.com/g/component/antbridge/1.1.1/antbridge.min.js"></script>
+        <script src="__JS__/AlipayShare.js?={:date('ymdhi')}"></script>
+        <script type="text/javascript">
+        </script>
+        <!--分享功能8.1以上钱包支持-->
+        </if>
+        <script src="__JS__/vendor.js"></script>
+        <script src="https://lkme.cc/js/linkedme.min.js" ></script>
+        <script>
+            var _h = $('.top_fixed').height();
+            $(window).scroll(function() {
+                    var top =  $('.top_fixed').position().top;
+                    var _scroll = $(this).scrollTop() - _h;
+                    if (_scroll > top) {
+                            $('.top_fixed').css("position", "fixed");
+                            
+                            $('.container').css("padding-top","3.06rem");
+                    } else {
+                            $('.top_fixed').css("position","relative");
+                            $('.container').css("padding-top","0");
+                    }
+            });
+		
+            linkedme.init("163284dee1b7af618c361b8df20016ba", null, null);
+            
+            shareTitle = "<?php echo str_replace(array("\r", "\n", "\r\n"), '',  $info['title'])?>";
+            shareDesc = "<?php echo str_replace(array("\r", "\n", "\r\n"), '', mb_substr($info['content'], 0, 50, 'utf-8'))?>";
+            shareImg = "{$info.pic_url}";
+            shareLink = "{:U('wap/Shop/article', array('id' => $info['id']))}";
+            <if condition="APP_TYPE eq 'wechat'">
+            shareFun();
+            </if>
+            var data = {};
+            var id = "{$info.id}";
+            data.params = '{"bind_id":"'+id+'", "action_type":"2"}';
+            console.log(data.params);
+            linkedme.link(data, function(err, data) {
+                if (err) {
+                  // 生成深度链接失败，返回错误对象err
+                } else {
+                  // 生成深度链接成功，深度链接可以通过data.url得到
+                  $('.open_app').attr('href', data.url);
+                }
+            },false);
+            
+            function caculateImg(p_wh) {
+                var parent=document.querySelector(p_wh);
+                var Imgarray = document.querySelectorAll(p_wh+' .imgc');
+                var ImgDivWidth=parent.clientWidth;
+                var ImgDivHeight=parent.clientHeight;
+                var realWidth; //真实的宽度
+                var realHeight; //真实的高度
+                for (var i = 0; i < Imgarray.length; i++) {
+                    var imgtemp = new Image(); //创建一个image对象
+                    imgtemp.src = Imgarray[i].src;
+                    imgtemp.index = i; //指定一个检索值，用于确定是哪张图
+                    imgtemp.onload = function() { //图片加载完成后执行
+                        var _stemp = this; //将当前指针复制给新的变量，不然会导致变量共用
+                        realWidth = this.width;
+                        realHeight = this.height;
+                        let imgRatio=realWidth/realHeight;
+                        if (imgRatio < 1) {
+                            Imgarray[_stemp.index].style.width = ImgDivWidth + 'px';
+                            Imgarray[_stemp.index].style.height = 'auto';
+                        }else if (imgRatio==1) {
+                            Imgarray[_stemp.index].style.width = ImgDivHeight + 'px';
+                            Imgarray[_stemp.index].style.height = 'auto';
+                        }else if(imgRatio > 1){
+                            Imgarray[_stemp.index].style.width ='auto' ;
+                            Imgarray[_stemp.index].style.height = ImgDivHeight + 'px';
+                        }
+                    }
+                }
+            }
+            caculateImg('.pic-wrap .item');
+            
+            
+            
+            
+            
+            function caculateImg2(p_wh) {
+                var parent=document.querySelector('#testitem');
+                var Imgarray = document.querySelector('#testimg');
+                var ImgDivWidth=parent.clientWidth;
+                var ImgDivHeight=parent.clientHeight;
+                var realWidth; //真实的宽度
+                var realHeight; //真实的高度
+
+                var imgtemp = new Image(); //创建一个image对象
+                imgtemp.src = Imgarray.src;
+                imgtemp.onload = function() { //图片加载完成后执行
+                    var _stemp = this; //将当前指针复制给新的变量，不然会导致变量共用
+                    realWidth = this.width;
+                    realHeight = this.height;
+                    let imgRatio=realWidth/realHeight;
+                    if (imgRatio < 1) {
+                        Imgarray.style.width = ImgDivWidth + 'px';
+                        Imgarray.style.height = 'auto';
+                    }else if (imgRatio==1) {
+                        Imgarray.style.width = ImgDivHeight + 'px';
+                        Imgarray.style.height = 'auto';
+                    }else if(imgRatio > 1) {
+                        Imgarray.style.width ='auto' ;
+                        Imgarray.style.height = ImgDivHeight + 'px';
+                    }
+                }
+
+            }
+            caculateImg2();            
+            
+            
+            
+            
+            
+			/*
+            $.fn.smartFloat = function() {
+                var position = function(element) {
+                    var top = element.position().top; //当前元素对象element距离浏览器上边缘的距离 
+                    var pos = element.css("position"); //当前元素距离页面document顶部的距离 
+                    $(window).scroll(function() { //侦听滚动时 
+                        var scrolls = $(this).scrollTop() - $('.top_fixed').height();
+                        if (scrolls > top) { //如果滚动到页面超出了当前元素element的相对页面顶部的高度 
+                            if (window.XMLHttpRequest) { //如果不是ie6 
+                                element.css({ //设置css 
+                                    position: "fixed", //固定定位,即不再跟随滚动 
+                                    top: 0, //距离页面顶部为0 
+                                }); //加上阴影样式.shadow 
+                            } else { //如果是ie6 
+                                element.css({
+                                    top: scrolls //与页面顶部距离 
+                                });
+                            }
+                        } else {
+                            element.css({ //如果当前元素element未滚动到浏览器上边缘，则使用默认样式 
+                                position: pos,
+                                top: top,
+
+                            }); //移除阴影样式.shadow 
+                        }
+                    });
+                };
+                return $(this).each(function() {
+                    position($(this));
+                });
+            };
+            $(".top_fixed").smartFloat();
+			*/
+        </script>
+</body>
+</html>

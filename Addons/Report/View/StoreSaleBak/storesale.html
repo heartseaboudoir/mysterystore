@@ -1,0 +1,173 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <?php
+        if($goods_name != ''){
+            $strhref .= "&goods_name=" .$goods_name;
+        }
+        if($cat_name != ''){
+            $strhref .= "&cat_name=" .$cat_name;
+        }
+    ?>
+    <!-- 高级搜索 -->
+    <div class="cf">
+        <div class="search-form fr cf">
+            <div class="sleft">
+                <input type="hidden" name="id" value="{$id}" />
+                <input type="hidden" name="type" value="{$type}" />
+                <input type="text" name="goods_name" class="text input-text search-input" style="" value="{$_GET['goods_name']}" placeholder="商品名称" />
+                <input type="text" name="cat_name" class="text input-text search-input" style="" value="{$_GET['cat_name']}" placeholder="分类名称" />
+                <a class="sch-btn" href="javascript:;" id="search" url="{:addons_url('Report://StoreSale:/storesale')}"><i class="btn-search"></i></a>
+            </div>
+        </div>
+    </div>
+    <ul class="tab-nav nav">
+        <li <?php if($type == 1){ echo('class="current"'); } else { echo('class=""'); } ?> data-tab="tab1">
+        <a href="{:addons_url('Report://StoreSale:/storesale')}?type=1&id={$id}{$strhref}">今天</a>
+        </li>
+        <li <?php if($type == 2){ echo('class="current"'); } else { echo('class=""'); } ?> data-tab="tab2">
+        <a href="{:addons_url('Report://StoreSale:/storesale')}?type=2&id={$id}{$strhref}">本周</a>
+        </li>
+        <li <?php if($type == 3){ echo('class="current"'); } else { echo('class=""'); } ?> data-tab="tab3">
+        <a href="{:addons_url('Report://StoreSale:/storesale')}?type=3&id={$id}{$strhref}">本月</a>
+        </li>
+        <li <?php if($type == 4){ echo('class="current"'); } else { echo('class=""'); } ?> data-tab="tab4">
+        <a href="{:addons_url('Report://StoreSale:/storesale')}?type=4&id={$id}{$strhref}">7天</a>
+        </li>
+        <li <?php if($type == 5){ echo('class="current"'); } else { echo('class=""'); } ?> data-tab="tab5">
+        <a href="{:addons_url('Report://StoreSale:/storesale')}?type=5&id={$id}{$strhref}">30天</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <!-- 数据列表 -->
+            <div class="tab-pane in tab1">
+                <div class="cf">
+                    <a href="{:addons_url('Report://StoreSale:/storesale')}?type={$type}&id={$id}&isprint=1{$strhref}" class="btn">导出Excel</a>
+                </div>
+                <!-- 数据列表 -->
+                <div class="data-table table-striped">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>门店</th>
+                            <th>用户</th>
+                            <th>订单号</th>
+                            <th>订单创建日期</th>
+                            <th>商品</th>
+                            <th>分类</th>
+                            <th>销量</th>
+                            <th>售价</th>
+                            <th>金额</th>
+                            <th>售价小计</th>
+                            <th>实收金额</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <notempty name="list">
+                            <volist name="list" id="lv" key="vo">
+                                <?php if(count($lv['child'])>1){ ?>
+                                <tr>
+                                    <td rowspan="<?php echo(count($lv['child'])); ?>">{$lv.store_name}</td>
+                                    <td rowspan="<?php echo(count($lv['child'])); ?>">{$lv.uid|get_nickname}</td>
+                                    <td rowspan="<?php echo(count($lv['child'])); ?>">{$lv.order_sn}</td>
+                                    <td rowspan="<?php echo(count($lv['child'])); ?>">{$lv.create_time|time_format="Y-m-d H:i"}</td>
+                                    <td>{$lv['child'][0]['goods_name']}</td>
+                                    <td>{$lv['child'][0]['cate_name']}</td>
+                                    <td>{$lv['child'][0]['num']}</td>
+                                    <td>{$lv['child'][0]['price']}</td>
+                                    <?php $sub_amount = (double)$lv['child'][0]['num']*(double)$lv['child'][0]['price']; ?>
+                                    <td>{$sub_amount|sprintf='%.2f',###}</td>
+                                    <?php $sum_sub_amount = 0;
+                                    for($i=0;$i<count($lv['child']);$i++){
+                                        $sum_sub_amount = $sum_sub_amount + (double)$lv['child'][$i]['num']*(double)$lv['child'][$i]['price'];
+                                    } ?>
+                                    <td rowspan="<?php echo(count($lv['child'])); ?>">{$sum_sub_amount|sprintf='%.2f',###}</td>
+                                    <td rowspan="<?php echo(count($lv['child'])); ?>">{$lv.pay_money}</td>
+                                    <td rowspan="<?php echo(count($lv['child'])); ?>"><a href="{:addons_url('Order://Order:/show')}?id={$lv['order_id']}&store_id={$id}">查看</a></td>
+
+
+                                </tr>
+                                <?php for($i=1;$i<count($lv['child']);$i++){ ?>
+                                <tr>
+                                    <td>{$lv['child'][$i]['goods_name']}</td>
+                                    <td>{$lv['child'][$i]['cate_name']}</td>
+                                    <td>{$lv['child'][$i]['num']}</td>
+                                    <td>{$lv['child'][$i]['price']}</td>
+                                    <?php $sub_amount = (double)$lv['child'][$i]['num']*(double)$lv['child'][$i]['price']; ?>
+                                    <td>{$sub_amount|sprintf='%.2f',###}</td>
+                                </tr>
+                                <?php } ?>
+                                <?php }else{ ?>
+                                <tr>
+                                    <td>{$lv.store_name}</td>
+                                    <td>{$lv.uid|get_nickname}</td>
+                                    <td>{$lv.order_sn}</td>
+                                    <td>{$lv.create_time|time_format="Y-m-d H:i"}</td>
+                                    <volist name="lv.child" id="lc" key="vo1">
+                                        <td>{$lc.goods_name}</td>
+                                        <td>{$lc.cate_name}</td>
+                                        <td>{$lc.num}</td>
+                                        <td>{$lc.price|sprintf='%.2f',###}</td>
+                                        <?php $sub_amount = (double)$lc['num']*(double)$lc['price']; ?>
+                                        <td>{$sub_amount|sprintf='%.2f',###}</td>
+                                    </volist>
+                                    <?php $sum_sub_amount = (double)$lc['num']*(double)$lc['price']; ?>
+                                    <td>{$sum_sub_amount|sprintf='%.2f',###}</td>
+                                    <td>{$lv.pay_money}</td>
+                                    <td><a href="{:addons_url('Order://Order:/show')}?id={$lv['order_id']}&store_id={$id}">查看</a></td>
+                                </tr>
+                                <?php } ?>
+                            </volist>
+                            <else/>
+                            <tr><td colspan="4">暂无数据~</td></tr>
+                        </notempty>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- 分页 -->
+                <div class="page">
+                    {$_page}
+                </div>
+            </div>
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        highlight_subnav('{:addons_url('Report://StoreSale:/allsale')}');
+        //搜索功能
+
+        $('.search-form input').focus(function(){
+            $(document).keypress(function (e) {
+                // 回车键事件
+                if (e.which == 13) {
+                    $("#search").click();
+                }
+            });
+        });
+        $("#search").click(function() {
+            var url = $(this).attr('url');
+            var query = $('.search-form').find('input').serialize();
+            query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g, '');
+            query = query.replace(/^&/g, '');
+            if (url.indexOf('?') > 0) {
+                url += '&' + query;
+            } else {
+                url += '?' + query;
+            }
+            var query2 = $('#select-form').serialize();
+            if (url.indexOf('?') > 0) {
+                url += '&' + query2;
+            } else {
+                url += '?' + query2;
+            }
+            window.location.href = url;
+        });
+
+    </script>
+</block>

@@ -1,0 +1,353 @@
+<extend name="Public/base" />
+<block name="body">
+    <div id="jq-content" class="site-content site-auto">
+        <div class="main-title">
+            <h2>调拨申请处理</h2>
+        </div>
+        <div class="search-form fr cf">
+            <form id="jq-search-form">
+                <div class="sleft">
+                    <input type="text" name="s_date" class="text input-text search-input time" placeholder="请选择开始日期" />
+                    <input type="text" name="e_date" class="text input-text search-input time" placeholder="请选择结束日期" />
+                    <a id="jq-search-btn" class="sch-btn" href="javascript:void(0);"><i class="btn-search"></i></a>
+                </div>
+            </form>
+        </div>
+        <div id="jq-tab" class="wrap-tab">
+            <a class="btn" href="javascript:void(0);">自动分单</a>
+            <a class="btn" href="javascript:void(0);">全部申请</a>
+        </div>
+        <a id="jq-download" class="btn" href="javascript:void(0);">导出Excel</a>
+        <div id="jq-box" class="wrap-box">
+            <div id="jq-single" class="wrap-list"></div>
+            <div id="jq-all" class="wrap-list wrap-hide">
+                <form class="form-horizontal">
+                    <div class="data-table table-striped">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th class="row-selected row-selected" width="30">
+                                        <input class="selectall" type="checkbox" name="selectAll">
+                                    </th>
+                                    <th>商品ID</th>
+                                    <th>商品名称</th>
+                                    <th>商品条码</th>
+                                    <th>申请单号</th>
+                                    <th>申请时间</th>
+                                    <th>申请来源</th>
+                                    <th>申请人</th>
+                                    <th>申请数量</th>
+                                    <th>库存数量</th>
+                                    <th>备注</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="jq-list"></tbody>
+                        </table>
+                        <br/><label>备注：<input type="text" class="text input-min remark" style="width: 200px;" name="remark"/></label>
+                        <button class="btn submit-btn hidden" target-form="form-horizontal" name="submit" type="submit">生成出库验货单</button>
+                    </div>
+                </form>
+                <div id="jq-page" class="page"></div>
+            </div>
+        </div>
+    </div>
+    <script id="temp-seperate" type="text/html">
+        {{each items as array}}
+        <form class="form-horizontal">
+            <div class="data-table table-striped">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="row-selected row-selected" width="30">
+                                <input class="selectall" type="checkbox" name="selectAll">
+                            </th>
+                            <th>商品ID</th>
+                            <th>商品名称</th>
+                            <th>商品条码</th>
+                            <th>申请单号</th>
+                            <th>申请时间</th>
+                            <th>申请来源</th>
+                            <th>申请人</th>
+                            <th>申请数量</th>
+                            <th>库存数量</th>
+                            <th>备注</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody class="jq-single"></tbody>
+                </table>
+                <br/><label>备注：<input type="text" class="text input-min remark" style="width: 200px;" name="remark"/></label>
+                <button class="btn submit-btn hidden" target-form="form-horizontal" name="submit" type="submit">生成出库验货单</button>
+            </div>
+        </form>
+        {{/each}}
+    </script>
+    <script id="temp-list" type="text/html">
+        {{each items as list index}}
+        <tr data-id="{{list.s_t_s_d_id}}">
+            <td><input class="selectthis" type="checkbox" name="selectActive"/></td>
+            <td>{{list.goods_id}}</td>
+            <td title="{{list.goods_name}}"><a href="{:addons_url('Goods://GoodsInfo:/index')}?id={{list.goods_id}}" target="_blank">
+            {{if list.goods_name != null}}
+                {{if list.goods_name.length > 19}}
+                    {{list.goods_name.slice(0,18) + '...'}}
+                {{else}}
+                    {{list.goods_name}}
+                {{/if}}
+                {{/if}}</a>
+            </td>
+            <td title="{{list.bar_code}}">
+            {{if list.bar_code != null}}
+                {{if list.bar_code.length > 15}}
+                    {{list.bar_code.slice(0,14) + '...'}}
+                {{else}}
+                    {{list.bar_code}}
+                {{/if}}
+            {{/if}}
+            </td>
+            <td>{{list.s_t_s_sn}}</td>
+            <td>{{list.ctime}}</td>
+            <td>{{list.store_name1}}</td>
+            <td>{{list.admin_nickname}}</td>
+            <td>{{list.g_num}}</td>
+            <td>{{list.stock_num}}</td>
+            <td title="{{list.remark}}">
+            {{if list.remark != null}}
+                {{if list.remark.length > 10}}
+                    {{list.remark.slice(0,9) + '...'}}
+                {{else}}
+                    {{list.remark}}
+                {{/if}}
+            {{/if}}
+            </td>
+            <td><a class="temp-reject" href="javascript:void(0);">拒绝</a>
+                <a class="temp-generate" href="javascript:void(0);">生成出库单</a>
+            </td>
+        </tr>
+        {{/each}}
+    </script>
+</block>
+<block name="script">
+    <script type="text/javascript">
+    layui.use(['main'], function() {
+        var $ = layui.jquery,
+            layer = layui.layer;
+
+        var Global = {
+            listUrl: '/Erp/StoreAssignmentApplicationHandle/index',
+            fileUrl: '/Erp/StoreAssignmentApplicationHandle/exportListExcel',
+            rejectUrl: '/Erp/StoreAssignmentApplicationHandle/reject',
+            generateUrl: '/Erp/StoreAssignmentApplicationHandle/generateStoreOutOrder',
+            jump: window.location.pathname.match(/(\D*)index/)[1]
+        };
+        $("a[href$='" + Global.jump + "index.html']").parent().addClass('layui-this');
+
+        var passData = $.dataJson({
+            list_type: 1
+        }); 
+        var data = $.parseJson( passData );
+
+        $.getData({
+             url: Global.listUrl + '?' + data,
+            load: true
+        }, function(res){
+            dataShow(res);
+        });
+        function dataShow(res){
+            var oDownload = $('#jq-download'),
+                    oList = $('#jq-list'),
+                    oPage = $('#jq-page'),
+                    empty = '<tr><td class="wrap-empty" colspan="12">暂无内容！</td></tr>';
+
+            oDownload.attr('href','javascript:void(0);').unbind();
+
+            if( passData.list_type == 1 ){
+                var oSingle = $('#jq-single'),
+                       oAll = $('#jq-all');
+
+                var list = [];
+                $.each( res.content.data,function(i,items){
+                    if( items.length > 0 ){
+                        list.push( res.content.data[i] );
+                    }
+                })
+                if( list.length == 0 ){
+                    oSingle.html( oAll.find('form').clone() ).find('tbody').html( empty );
+                    oDownload.css('cursor','default');
+                }else{
+                    oSingle.html('').prepend( template('temp-seperate', { items: list }) );
+                    oSingle.find('form').each(function(i){
+                        $(this).find('.jq-single').html( template('temp-list', { items: list[i] }) );
+                    });
+                    if( res.content.recordCount > res.content.pageSize ){
+                        var total = '<span class="rows">共'+res.content.recordCount+'条记录</span>';
+                        var content = res.content.pager.replace( new RegExp(Global.listUrl,'g'),Global.jump+'index' ) + total;
+                        oSingle.append( '<div id="jq-single-page" class="page">'+ content +'</div>' );
+                    }
+                    fileEvent();
+                }
+
+            }else{
+
+                if( res.content.data == null || res.content.data.length == 0 ){
+                    oList.html( empty );
+                    oDownload.css('cursor','default');
+                    oPage.html( res.content.pager );
+                }else{
+                    oList.html(template('temp-list', { items: res.content.data }));
+                    if( res.content.recordCount > res.content.pageSize ){
+                        var total = '<span class="rows">共'+res.content.recordCount+'条记录</span>';
+                        oPage.html( res.content.pager.replace( new RegExp(Global.listUrl,'g'),Global.jump+'index' ) + total );
+                    }
+                    fileEvent();
+                }
+            }
+
+            $('.temp-reject').tempConfirm({
+                url: Global.rejectUrl
+            },function(self){
+                var aId = parseInt( self.parents('tr').attr('data-id') );
+                return {'s_t_s_d_id': aId};
+            },function(){
+                pageEvent(res);
+            });
+
+            $('.temp-generate').tempConfirm({
+                url: Global.generateUrl
+            },function(self){
+                var aId = parseInt( self.parents('tr').attr('data-id') );
+                return {'s_t_s_d_ids': aId};
+            },function(){
+                pageEvent(res);
+            });
+
+            $('#jq-single,#jq-all').find('form').each(function(){
+                $(this).find('tr').on({
+                    click:function(){
+                        var oForm = $(this).parents('form'),
+                             oAll = oForm.find('[name="selectAll"]'),
+                          oActive = oForm.find('[name="selectActive"]'),
+                         selected = true;
+
+                        if( $(this).find('th').length > 0 ){
+                            if( oAll.prop('checked') ) {
+                                selected = false;
+                            }
+                            oAll.prop('checked',selected);
+                            oActive.prop('checked',selected);
+                        }else{
+                            if( $(this).find('[name="selectActive"]').prop('checked') ) {
+                                selected = false;
+                            }
+                            $(this).find('[name="selectActive"]').prop('checked',selected);
+                            oAll.prop('checked',oActive.length == oActive.filter(':checked').length);
+                        }
+                    }
+                });
+                $(this).find('[name="selectAll"]').on({
+                    click:function(e){
+                        e.stopPropagation(); 
+                        $(this).parents('form').find('[name="selectActive"]').prop('checked',this.checked);
+                    }
+                });
+                $(this).find('[name="selectActive"]').on({
+                    click:function(e){
+                        e.stopPropagation(); 
+                        var oForm = $(this).parents('form'),
+                             oAll = oForm.find('[name="selectAll"]'),
+                          oActive = oForm.find('[name="selectActive"]');
+                        oAll.prop('checked',oActive.length == oActive.filter(':checked').length);
+                    }
+                });
+                
+                var self = $(this);
+                $(this).find('[name="submit"]').tempConfirm({
+                    url: Global.generateUrl,
+                    verify: true
+                },function(){
+                    var vRemark = self.find('[name="remark"]').val(),
+                            arr = [];
+                    self.find('[name="selectActive"]').each(function(){
+                        if( $(this).prop('checked') ){
+                            arr.push( parseInt( $(this).parents('tr').attr('data-id') ) );
+                        }
+                    });
+                    return {'s_t_s_d_ids': arr.join(','), 'remark': vRemark };
+                },function(){
+                    pageEvent(res);
+                });
+
+            })
+        }
+        function fileEvent(){
+            var data = $('#jq-search-form').find('input').serialize() + '&list_type='+passData.list_type;
+            $('#jq-download').fileDown({
+                 url: Global.fileUrl + '?' + data,
+            }).removeAttr('style');
+        }
+        function pageEvent(res){
+            if( passData.p > 1 ){
+                if( passData.list_type == 1 ){
+                    var list = [];
+                    $.each( res.content.data,function(i,items){
+                        $.each( items,function(i,items){
+                            list.push( i );
+                        });
+                    })
+                    if( res.content.data.length == 1 && list.length == 1 ){
+                        passData.p -= 1;
+                    }
+                }else{
+                    if( res.content.data.length == 1 ){
+                        passData.p -= 1;
+                    }
+                }
+            }
+            var data = $('#jq-search-form').find('input').serialize() + '&pageSize='+passData.pageSize;
+               data += '&list_type='+passData.list_type + '&p=' + passData.p;
+            $.getData({
+                url: Global.listUrl + '?' + data
+            }, function(res){
+                dataShow(res);
+                window.history.pushState( {},'',Global.jump+'index/list_type/'+passData.list_type+'/p/'+passData.p+'.html' );
+            });
+        }
+
+        $('#jq-tab').find('a').eq( passData.list_type - 1 ).addClass('wrap-active');
+        $('#jq-box').find('.wrap-list').eq( passData.list_type - 1 ).show().siblings().hide();
+        $('#jq-tab').find('a').on({
+            click:function(){
+                var index = $(this).index();
+                var s_date = $('[name="s_date"]').val();
+                var e_date = $('[name="e_date"]').val();
+                if( index == 0 ){
+                    Global.jump +=  'index/p/1/list_type/1/s_date/'+s_date+'/e_date/'+e_date+'.html';
+                }else{
+                    Global.jump +=  'index/p/1/list_type/2/s_date/'+s_date+'/e_date/'+e_date+'.html';
+                }
+                window.location.href = Global.jump;
+            }
+        });  
+
+        $('#jq-search-btn').off().on({
+            click: function() {
+                var data = $('#jq-search-form').find('input').serialize() + '&pageSize='+passData.pageSize;
+                    data += '&list_type='+passData.list_type + '&p=' + passData.p;
+                $.getData({
+                    url: Global.listUrl + '?' + data
+                }, function(res){
+                    dataShow(res);
+                    window.history.pushState( {},'',Global.jump+'index/list_type/'+passData.list_type+'.html' );
+                });
+            }
+        });
+        $(document).keydown(function(e) {
+            if (e.which == 13) {
+                $('#jq-search-btn').click();
+            }
+        });
+        
+    });
+    </script>
+</block>

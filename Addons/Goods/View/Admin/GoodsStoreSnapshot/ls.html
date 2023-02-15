@@ -1,0 +1,82 @@
+<extend name="Public/base"/>
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <a href="{:addons_url('Goods://GoodsStoreSnapshotAdmin:/download_log', array('id' => $_GET['id']))}" class="btn">导出快照</a>
+    <p style="margin-top:10px;">筛选：<a
+            href="{:addons_url('Goods://GoodsStoreSnapshotAdmin:/ls', array('id' => $_GET['id']))}"
+        <empty name="_GET[status]">class="btn"</empty>
+        >全部({$total_data[0]|default=0})</a> <a
+                href="{:addons_url('Goods://GoodsStoreSnapshotAdmin:/ls', array('id' => $_GET['id'], 'status' => 1))}"
+        <eq name="_GET[status]" value="1">class="btn"</eq>
+        >上架({$total_data[1]|default=0})</a> <a
+                href="{:addons_url('Goods://GoodsStoreSnapshotAdmin:/ls', array('id' => $_GET['id'], 'status' => 2))}"
+        <eq name="_GET[status]" value="2">class="btn"</eq>
+        >下架({$total_data[2]|default=0})</a> <a
+                href="{:addons_url('Goods://GoodsStoreSnapshotAdmin:/ls', array('id' => $_GET['id'], 'status' => -1))}"
+        <eq name="_GET[status]" value="-1">class="btn"</eq>
+        >已删除({$total_data[3]|default=0})</a></p>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+            <tr>
+                <th>商品ID</th>
+                <th>商品名</th>
+                <th>售价</th>
+                <th>成本价</th>
+                <th>库存</th>
+                <th>库存成本金额</th>
+                <th>状态</th>
+                <th>年份</th>
+                <th>月份</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td>{$lv.goods_id}</td>
+                    <td>
+                        <empty name="lv.goods">未知商品
+                            <else/>
+                            <a href="{:addons_url('Goods://GoodsStoreAdmin:/show', array('id' => $lv['goods_id']))}"
+                               target="_blank">{$lv.goods.title}</a></empty>
+                    </td>
+                    <td>{$lv.price}</td>
+                    <td>{$lv.g_price}</td>
+                    <td>{$lv.num}</td>
+                    <td>{$lv.g_amounts}</td>
+                    <td>
+                        <switch name="lv.status">
+                            <case value="1">上架</case>
+                            <case value="2">下架</case>
+                            <case value="-1">已删除</case>
+                        </switch>
+                    </td>
+                    <td>{$lv.year}年</td>
+                    <td>{$lv.month}月</td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $(function () {
+            highlight_subnav('{:addons_url('
+            Goods://GoodsStoreSnapshotAdmin:/index')}');
+                //全选节点
+                $('.check-all').on('change', function () {
+                    $('.ids').prop('checked', this.checked);
+                });
+        })
+    </script>
+</block>

@@ -1,0 +1,275 @@
+<extend name="Base/common"/>
+<block name="body">
+    <style>
+        .header_img{display:block; width:100%;}
+        .in_app .header_img{border-top:1px solid #ccc;}
+        .weui_article .title{font-size:24px; color:#000; margin-bottom:15px;}
+        .weui_article .info_p{color:#988366; margin-bottom:20px;}
+        .weui_article .info_p span{margin-right:15px;}
+        .weui_article .content{color:#575757;}
+        .weui_article .content img{max-width:100%;}
+        .open_app{
+            background:rgba(0,0,0,0.86);
+            position:fixed;
+            bottom:0;
+            left:0;
+            width:100%;
+            padding:.6rem .85rem;
+            display:none;
+        }
+        .open_app div{
+            display:inline-block;
+            margin-right:.2rem;
+        }
+        .open_app div:last-child{
+            margin-right:0px;
+        }
+        .open_app .icon{
+            width:4.2rem;
+        }
+        .open_app .icon img{
+            position:absolute;
+            width:4.2rem;
+            top:-.7rem;
+        }
+        .open_app .text{
+            width:calc(100% - 10.4315rem);
+        }
+        .open_app .text .title{
+            font-weight:bold;
+            color:#fff;
+            margin-bottom:5px;
+        }
+        .open_app .text .desc{
+            color:#bbb;
+            font-size:12px;
+            letter-spacing: 1px;
+        }
+        .open_app .btn{
+            height:100%;
+            width: 5.5315rem;
+            float: right;
+            margin-top: .25rem;
+        }
+        .open_app .btn a{
+            color:#000;
+            background:rgb(250,236,4);
+            border-radius: 10px;
+            padding: .4rem 0;
+            display:inline-block;
+            vertical-align: bottom;
+            width: 5.5315rem;
+            text-align: center;
+        }
+        .position .tip{
+            background:#f1f0f0;
+            color:#575757;
+            padding:1.2rem .85rem;
+        }
+        .position ul{
+            padding-left:.85rem;
+        }
+        .position ul li{
+            padding:.95rem 2.5rem .95rem 0;
+            border-bottom:1px solid #e0e0e0;
+            clear:both;
+            height:6rem;
+            display:block;
+        }
+        .position ul li a{
+            display: block;
+            width: 100%;
+        }
+        .position ul li div{
+            /*display:inline-block;*/
+            float:left;
+        }
+        .position ul li .image{
+            width:7.2rem;
+            height:4.0rem;
+            margin-right:.4rem;
+        }
+        .position ul li .image img{
+            width:100%;
+            height:100%;
+            display:block;
+        }
+        .position ul li .text{
+            width:calc(100% - 7.6rem);
+            width: -moz-calc(100% - 7.6rem);
+            width: -webkit-calc(100% - 7.6rem);
+            overflow:hidden;
+        }
+        .position ul li.no_image .text{
+            width:calc(100% - 0.4rem);
+            width: -moz-calc(100% - 0.4rem);
+            width: -webkit-calc(100% - 0.4rem);
+        }
+        
+        .position ul li .text .title{
+            color:#000000;
+            font-size:1.2rem;
+            margin-top: .2rem;
+            margin-bottom:.5rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            -o-text-overflow: ellipsis;
+            word-wrap: break-word;
+            display:block;
+        }
+        .position ul li .text .description{
+            color:#a3a3a3;
+            font-size:.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            -o-text-overflow: ellipsis;
+            word-wrap: break-word;
+            display:block;
+        }
+    </style>
+    <div class="fix-container-body">
+        <php>
+            $pic_url = get_cover_url($data['cover_id']);
+        </php>
+        <notempty name="pic_url">
+        <img src="{$pic_url}" class="header_img" />
+        </notempty>
+        <article class="weui_article">
+            <h1 class="title">{$data.title}</h1>
+            <div class="info_p"><span>神秘商店</span><span>{$data.create_time|time_format="Y-m-d"}</span><notempty name="data.tag"><span>#{$data.tag}#</span></notempty></div>
+            <section class="content">
+                {$data.content}
+            </section>
+        </article>
+    </div>
+    <php>
+        $position = array();
+        if(!empty($data['tag'])){
+            $access = M('DocumentTagAccess')->where(array('tag' => array('in', $data['tag']), 'did' => array('neq', $data['id'])))->select();
+            $did = array();
+            foreach($access as $k => $v){
+                !in_array($v['did'], $did) && $did[] = $v['did'];
+            }
+            $did && $position = M('Document')->where(array('id' => array('in', $did)))->limit(5)->field('id,cover_id,title,description')->select();
+            if($position){
+                foreach($position as $k => $v){
+                    $v['pic_url'] = get_cover_url($v['cover_id']);
+                    $position[$k] = $v;
+                }
+            }
+        }
+    </php>
+    <notempty name="position">
+    <div class="position">
+        <p class="tip">相关推荐</p>
+        <ul>
+            <volist name="position" id="lv">
+            <li class="<empty name="lv.pic_url">no_image</empty>">
+                <a href="{:U('wap/document/show', array('name' => $lv['id'], 'in_app' => isset($_GET['in_app']) ? $_GET['in_app'] : ''))}">
+                <notempty name="lv.pic_url"><div class="image"><img src="{$lv.pic_url}" /></div></notempty>
+                 <div class="text">
+                    <p class="title">{$lv.title}</p>
+                    <p class="description">{$lv.description}</p>
+                </div>
+                </a>
+            </li>
+            </volist>
+        </ul>
+    </div>
+    </notempty>
+    <footer>
+        <div class="footer">
+            <div class="copyright">Copyright©2015-{:date('Y')}</div>
+            <div class="company">广州市宅客电子商务有限责任公司</div>
+        </div>
+    </footer>
+    <div class="open_app">
+        <div class="icon"><img src="__IMG__/icon/icon-app.png" /></div>
+        <div class="text">
+            <p class="title">神秘商店</p>
+            <p class="desc">一切美好源自于信任</p>
+        </div>
+        <div class="btn"><a href="javascript:;" id="open_app2">打开APP</a></div>
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript" src="__JS__/jquery.lazyload.min.js"></script>
+    <script type="text/javascript">
+        $('body').addClass('bdw');
+        $('img').lazyload();
+        if ($(window).height() < $('body').height() + $('.footer').height()) {
+            $('.footer').css('position', 'static');
+        }else{
+            $('.footer').css('bottom', '80px');
+        }
+        // 兼容calc属性
+        var _W = $('.position li').width();
+        var _ImgW = $('.position .image').width();
+        var _ImgMR = parseFloat($('.position .image').css('margin-right'));
+        var _TextW = $('.position .text').width();
+        if(_TextW+_ImgW > _W){
+            $('.position .text').width(_W - _ImgW - _ImgMR);
+        }
+    </script>
+    <php>
+        $in_app = strpos($_SERVER['HTTP_USER_AGENT'], 'mysteryshop') !== false ? 1 : 0;
+    </php>
+    <empty name="in_app">
+    <php>
+        $has_goods = 0;
+        $access_data = M('DocumentGoodsAccess')->where(array('did' => $data['id']))->find();
+        $store_id = C('STORE_ONLINE');
+        if($access_data && M('Goods')->alias('a')->join('__GOODS_STORE__ as b ON a.id = b.goods_id')->where(array('a.status' => 1, 'b.store_id' => $store_id, 'a.id' => $access_data['goods_id']))->field('a.id')->find()){
+            $has_goods = 1;
+        }
+    </php>
+    <script src="https://lkme.cc/js/linkedme.min.js" ></script>
+    <script type="text/javascript">
+        linkedme.init("163284dee1b7af618c361b8df20016ba", null, null);
+        var data = {};
+        linkedme.link(data, function(err, data) {
+            if (err) {
+              // 生成深度链接失败，返回错误对象err
+            } else {
+              // 生成深度链接成功，深度链接可以通过data.url得到
+              $('#open_app1').attr('href', data.url);
+            }
+        },false);
+        
+        var data = {};
+        var value = "{:U('wap/document/show', array('name' => $data['id']))}";
+        var cid = "{$data.id}";
+        var has_goods = "{$has_goods}";
+        var title = "{$data.title}";
+        var description = "{:str_replace("\b"," ",$data['description'])}";
+        var image = "{$pic_url}";
+        shareFun();
+        
+        shareTitle = "{$data['title']}";
+        shareDesc = "{$data['description']}";
+        shareImg = "{$pic_url}";
+        shareLink = "{:U('wap/document/show', array('name' => $data['id']))}";
+        <if condition="APP_TYPE eq 'wechat'">
+        shareFun();
+        </if>
+        data.params = '{"view":"'+value+'", "cid":"'+cid+'", "has_goods":"'+has_goods+'", "title":"'+title+'", "description":"'+description+'", "image":"'+image+'", "bind_id":"'+cid+'", "action_type":"1"}';
+        linkedme.link(data, function(err, data) {
+            if (err) {
+              // 生成深度链接失败，返回错误对象err
+            } else {
+              // 生成深度链接成功，深度链接可以通过data.url得到
+              $('#open_app2').attr('href', data.url);
+              $('.open_app').show();
+              $('body').css('padding-bottom', '80px');
+            }
+        },false);
+    </script>
+    <else/>
+    <script type="text/javascript">
+        $('body').addClass('in_app');
+    </script>
+    </empty>
+    
+</block>

@@ -1,0 +1,35 @@
+<extend name="Base/common"/>
+<block name="body">
+    <div class="getCoupons">
+    <div class="getCoupons-bd">
+        <div class="getCoupons-bd-form">
+            <div class="coupons-words">恭喜您抽中<strong>{$money}</strong>元优惠券</div>
+            <input type="tel" placeholder="请输入您的手机号领取" id="mobile">
+            <div class="coupons-getVildCode">
+                <input type="number" placeholder="请输入验证码" id="code">
+                <a class="btn" href="javascript:;" id="send">获取验证码</a>
+            </div>
+            <input type="submit" value="确定" id="sub_btn">
+        </div>
+        <notempty name="config.remark">
+        <div class="getCoupons-bd-spec">
+            <h3><span>活动规则</span></h3>
+            <p>{$config['rule_content']}</p>
+        </div>
+        </notempty>
+    </div>
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $('body').css('background', '#b92f50');
+        
+        shareTitle = "{$_GET['title']|default='[蜜狗礼包] 你有一个中秋礼包待领取！'}";
+        shareDesc = "{$_GET['desc']|default='测试用的'}";
+        shareImg = "{:$pay_share['cover']}";
+        shareLink = "{:$pay_share['url']}";
+        <eq name="APP_TYPE" value="wechat">
+        shareFun();
+        </eq>
+    </script>
+</block>

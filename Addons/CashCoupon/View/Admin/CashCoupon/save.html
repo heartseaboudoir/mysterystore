@@ -1,0 +1,185 @@
+<extend name="Public/base" />
+
+<block name="body">
+	<!-- 标题栏 -->
+	<div class="main-title">
+		<h2>{$meta_title}</h2>
+	</div>
+        <ul class="tab-nav nav">
+            <li class="current" data-tab="tab1"><a href="javascript:void(0);">基础</a></li>
+            <li class="" data-tab="tab2"><a href="javascript:void(0);">领取规则</a></li>
+        </ul>
+        <div class="tab-content">
+            <!-- 数据列表 -->
+            <form id="form" action="{:addons_url('CashCoupon://CashCouponAdmin:/update')}" method="post" class="form-horizontal">
+                <div class="tab-pane in tab1">
+                        <div class="form-item cf">
+                            <label class="item-label">类型<span class="check-tips"></span></label>
+                            <div class="controls">
+                                <label><input type="radio" name="type" value="1" checked /> 满减券</label>
+                                <label><input type="radio" name="type" value="2" <eq name="data.type" value="2">checked</eq> /> 折扣券</label>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">标题<span class="check-tips">（描述优惠券，如 10元优惠券）</span></label>
+                            <div class="controls">
+                                <input class="text input-min" type="text" value="{$data['title']}" name="title" maxlength="20">
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">描述<span class="check-tips">（描述其他信息， 如 满100减20）</span></label>
+                            <div class="controls">
+                                <input class="text input-large" type="text" value="{$data['description']}" name="description" maxlength="80">
+                            </div>
+                        </div>
+                        
+                        <div class="form-item cf type_div type_1" id="money_div">
+                            <label class="item-label">金额<span class="check-tips">（可优惠的金额，大于0，保留2位小数）</span></label>
+                            <div class="controls">
+                                <input class="text input-mini" type="text" value="{$data['money']}" name="money" >
+                            </div>
+                        </div>
+                        <div class="form-item cf type_div type_2" id="money_div">
+                            <label class="item-label">折扣额度<span class="check-tips">（可折扣的额度，范围 0.1 - 9.9， 保留1位小数， 如：设置为 8.5）</span></label>
+                            <div class="controls">
+                                <input class="text input-mini" type="text" value="{$data['discount']|default=''}" name="discount"> 折
+                            </div>
+                        </div>
+                        <div class="form-item cf type_div type_1">
+                            <label class="item-label">使用的最低限额<span class="check-tips">（消费满多少可使用，为大于0,保存2位小数）</span></label>
+                            <div class="controls">
+                                <input class="text input-mini" type="text" value="{$data['min_use_money']}" name="min_use_money">
+                            </div>
+                        </div>
+                        <div class="form-item cf type_div type_2">
+                            <label class="item-label">最多抵扣的金额<span class="check-tips">（为大于0,保存2位小数）</span></label>
+                            <div class="controls">
+                                <input class="text input-mini" type="text" value="{$data['max_dis_money']}" name="max_dis_money">
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">最多领取数量<span class="check-tips"></span></label>
+                            <div class="controls">
+                                <label><input type="radio" name="is_max" value="0" checked=""> 不限</label>
+                                <input type="radio" name="is_max" value="1" id="max_label"  <eq name="data.is_max" value="1">checked=""</eq> > <label for="max_label">限 <input class="text input-2x" type="number"  onclick="$('#max_label').click();" min="0" value="<eq name="data.is_max" value="1">{$data['num']|default=0}</eq>" name="num"></label>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">最晚使用期限<span class="check-tips">(当设置为空时表示可不限期)</span></label>
+                            <div class="controls">
+                                <label><input type="text" class="input-2x time text" name="last_time" value="<gt name="data.last_time" value="0">{$data['last_time']|time_format='Y-m-d'}</gt>" /></label>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">特殊抽取金额<span class="check-tips">（特殊限定的金额）</span></label>
+                            <div class="controls">
+                                <input class="text input-mini" type="text" value="{$data['sp_money']}" name="sp_money">
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">特殊优惠券的描述<span class="check-tips">（描述其他信息， 如 满100减20）</span></label>
+                            <div class="controls">
+                                <input class="text input-large" type="text" value="{$data['sp_description']}" name="sp_description" maxlength="80">
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">特殊优惠券最多抽取数量<span class="check-tips">（特殊的优惠券最多可以抽取的数量，不得大于最多可被抽取数量）</span></label>
+                            <div class="controls">
+                                <input class="text input-mini" type="text" value="{$data['sp_num']}" name="sp_num">
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">特殊优惠券使用的最低限额<span class="check-tips">（特殊优惠券消费满多少可使用，为大于0,保存2位小数）</span></label>
+                            <div class="controls">
+                                <input class="text input-mini" type="text" value="{$data['sp_min_use_money']}" name="sp_min_use_money">
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">已被领取数量<span class="check-tips"></span></label>
+                            <div class="controls">
+                                <input class="text input-2x" type="text" value="{$data['get_num']|default=0}" disabled="">
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">状态<span class="check-tips">（一般情况下由系统自动处理）</span></label>
+                            <div class="controls">
+                                <label><input type="radio" name="status" value="1" <eq name="data.status" value="1">checked</eq> /> 正常</label>
+                                <label><input type="radio" name="status" value="2" <eq name="data.status" value="2">checked</eq> /> 过期</label>
+                                <label><input type="radio" name="status" value="3" <eq name="data.status" value="3">checked</eq> /> 已被领完</label>
+                                <label><input type="radio" name="status" value="4" <eq name="data.status" value="4">checked</eq> /> 已作废</label>
+                            </div>
+                        </div>
+                </div>
+                <div class="tab-pane tab2">
+                        <div class="form-item cf">
+                            <label class="item-label">类型<span class="check-tips">（规则类型）</span></label>
+                            <div class="controls">
+                                <select name="rule_type">
+                                    <option value="">无</option>
+                                    <option value="score" <eq name="data.rule_type" value="score">selected</eq>>蜜糖兑换</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-item cf rule_div score_rule" >
+                            <label class="item-label">蜜糖值<span class="check-tips">（多少蜜糖可以兑换）</span></label>
+                            <div class="controls">
+                                <input type="text" class="text input-min" name="rule[score][val]" value="{$data.rule.score.val}" />
+                            </div>
+                        </div>
+                </div>
+                <div class="form-item cf">
+                    <button id="submit" class="btn submit-btn ajax-post hidden" target-form="form-horizontal" type="submit">确 定</button>
+                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                    <input type="hidden" value="{$data.id}" name="id" />
+                </div>
+            </form>
+        </div>
+</block>
+<block name="script">
+<link href="__STATIC__/datetimepicker/css/datetimepicker.css" rel="stylesheet" type="text/css">
+<link href="__STATIC__/datetimepicker/css/dropdown.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="__STATIC__/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+<script type="text/javascript" src="__STATIC__/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+	<script type="text/javascript">
+		$(function(){
+                    highlight_subnav('{:addons_url('CashCoupon://CashCouponAdmin:/index')}');
+                    //全选节点
+                    $('.check-all').on('change',function(){
+                        $('.ids').prop('checked',this.checked);
+                    });showTab();
+                    $('.time').datetimepicker({
+                        format: 'yyyy-mm-dd',
+                        language:"zh-CN",
+                        minView:2,
+                        autoclose:true
+                    });
+                    $('[name="rule_type"]').change(function(){
+                        change_rule_div();
+                    });
+                    function change_rule_div(){
+                        var rule = $('[name="rule_type"]').val();
+                        $('.rule_div').hide();
+                        $("."+rule+'_rule').show();
+                    }
+                    change_rule_div();
+                    
+                    function change_type(){
+                        var val = $('[name="type"]:checked').val();
+                        $('.type_div').hide();
+                        $('.type_'+val).show();
+                        if(val == 1){
+                            $('.type_div').hide();
+                            $('.type_1').show();
+                        }else{
+                            $('.type_div').hide();
+                            $('.type_2').show();
+                        }
+                    }
+                    $('[name="type"]').change(function(){
+                        change_type();
+                    });
+                    change_type();
+		})
+                
+	</script>
+</block>

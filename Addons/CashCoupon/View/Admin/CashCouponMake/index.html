@@ -1,0 +1,76 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <style>
+        .in_cur{background:#170; color:#fff;}
+    </style>
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <div style="margin-bottom:10px;">
+        <a href="{:addons_url('CashCoupon://CashCouponMakeAdmin:/config')}" class="btn">生成配置管理</a>
+    </div>
+    <div style="width:460px; text-align: center; position: fixed; left: 50%; top: 100px; margin-left: -230px; border-radius: 10px; background: #eee none repeat scroll 0px 0px; padding: 60px 20px 20px;box-shadow:0 0 5px rgba(0,0,0,0.3);display:none;" id="show_line_div">
+        <p style="background:rgb(202,22,32);color:#fff;position:absolute;padding: 0 20px;width: calc(100% - 40px);text-overflow: ellipsis;white-space: nowrap;overflow: hidden;height:35px;line-height: 35px; top:0;left:0;border-radius:10px 10px 0 0;" class="title">访问地址</p>
+        <p style="margin-bottom: 5px;"><input type="text input-large" id="biao1" readonly value="" style="width: 388px;border:none;height:30px;line-height: 30px;border-radius: 5px;padding:0 5px;" /> <a href="javascript:;" class="cp_btn">复制链接</a></p>
+        <p style="margin-bottom: 10px; text-align:left;">注：若复制不成功，请手动复制</p>
+        <a href="javascript:;" class="btn" onclick="$('#show_line_div').hide();">关闭</a>
+    </div>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+                <tr>
+                    <th>领取码</th>
+                    <th>最多抽取数量</th>
+                    <th>已抽取数量</th>
+                    <th>状态</th>
+                    <th width="150">生成时间</th>
+                    <th width="150">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td><a href="javascript:;" class="show_line" data-url="{$lv.show_url}" data-title="{$lv.title}"></a>{$lv.code}</td>
+                    <td>{$lv.num}</td>
+                    <td>{$lv.get_num|default=0}</td>
+                    <td><switch name="lv.status"><case value="1">正常</case><case value="2">已领取完</case></switch></td>
+                    <td><span>{$lv.create_time|time_format="Y-m-d H:i:s"}</span></td>
+                    <td>
+                        <a class="" href="{:addons_url('CashCoupon://CashCouponAdmin:/user_lists',array('p_code' => $lv['code']))}" data-id="{$lv.id}">查询领取记录</a>
+                    </td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $(function() {
+            highlight_subnav('{:addons_url('CashCoupon://CashCouponMakeAdmin:/index')}');
+            $('.show_line').click(function(){
+                var obj = $('#show_line_div');
+                var title = $(this).data('title') || '访问地址';
+                obj.find('input').val($(this).data('url'));
+                obj.find('.title').text(title);
+                obj.show();
+            });
+            $('#show_line_div .cp_btn').click(function(){
+                var Url2=document.getElementById("biao1");
+                Url2.select(); // 选择对象
+                document.execCommand("Copy"); // 执行浏览器复制命令
+                alert("已复制");
+            });
+            $('#show_line_div input').click(function(){
+                $(this).select();
+            });
+        })
+    </script>
+</block>

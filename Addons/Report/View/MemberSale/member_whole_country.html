@@ -1,0 +1,586 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <?php
+        if($s_date != ''){
+            $strhref .= "&s_date=" .$s_date;
+        }
+        if($e_date != ''){
+            $strhref .= "&e_date=" .$e_date;
+        }
+        if($store_select != ''){
+            $strhref .= "&store=" .implode(',',$store_select);
+        }
+        if($goodscate_select != ''){
+            $strhref .= "&goodscate_select=" .implode(',',$goodscate_select);
+        }
+        if($goods_id != ''){
+            $strhref .= "&goods_id=" .$goods_id;
+        }
+        if($goods_name != ''){
+            $strhref .= "&goods_name=" .$goods_name;
+        }
+        if($min_price != ''){
+            $strhref .= "&min_price=" .$min_price;
+        }
+        if($max_price != ''){
+            $strhref .= "&max_price=" .$max_price;
+        }
+        if($num_order != ''){
+            $strhref1 .= "&num_order=" .$num_order;
+        }
+        if($amount_order != ''){
+            $strhref1 .= "&amount_order=" .$amount_order;
+        }
+        if($sn_order != ''){
+            $strhref1 .= "&sn_order=" .$sn_order;
+        }
+		if($user_name != ''){
+			$strhref .= "&user_name=" .$user_name;
+		}
+    ?>
+<div class="site-allsale">
+    <!-- 高级搜索 -->
+    <form id="form" action="{:addons_url('Report://MemberSale:/member_whole_country')}" method="post" class="form-horizontal">
+    <input type="hidden" name='one' value='{$one}'/>
+        <div class="cf">
+            <div class="search-form cf">
+                <div class="sleft">
+                <dl id="jq-check-box" class="checkmod">
+                    <dt class="hd">
+                        <label class="checkbox">选择区域门店</label>
+                    </dt>
+                    <volist name="shequ" id="lv">
+                        <notempty name="store[$lv[id]]">
+                            <dd class="bd">
+                                <div class="rule_check">
+                                    <div class="wrap-check-list">
+                                       <label class="checkbox">
+                                       <input class="auth_rules rules_row" type="checkbox" name="rules[]" value="{$lv.id}">{$lv.title}&nbsp;&nbsp;(门店数：<?php echo count($store[$lv[id]])?>)
+                                       </label>
+                                    </div>
+                                    <!--<span class="divsion">&nbsp;</span>-->
+                                    <div class="wrap-check-single child_row">
+                                        <volist name="store[$lv[id]]" id="lc">
+                                            <label class="checkbox" title="{$lc.title}">
+                                                <input class="auth_rules" type="checkbox" name="store[]"
+                                                <?php for($i=0;$i<count($store_select);$i++){
+                                                if( $lc['id'] == $store_select[$i] ){
+                                                	echo(' checked="checked"');
+                                                }
+                                                } ?>
+                                                 value="{$lc.id}">{$lc.title}
+                                            </label>
+                                        </volist>
+                                        <p class="wrap-more"></p>
+                                    </div>
+                                </div>
+                        	</dd>
+                        </notempty>
+                    </volist>
+                </dl>
+                <dl class="checkmod">
+                    <dt class="hd">
+                        <label class="checkbox">选择类别</label>
+                    </dt>
+                        <notempty name="goodscate">
+                    <dd class="bd">
+                        <div class="rule_check">
+                            <div>
+                               <label class="checkbox">
+                               <input class="auth_rules rules_row" type="checkbox" name="rules[]" value="{$lv.id}">选择类别
+                               </label>
+                            </div>
+                           <span class="divsion">&nbsp;</span>
+                           <span class="child_row">
+                                <volist name="goodscate" id="ld">
+                                    <label class="checkbox"><input class="auth_rules" type="checkbox" name="goodscate_select[]"
+                                <?php for($i=0;$i<count($goodscate_select);$i++){
+                                if( $ld['id'] == $goodscate_select[$i] ){
+                                	echo(' checked="checked"');
+                                }
+                                } ?>
+                                 value="{$ld.id}">{$ld.title}</label>
+                                </volist>
+                           </span>
+                        </div>
+                	</dd>
+                        </notempty>
+                </dl>
+                <dl class="checkmod">
+                    <dt class="hd">
+                        <label class="checkbox">商品</label>
+                    </dt>
+                    <dd class="bd">
+                        <div class="rule_check">
+                            <label class="checkbox"><input type="text" name="goods_id" class="text input-text search-input" style="" value="{$goods_id}" placeholder="ID" /></label>
+                            <label class="checkbox"><input type="text" name="goods_name" class="text input-text search-input" style="" value="{$goods_name}" placeholder="按商品名称搜索" /></label>
+                        </div>
+                	</dd>
+                </dl>
+                <dl class="checkmod">
+                    <dt class="hd">
+                        <label class="checkbox">价格区间</label>
+                    </dt>
+                    <dd class="bd">
+                        <div class="rule_check">
+                            <label class="checkbox"><input type="text" name="min_price" class="text input-text search-input" style="" value="{$min_price}" placeholder="最低价" /></label>
+                            <label class="checkbox"><input type="text" name="max_price" class="text input-text search-input" style="" value="{$max_price}" placeholder="最高价" /></label>
+                        </div>
+                	</dd>
+                </dl>
+                <dl class="checkmod">
+                    <dt class="hd">
+                        <label class="checkbox">时间区间</label>
+                    </dt>
+                    <dd class="bd">
+                        <div class="rule_check">
+                            <label class="checkbox"><input type="text" name="s_date" class="text input-text search-input time" value="{$s_date}" placeholder="请选择开始日期" /></label>
+                            <label class="checkbox"><input type="text" name="e_date" class="text input-text search-input time" value="{$e_date}" placeholder="请选择结束日期" /></label>
+                            <label class="checkbox">日 <input type="radio" name="dwm" class="" value="d" <eq name='dwm' value='d'>checked</eq> placeholder="日" /></label>
+                            <label class="checkbox">周 <input type="radio" name="dwm" class="" value="w" <eq name='dwm' value='w'>checked</eq>  placeholder="周" /></label>
+                            <label class="checkbox">月 <input type="radio" name="dwm" class="" value="m" <eq name='dwm' value='m'>checked</eq>  placeholder="月" /></label>                   
+                        </div>
+                        
+                	</dd>
+                </dl>
+                  <dl class="checkmod">
+                    <dt class="hd">
+                        <label class="checkbox">用户名查找</label>
+                    </dt>
+                    <dd class="bd">
+                        <div class="rule_check">
+                            <div>
+                               <label class="checkbox">
+                        <input type="text" name="user_name" class="text input-text search-input" value="{$user_name}" placeholder="请输入用户名" />
+                            </div>
+                        </div>
+                	</dd>
+                </dl>
+                    <input type="hidden" name="id" value="{$id}" />
+                    <input type="hidden" name="jc_id" value="{$jc_id}" />
+                    <input type="hidden" name="type" value="{$type}" />
+                    <button id="submit" class="btn submit-btn ajax-post hidden" target-form="form-horizontal" type="submit">搜索</button>
+						 <a href="{:addons_url('Report://MemberSale:/member_whole_country')}?isprint=1&one=1{$strhref}" class="btn">导出Excel</a>
+                </div>
+            </div>
+        </div>
+    </form>
+<div id="first" style="width: 100%;height:700px;float:left;"></div>
+<div id="pie1" style="width: 50%;height:500px;float:left;"></div>
+<div id="pie2" style="width: 50%;height:500px;float:left;"></div>
+    <div class="main-title">
+        <h2>TOP25活跃用户>>></h2>
+    </div>
+        <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table width="99%" style="table-layout:fixed">
+            <thead>
+            <tr>
+                <th>排名</th>
+                <th>用户名</th>
+                <th>门店</th>
+                <th>消费金额</th>
+                <th>消费次数</th>
+                <th>最爱</th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php $i = 0; ?>
+            <notempty name="info">
+                <volist name="info" id="lv" key="vo">
+                    <?php $i++; ?>
+                    <tr>
+                        <td>{$i}</td>
+                        <td>{$lv.uid|get_nickname_jinjiang=$lv['pay_type']}</td>
+                        <td title='{$lv.store_name|get_order_store_name_store}' style="width:10%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{$lv.store_name|get_order_store_name_store}</td>
+                        <td>{$lv.order_money}</td>
+                        <td>{$lv.order_count}</td>
+                        <td>{$lv.title}</td>
+                    </tr>
+                </volist>
+                <else/>
+                <tr>
+                    <td colspan="8" align="center">没有销售记录</td>
+                </tr>
+            </notempty>
+            </tbody>
+        </table>
+    </div>
+</div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+    layui.use(['main','highcharts'], function() {
+        var $ = layui.jquery,
+        layer = layui.layer;
+        highcharts = layui.highcharts;
+
+
+        var aList = $('#jq-check-box').width();
+        $('#jq-check-box').find('dd').each(function(){
+            var arr = 0,
+              index = 0,
+               show = '展开<i class="layui-icon">&#xe61a;</i>',
+               hide = '收缩<i class="layui-icon">&#xe61a;</i>';
+            var that = $(this);
+            $(this).find('.wrap-check-single label').each(function(){
+                var self = $(this),
+                  aWidth = parseInt( self.outerWidth() ) + 20;
+                arr += aWidth;
+                if(arr > aList){
+                    index = self.index() - 1;
+                    $(this).parents('.wrap-check-single').find('.wrap-more').html(show).attr('show',1);
+                    that.find('.wrap-check-single label:gt('+index+')').hide();
+                    that.parents('#jq-check-box').css('width',aList);
+                    return false;
+                }
+            });
+            $(this).find('.wrap-more').on({
+                click:function(){
+                    if( $(this).attr('show') == 1 ){
+                        $(this).html(hide).removeAttr('show');
+                        $(this).parents('.wrap-check-single').find('label').show();
+                    }else{
+                        $(this).html(show).attr('show',1);
+                        $(this).parents('.wrap-check-single').find('label:gt('+index+')').hide();
+                    }
+                }
+            });
+        });
+
+        $(window).resize(function() {
+            if( $(window).width() > 1560 ){
+                $('#jq-check-box').css('width',aList);
+            }else{
+                $('#jq-check-box').removeAttr('style');
+            };
+        });
+
+        $('#jq-treetable').find('.wrap-b').each(function(){
+            if( $.trim( $(this).find('td').html() ) != '' ){
+                $(this).prev().find('.layui-icon').html('&#xe61a;');
+                //$('#jq-treetable-all').find('.layui-icon').html('&#xe61a;');
+            }else{
+                $(this).prev().find('.wrap-toggle').css('cursor','default');
+            }
+        });
+        //$('#jq-treetable').find('.wrap-b').eq(0).show().prev().find('.layui-icon').attr('data-id',1).html('&#xe619;');
+        $('#jq-treetable').find('.wrap-toggle').on({
+            click:function(){
+                var oIcon = $(this).find('.layui-icon');
+                if( oIcon.html()  != '' ){
+                    if( oIcon.attr('data-id') == 1 ){
+                        oIcon.removeAttr('data-id').html('&#xe61a;');
+                        oIcon.parents('tr').next().hide();
+                        return false;
+                    }
+                    oIcon.attr('data-id',1).html('&#xe619;');
+                    oIcon.parents('tr').next().show();
+                }
+            }
+        });
+        /*$('#jq-treetable-all').find('.layui-icon').on({
+            click:function(){
+                $(this).attr('data-id',1).html('&#xe619;');
+                $(this).parents('tr').next().show();
+            }
+        });*/
+
+      /*   var storename = {$listout_storename},
+             storesn = {$listout_storesn},
+             storenum = {$listout_storenum},
+          storeamount = {$listout_storeamount};
+
+        function arrFormat(options){
+            $.each( options,function(i,items){
+                if(items == null){
+                    options[i] = 0;
+                }else{
+                    options[i] = parseInt(items);
+                }
+            });
+        }  
+        arrFormat(storesn);
+        arrFormat(storenum);
+        arrFormat(storeamount); */
+        var myChart = echarts.init(document.getElementById('first'));
+        // 显示标题，图例和空的坐标轴
+        /*grid: {
+         left: '3%',
+         right: '4%',
+         bottom: '3%',
+         containLabel: true
+         },
+         toolbox: {
+         feature: {
+         saveAsImage: {}
+         }
+         },*/
+         option = {
+                 title: {
+                     text: '用户分析'
+                 },
+                 tooltip: {
+                     trigger: 'axis'
+                 },
+                 legend: {
+                     data:['活跃用户','消费次数','销售数量','消费金额']
+                 },
+                 xAxis: {
+                     type: 'category',
+                     boundaryGap: false,
+                     data: ['{$user_data.time}'],
+                 },
+                 yAxis: [
+                     {
+                         type: 'value',
+                         name: '用户/次数',
+                         axisLabel: {
+                             formatter: '{value}'
+                         }
+                     },
+                     {
+                         type: 'value',
+                         name: '金额',
+                         axisLabel: {
+                             formatter: '{value}'
+                         }
+                     }
+                 ],
+                 series: [
+                     {
+                         name:'活跃用户',
+                         type:'line',
+                         data:['{$user_data.count}']
+                     },
+                     {
+                         name:'消费次数',
+                         type:'line',
+                         data:['{$user_data.money_count}']
+                     },
+                     {
+                         name:'销售数量',
+                         type:'line',
+                         data:['{$user_data.num}']
+                     },
+                     {
+                         name:'消费金额',
+                         type:'line',
+                         yAxisIndex: 1,
+                         data:['{$user_data.money_sum}']
+                     },
+                 ]
+             };
+
+        myChart.setOption(option);
+         var myChart1 = echarts.init(document.getElementById('pie1'));
+        var datas_name = '{$goods_money_p10}';
+        var obj = eval('(' + datas_name + ')');
+        option1 = {
+            title : {
+                text: '商品销售额TOP10',
+                subtext: '{$s_date}~~{$e_date}',
+                x:'center'
+            },
+            tooltip : {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+            legend: {
+                orient: 'horizontal',
+                bottom: 'bottom',
+                data: obj.data,
+                formatter: function (name) {
+                    return (name.length > 5 ? (name.slice(0,5)+"...") : name );
+                }
+            },
+            series : [
+                {
+                    name: '销售金额',
+                    type: 'pie',
+                    data:obj.money,
+                    itemStyle: {
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }
+            ]
+        };
+        myChart1.setOption(option1);
+/*         myChart1.on('click', function (params) {
+            var ids = params.dataIndex;
+            var uidary = params.seriesId;
+            var uida = uidary.split(',');
+            var uid = uida[ids];
+            var str = '{:addons_url('Report://Sale:/goods_top10')}?od=sum_amount&s_date={$s_date}&e_date={$e_date}';
+                    window.location.href = str;
+        }); */
+        var myChart2 = echarts.init(document.getElementById('pie2'));
+        var datas_name2 = '{$goods_cate_money_p10}';
+        var obj2 = eval('(' + datas_name2 + ')');
+        option2 = {
+            title : {
+                text: '分类销售额TOP10',
+                subtext: '{$s_date}~~{$e_date}',
+                x:'center'
+            },
+            tooltip : {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+            legend: {
+                orient: 'horizontal',
+                bottom: 'bottom',
+                data: obj2.data,
+                formatter: function (name) {
+                    return (name.length > 5 ? (name.slice(0,5)+"...") : name );
+                }
+            },
+            series : [
+                {
+                    name: '销售金额',
+                    type: 'pie',
+                    data:obj2.money,
+                    itemStyle: {
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }
+            ]
+        };
+        myChart2.setOption(option2);
+/*         myChart1.on('click', function (params) {
+            var ids = params.dataIndex;
+            var uidary = params.seriesId;
+            var uida = uidary.split(',');
+            var uid = uida[ids];
+            var str = '{:addons_url('Report://Sale:/goods_top10')}?od=sum_amount&s_date={$s_date}&e_date={$e_date}';
+                    window.location.href = str;
+        }); */
+    });
+    </script>
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/echarts.js"></script>
+    <link href="__STATIC__/datetimepicker/css/datetimepicker.css" rel="stylesheet" type="text/css">
+    <link href="__STATIC__/datetimepicker/css/dropdown.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+
+    <script type="text/javascript" src="__STATIC__/artDialog/lib/sea.js"></script>
+    <script type="text/javascript">
+        highlight_subnav('{:addons_url('Report://MemberSale:/member_whole_country')}');
+        var rules = [{$this_group}];
+        $('.auth_rules').each(function(){
+            if( $.inArray( parseInt(this.value,10),rules )>-1 ){
+                //$(this).prop('checked',true);
+            }
+            if(this.value==''){
+                //$(this).closest('span').remove();
+            }
+        });
+
+        //全选节点
+        $('.rules_all').on('change',function(){
+            $(this).closest('dl').find('dd').find('input').prop('checked',this.checked);
+        });
+        $('.rules_row').on('change',function(){
+            $(this).closest('.rule_check').find('.child_row').find('input').prop('checked',this.checked);
+        });
+
+
+        $('select[name=group]').change(function(){
+			location.href = this.value;
+        });
+		
+        //搜索功能
+        $(".submit-btn").click(function() {
+            var url = $(this).attr('url');
+            var query = $('.search-form').find('input').serialize();
+            query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g, '');
+            query = query.replace(/^&/g, '');
+            if (url.indexOf('?') > 0) {
+                url += '&' + query;
+            } else {
+                url += '?' + query;
+            }
+            var query2 = $('#select-form').serialize();
+            if (url.indexOf('?') > 0) {
+                url += '&' + query2;
+            } else {
+                url += '?' + query2;
+            }
+			console.log(url);
+			return false;
+            window.location.href = url;
+        });
+        // 状态搜索子菜单
+        $(".search-form").find(".drop-down").hover(function() {
+            $("#sub-sch-menu").removeClass("hidden");
+        }, function() {
+            $("#sub-sch-menu").addClass("hidden");
+        });
+        $("#sub-sch-menu li").find("a").each(function() {
+            $(this).click(function() {
+                var text = $(this).text();
+                $("#sch-sort-txt").text(text).attr("data", $(this).attr("value"));
+                $("#sub-sch-menu").addClass("hidden");
+            })
+        });
+        var _T;
+        $('.select-form input').change(function(){
+            clearTimeout(_T);
+            _T = setTimeout(function(){
+                $("#search").click();
+            }, 1000);
+        });
+
+
+        /**
+         *对Date的扩展，将 Date 转化为指定格式的String
+         *月(M)、日(d)、小时(h)、分(m)、秒(s)、季度(q) 可以用 1-2 个占位符，
+         *年(y)可以用 1-4 个占位符，毫秒(S)只能用 1 个占位符(是 1-3 位的数字)
+         *例子：
+         *(new Date()).Format("yyyy-MM-dd hh:mm:ss.S") ==> 2006-07-02 08:09:04.423
+         *(new Date()).Format("yyyy-M-d h:m:s.S")      ==> 2006-7-2 8:9:4.18
+         */
+        Date.prototype.format = function (fmt) {
+            var o = {
+                "M+": this.getMonth() + 1, //月份
+                "d+": this.getDate(), //日
+                "h+": this.getHours(), //小时
+                "m+": this.getMinutes(), //分
+                "s+": this.getSeconds(), //秒
+                "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+                "S": this.getMilliseconds() //毫秒
+            };
+            if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+            for (var k in o)
+                if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+            return fmt;
+        }
+         
+         var day1 = new Date();
+        day1.setDate(day1.getDate() - 1);
+        var s1 = day1.format("yyyy-MM-dd");
+        
+        $('.time').datetimepicker({
+            format: 'yyyy-mm-dd',
+            language: "zh-CN",
+            minView: 2,
+            endDate:s1,
+            autoclose: true
+        });
+
+    </script>
+</block>

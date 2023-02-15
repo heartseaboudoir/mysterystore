@@ -1,0 +1,44 @@
+<extend name="Base/common"/>
+<block name="body">
+<div class="weui_tab">
+    <div class="weui_tab_bd">
+        <div></div>
+        <div class="weui_cells weui_cells_form">
+            <div class="weui_cell weui_vcode_noft">
+                <div class="weui_cell_bd weui_cell_primary">
+                    <input class="weui_input" type="text" placeholder="请输入昵称" name="nickname" value="{$nickname}"/>
+                </div>
+            </div>
+        </div>
+        <a href="javascript:;" class="weui_btn weui_btn_warn weui_btn_pay mt15" id="sub_btn">确定</a>
+    </div>
+</div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $("#sub_btn").click(function () {
+            if ($(this).data('act') == 1) {
+                //return false;
+            }
+            var nickname = $("[name='nickname']").val();
+            if (nickname == '') {
+                alert('请输入昵称');
+                return false;
+            }
+            $(this).data('act', 1);
+            var url = "{:U('User/update_nickname')}";
+            $.post(url, {nickname : nickname}, success, "json");
+            return false;
+
+            function success(data) {
+                if (data.status) {
+                    alert(data.info);
+                    window.location.href = data.url;
+                } else {
+                    alert(data.info);
+                    $("#sub_btn").data('act', 0);
+                }
+            }
+        });
+    </script>
+</block>

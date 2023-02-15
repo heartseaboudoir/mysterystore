@@ -1,0 +1,139 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <!-- 高级搜索 -->
+    <div class="cf">
+        <?php
+            if($id != ''){
+                $strhref .= "&id=" .$id;
+            }
+            if($jc_id != ''){
+                $strhref .= "&jc_id=" .$jc_id;
+            }
+            if($goods_name != ''){
+                $strhref .= "&goods_name=" .$goods_name;
+            }
+            if($cat_name != ''){
+                $strhref .= "&cat_name=" .$cat_name;
+            }
+        ?>
+        <a href="{:addons_url('Report://StoreJieCunAdmin:/viewchild')}?isprint=1{$strhref}" class="btn">导出Excel</a>
+        <div class="search-form fr cf">
+            <div class="sleft">
+                <input type="hidden" name="id" value="{$id}" />
+                <input type="hidden" name="jc_id" value="{$jc_id}" />
+                <input type="text" name="goods_name" class="text input-text search-input" style="" value="{$_GET['goods_name']}" placeholder="商品名称" />
+                <input type="text" name="cat_name" class="text input-text search-input" style="" value="{$_GET['cat_name']}" placeholder="分类名称" />
+                <a class="sch-btn" href="javascript:;" id="search" url="{:addons_url('Report://StoreJieCunAdmin:/viewchild')}"><i class="btn-search"></i></a>
+            </div>
+        </div>
+    </div>
+    <div style="clear:both;"></div>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+                <tr>
+                    <th>门店</th>
+                    <th>商品id</th>
+                    <th>商品名</th>
+                    <th>商品分类</th>
+                    <th>库存</th>
+                    <th>售价</th>
+                    <th>金额</th>
+            </tr>
+            </thead>
+            <tbody>
+            <notempty name="list">
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td>{$lv.store_title}</td>
+                    <td>{$lv.goods_id}</td>
+                    <td>{$lv.goods_title}</td>
+                    <td>{$lv.goods_cat}</td>
+                    <td>{$lv.jc_num}</td>
+                    <td>{$lv.sell_price}</td>
+                    <td>{$lv.jc_amount}</td>
+                </tr>
+            </volist>
+            <else/>
+            <tr><td colspan="4">暂无数据~</td></tr>
+            </notempty>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <link href="__STATIC__/datetimepicker/css/datetimepicker.css" rel="stylesheet" type="text/css">
+    <link href="__STATIC__/datetimepicker/css/dropdown.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+    <script type="text/javascript">
+        $(function() {
+            highlight_subnav('{:addons_url('Report://StoreJieCunAdmin:/index')}');
+            //搜索功能
+
+            $('.search-form input').focus(function(){
+                $(document).keypress(function (e) {
+                    // 回车键事件
+                    if (e.which == 13) {
+                        $("#search").click();
+                    }
+                });
+            });
+            $("#search").click(function() {
+                var url = $(this).attr('url');
+                var query = $('.search-form').find('input').serialize();
+                query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g, '');
+                query = query.replace(/^&/g, '');
+                if (url.indexOf('?') > 0) {
+                    url += '&' + query;
+                } else {
+                    url += '?' + query;
+                }
+                var query2 = $('#select-form').serialize();
+                if (url.indexOf('?') > 0) {
+                    url += '&' + query2;
+                } else {
+                    url += '?' + query2;
+                }
+                window.location.href = url;
+            });
+
+            /* 状态搜索子菜单 */
+            $(".search-form").find(".drop-down").hover(function() {
+                $("#sub-sch-menu").removeClass("hidden");
+            }, function() {
+                $("#sub-sch-menu").addClass("hidden");
+            });
+            $("#sub-sch-menu li").find("a").each(function() {
+                $(this).click(function() {
+                    var text = $(this).text();
+                    $("#sch-sort-txt").text(text).attr("data", $(this).attr("value"));
+                    $("#sub-sch-menu").addClass("hidden");
+                })
+            });
+            var _T;
+            $('#select-form input').change(function(){
+                clearTimeout(_T);
+                _T = setTimeout(function(){
+                    $("#search").click();
+                }, 1000);
+            });
+            $('.time').datetimepicker({
+                format: 'yyyy-mm-dd',
+                language: "zh-CN",
+                minView: 2,
+                autoclose: true
+            });
+        })
+    </script>
+</block>

@@ -1,0 +1,231 @@
+<extend name="Public/base" />
+
+<block name="body">
+<script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+<!-- 标题栏 -->
+<div class="main-title">
+	<h2>{$meta_title}</h2>
+</div>
+<div class="tab-content site-ad">
+    <!-- 数据列表 -->
+    <form id="form" action="{:addons_url('Poster://PosterDataAdmin:/update')}" method="post" class="form-horizontal">
+        <div class="tab-pane in tab1">
+                <div class="form-item cf">
+                    <label class="item-label">标题</label>
+                    <div class="controls">
+                        <input type="text" class="text input-large" name="title" value="{$data.title}" />
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">广告图类型<span class="check-tips">（下方选择的广告图的类型）</span></label>
+                    <div class="controls">
+                        <input type="radio" name="cover_type" <?php if ($data['cover_type'] == 0) { echo 'checked'; }?> value="0" /> 图片
+                        <input type="radio" name="cover_type" <?php if ($data['cover_type'] == 1) { echo 'checked'; }?> value="1" /> 视频
+                    </div>
+                </div>                        
+                <div class="form-item cf">
+                    <div class="form-item cf">
+                        <label class="item-label">广告图<span class="check-tips">(请根据广告位需要上传相对应比例的图片)</span></label>
+                        <div class="controls">
+                            <input type="file" id="upload_picture_cover_id">
+                            <input type="hidden" name=cover_id id=cover_id value="{$data[cover_id]}"/>
+                            <div class="upload-img-box">
+                                <notempty name="data[cover_id]">
+                                    <div class="upload-pre-item"><img src="{$data[cover_id]|get_cover='path'}"/><a target="_blank" href="{$data[cover_id]|get_cover='path'}">预览</a></div>
+                                </notempty>
+                            </div>
+                            <script type="text/javascript">
+                            //上传图片
+                            /* 初始化上传插件 */
+                            $("#upload_picture_cover_id").uploadify({
+                                "height"          : 30,
+                                "swf"             : "__STATIC__/uploadify/uploadify.swf",
+                                "fileObjName"     : "download",
+                                "buttonText"      : "上传图片",
+                                "uploader"        : "{:U('File/uploadPicture',array('session_id'=>session_id()))}",
+                                "width"           : 120,
+                                'removeTimeout'	  : 1,
+                                'fileTypeExts'	  : '*.jpg; *.png; *.gif; *.avi; *.wmv; *.mp4;',
+                                "onUploadSuccess" : uploadPicturecover_id,
+                                'onFallback' : function() {
+                                    alert('未检测到兼容版本的Flash.');
+                                }
+                            });
+                            function uploadPicturecover_id(file, data){
+                                var data = $.parseJSON(data);
+                                var src = '';
+                                if(data.status){
+                                        $("#cover_id").val(data.id);
+                                        src = data.url || '__ROOT__' + data.path
+                                        $("#cover_id").parent().find('.upload-img-box').html(
+                                                '<div class="upload-pre-item"><img src="__ROOT__' + src + '"/><a target="_blank" href="' + src + '">预览</a></div>'
+                                        );
+                                } else {
+                                        updateAlert(data.info);
+                                        setTimeout(function(){
+                                        $('#top-alert').find('button').click();
+                                        $(that).removeClass('disabled').prop('disabled',false);
+                                    },1500);
+                                }
+                            }
+                            </script>
+                        </div>
+                    </div>
+                </div>
+                <eq name="poster.is_access" value="1">
+                    <style>
+                        select option:disabled{color:#aaa;}
+                        #store_data{display:inline-block;border:1px solid #ddd; height:188px; width:290px; overflow-y: scroll;padding:5px; margin-left:15px}
+                        #store_data p{cursor: pointer;padding:2px;}
+                        #store_data p:hover{background:#eee;}
+                    </style>
+                    <div class="form-item cf">
+                        <label class="item-label">关联门店<span class="check-tips">（双击门店名添加，双击右侧已选区域可移除，提交保存后生效）</span></label>
+                        <div class="controls">
+                            <select id="store_select" multiple="multiple" class="wrap-select">
+                                <volist name="shequ" id="ls">
+                                    <option disabled>{$ls.title}</option>
+                                    <volist name="ls.store" id="lv">
+                                        <option value="{$lv.id}" data-title="{$lv.title}"> |-- {$lv.title}</option>
+                                    </volist>
+                                </volist>
+                            </select>
+                            <div class="wrap-btn">
+                                <a id="jq-add" class="wrap-btn-add" href="javascript:void(0);">选中添加 &gt;&gt;</a>
+                                <a id="jq-del" class="wrap-btn-del" href="javascript:void(0);">&lt;&lt; 选中删除</a>
+                            </div>
+                            <select id="store_data" multiple="multiple" class="wrap-select">
+                                <volist name="shequ" id="ls">
+                                    <volist name="ls.store" id="lv">
+                                        <in name="lv.id" value="$data.store_id">
+                                        <option value="{$lv.id}" data-title="{$lv.title}">{$lv.title}</option>
+                                        </in>
+                                    </volist>
+                                </volist>
+                            </select>
+                            <!--<div id="store_data" style="">
+                                <volist name="shequ" id="ls">
+                                    <volist name="ls.store" id="lv">
+                                        <in name="lv.id" value="$data.store_id">
+                                        <p data-id="{$lv.id}">{$lv.title}</p>
+                                        </in>
+                                    </volist>
+                                </volist>
+                            </div>-->
+                        </div>
+                    </div>
+                    <input type="hidden" name="store_id" value="{$data.store_id}" />
+                </eq>
+                <div class="form-item cf">
+                    <label class="item-label">关联内容ID<span class="check-tips">（广告中关联的内容的ID）</span></label>
+                    <div class="controls">
+                        <input type="text" class="text input-min" name="action_id" value="{$data.action_id}" />
+                    </div>
+                </div>
+            
+                <div class="form-item cf">
+                    <label class="item-label">链接地址<span class="check-tips">（不为空时优先使用链接地址）</span></label>
+                    <div class="controls">
+                        <input type="text" class="text input-large" name="url" value="{$data.url}" />
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">备注<span class="check-tips"></span></label>
+                    <div class="controls">
+                        <textarea class="textarea input-large">{$data.remark}</textarea>
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">状态<span class="check-tips"></span></label>
+                    <div class="controls">
+                        <label><input type="radio" name="status" value="1" checked /> 正常</label>
+                        <label><input type="radio" name="status" value="2" <eq name="data.status" value="2">checked</eq> /> 禁止</label>
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">最后更新时间<span class="check-tips"></span></label>
+                    <div class="controls">
+                        {$info.update_time|time_format="Y-m-d H:i"}
+                    </div>
+                </div>
+        </div>
+        <div class="form-item cf">
+            <button id="submit" class="btn submit-btn ajax-post hidden" target-form="form-horizontal" type="submit">确 定</button>
+            <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+            <input type="hidden" value="{$data.id}" name="id" />
+            <input type="hidden" value="{$poster.id}" name="pid" />
+        </div>
+    </form>
+</div>
+</block>
+<block name="script">
+<script type="text/javascript">
+$(function(){
+    highlight_subnav('{:addons_url('Poster://PosterAdmin:/index')}');
+    //全选节点
+    $('.check-all').on('change',function(){
+        $('.ids').prop('checked',this.checked);
+    });
+    showTab();
+
+    $('#store_select option').dblclick(function(){
+        if($(this).attr('disabled')){
+            return false;
+        }
+        var val = $(this).attr('value');
+        var text = $(this).data('title');
+        if($('#store_data').find('[value="'+val+'"]').length > 0){
+            return false;
+        }
+        //$('#store_data').append('<p data-id="'+val+'">'+text+'</p>');
+        $('#store_data').append('<option value="'+val+'" data-title="'+text+'">'+text+'</option>');
+        set_store();
+    });
+    $('#store_data').delegate('option', 'dblclick', function(){
+        $(this).remove();
+        set_store();
+    });
+    function set_store(){
+        var l  = '';
+        var id ;
+        $('#store_data option').each(function(x, y){
+            //id = $(y).data('id');
+            id = $(this).attr('value');
+            l += (l == '' ? '' : ',') + id;
+        });
+        $('[name="store_id"]').val(l);
+    }
+
+    $('#jq-add').on({
+        click:function(){
+            var data = {
+                id: [],
+                title: [],
+                box: $('#store_data')
+            }
+            $('#store_select option:selected').each(function(){
+                var id = $(this).attr('value');
+                if( !(data.box.find('[value="'+id+'"]').length > 0) ){
+                    data.id.push( id );
+                    data.title.push( $(this).attr('data-title') );
+                }
+            });
+            var str = '';
+            for(var i=0;i<data.id.length;i++){
+                str += '<option value="'+data.id[i]+'" data-title="'+data.title[i]+'">'+data.title[i]+'</option>';
+            }
+            data.box.append( str );
+            set_store();
+        }
+    });
+    $('#jq-del').on({
+        click:function(){
+            $('#store_data option:selected').each(function(){
+                $(this).remove();
+            });
+            set_store();
+        }
+    });
+})     
+</script>
+</block>

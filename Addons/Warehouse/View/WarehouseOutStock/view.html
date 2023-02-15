@@ -1,0 +1,174 @@
+<extend name="Public/base" />
+<block name="body">
+    <div id="jq-content" class="site-content">
+        <div class="main-title">
+            <h2>出库单查看</h2>
+        </div>
+        <a id="jq-download" class="btn" href="javascript:void(0);">导出Excel</a>
+        <form class="form-horizontal">
+            <div id="jq-list" class="tab-pane in tab1"></div>
+            <div class="data-table table-striped">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>商品ID</th>
+                            <th>商品名称</th>
+                            <th>商品类别</th>
+                            <th>商品属性</th>
+                            <th>商品条码</th>
+                            <th>零售价</th>
+                            <th>库存数量</th>
+                            <th>申请数量</th>
+                            <th>有货数量</th>
+                            <th>缺货数量</th>
+                            <th>备注</th>
+                        </tr>
+                    </thead>
+                    <tbody id="jq-child"></tbody>
+                </table>
+            </div>
+        </form>
+    </div>
+    <script id="temp-list" type="text/html">
+        {{each items as list index}}
+        <div class="form-item cf">
+            <div class="controls goods_div">
+                <label>出库单号：{{list.w_out_s_sn}}</label>
+                <label>创建日期：{{list.ctime}}</label>
+                <label>商品种类：{{list.g_type}}种</label>
+                <label>商品数量：{{list.g_nums}}</label>
+                <label>售价金额：{{list.g_amounts}}</label>
+            </div>
+            <div class="controls goods_div1">
+                <label>管理员：{{list.nickname}}</label>
+                <label>申请仓库/门店：
+                        {{if list.w_out_s_type == 0}} 
+                            {{list.w_name1}} 
+                        {{else list.w_out_s_type == 1}} 
+                            {{list.store_name}} 
+                        {{/if}} 
+                </label>
+                <label>出库仓库：{{list.w_name2}}</label>
+                {{if list.pnickname != ''}}
+                <label>审核人：{{list.pnickname}}</label>
+                <label>审核时间：{{list.ptime}}</label>
+                {{/if}}
+            </div>
+            <div class="controls goods_div2">
+                <label>来源：
+                <span class="wrap-empty">
+                {{if list.w_out_s_type == 0}} 
+                    仓库调拨 
+                {{else if list.w_out_s_type == 1}} 
+                    门店申请 
+                {{else if list.w_out_s_type == 3}} 
+                    盘亏出库
+                {{else if list.w_out_s_type == 4}} 
+                    其它 
+                {{else if list.w_out_s_type == 5}} 
+                    直接出库
+                {{/if}}
+                </span>
+                </label>
+            </div>
+            <div class="controls goods_div3">
+                <label>单据状态：
+                <span class="wrap-highlight">
+                {{if list.w_out_s_status == 0}} 
+                    新增 
+                {{else if list.w_out_s_status == 1}} 
+                    已审核转出库 
+                {{else if list.w_out_s_status == 2}} 
+                    已拒绝 
+                {{else if list.w_out_s_status == 3}} 
+                    部分拒绝 
+                {{/if}}
+                </span> 
+                </label>
+            </div>
+            <div class="controls goods_div4">
+                <label>备注：{{list.remark}}</label>
+            </div>
+        </div>
+        {{/each}}
+    </script>
+    <script id="temp-child" type="text/html">
+        {{each items as list index}}
+        <tr class="data_list">
+            <td>{{list.goods_id}}</td>
+            <td title="{{list.goods_name}}"><a href="{:addons_url('Goods://GoodsInfo:/index')}?id={{list.goods_id}}" target="_blank">
+            {{if list.goods_name != null}}
+                {{if list.goods_name.length > 19}}
+                    {{list.goods_name.slice(0,18) + '...'}}
+                {{else}}
+                    {{list.goods_name}}
+                {{/if}}
+                {{/if}}</a>
+            </td>
+            <td>{{list.cate_name}}</td>
+            <td>{{list.value_name}}</td>
+            <td title="{{list.bar_code}}">
+            {{if list.bar_code != null}}
+                {{if list.bar_code.length > 15}}
+                    {{list.bar_code.slice(0,14) + '...'}}
+                {{else}}
+                    {{list.bar_code}}
+                {{/if}}
+            {{/if}}
+            </td>
+            <td>{{list.sell_price}}</td>
+            <td>{{list.stock_num}}</td>
+            <td>{{list.g_num}}</td>
+            <td>{{list.in_num}}</td>
+            <td>{{list.out_num}}</td>
+            <td title="{{list.remark}}">
+                {{if list.remark != null}}
+                    {{if list.remark.length > 10 }}
+                        {{list.remark.slice(0,9) + '...'}}
+                    {{else}}
+                        {{list.remark}}
+                    {{/if}}
+                {{/if}}
+            </td>
+        </tr>
+        {{/each}}
+    </script>
+</block>
+<block name="script">
+    <script type="text/javascript">
+    layui.use(['main'], function() {
+        var $ = layui.jquery,
+            layer = layui.layer;
+
+        var Global = {
+            listUrl: '/Erp/WarehouseOutStock/view',
+            jump: window.location.pathname.match(/(\D*)view/)[1],
+        }
+        $("a[href$='" + Global.jump + "index.html']").parent().addClass('layui-this');
+
+        var passData = {
+            id: window.location.pathname.match(/\/(\w+).html/)[1]
+        }
+        var data = $.parseJson( passData );
+        
+        $.postData({
+             url: Global.listUrl,
+            data: data,
+            load: true
+        }, function(res){
+            dataShow(res);
+        });
+        function dataShow(res){
+            $('#jq-list').html(template('temp-list', { items: res.content.main }));
+            $('#jq-child').prepend(template('temp-child', { items: res.content.child }));
+        }
+
+        $('#jq-download').fileDown({
+            post: true,
+             url: Global.listUrl,
+            data: data + '&isprint=1'
+        });
+
+    });
+    </script>
+</block>

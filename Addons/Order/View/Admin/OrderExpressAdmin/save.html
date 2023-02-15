@@ -1,0 +1,66 @@
+<extend name="Public/base" />
+
+<block name="body">
+        <script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+	<!-- 标题栏 -->
+	<div class="main-title">
+		<h2>{$meta_title}</h2>
+	</div>
+        <div class="tab-content">
+            <!-- 数据列表 -->
+            <form id="form" action="{:addons_url('Order://OrderExpressAdmin:/update')}" method="post" class="form-horizontal">
+                <p class="notice_data">注：只能添加<a href="http://www.kdniao.com" target="_blank">快递鸟平台</a>支持的快递公司，其他无效</p>
+                <div class="tab-pane in tab1">
+                        <div class="form-item cf">
+                            <label class="item-label">快递公司</label>
+                            <div class="controls">
+                                <input type="text" class="text input-min" name="company" value="{$data.company}" />
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">标识<span class="check-tips"></span></label>
+                            <div class="controls">
+                                <input type="text" class="text input-min" name="name" value="{$data.name}" />
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">第三方平台绑定标识<span class="check-tips">（用于使用第三方平台查询快递时的标识，修改需慎重）</span></label>
+                            <div class="controls">
+                                <input type="text" class="text input-min" name="search_no" value="{$data.search_no}" />
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">状态<span class="check-tips">（只有被启用的，才会被用户搜索到）</span></label>
+                            <div class="controls">
+                                <label><input type="radio" name="status" value="1" checked /> 启用</label>
+                                <label><input type="radio" name="status" value="2" <eq name="data.status" value="2">checked</eq> /> 禁止</label>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">最后更新时间<span class="check-tips"></span></label>
+                            <div class="controls">
+                                {$info.update_time|time_format="Y-m-d H:i"}
+                            </div>
+                        </div>
+                </div>
+                <div class="form-item cf">
+                    <button id="submit" class="btn submit-btn ajax-post hidden" target-form="form-horizontal" type="submit">确 定</button>
+                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                    <input type="hidden" value="{$data.id}" name="id" />
+                    <input type="hidden" value="{$poster.id}" name="pid" />
+                </div>
+            </form>
+        </div>
+</block>
+<block name="script">
+	<script type="text/javascript">
+		$(function(){
+                    highlight_subnav('{:addons_url('Order://OrderExpressAdmin:/index')}');
+                    //全选节点
+                    $('.check-all').on('change',function(){
+                        $('.ids').prop('checked',this.checked);
+                    });showTab();
+		})
+                
+	</script>
+</block>

@@ -1,0 +1,83 @@
+<extend name="Base/common"/>
+<block name="body">
+    <div class="weui_tab">
+    <div class="top_message">
+        <span><i class="weui_icon_success"></i></span>
+        <span class="top_message_success">支付完成</span>
+    </div>
+    <div class="weui_tab_bd pb55">
+        <div class="weui_cells">
+            <div class="weui_cell">
+                <div class="weui_cell_bd">
+                    <div class="weui_cell_marketname">{$info.store_title}</div>
+                </div>
+            </div> 
+            <ul class="olist">
+                <volist name="info.detail" id="lv">
+                <li class="olist_li">
+                    <div class="olist_li_hd">{$lv.title}</div>
+                    <div class="olist_li_bd">×{$lv.num}</div>
+                    <div class="olist_li_fd">￥{$lv.price}</div>
+                </li>
+                </volist>
+            </ul>
+            <a href="javascript:void(0);" class="weui_media_box weui_media_appmsg">
+                <div class="weui_media_hd">
+                    <img class="weui_media_appmsg_thumb" src="{$info.pic_url}" alt="">
+                </div>
+                <div class="weui_media_bd">
+                    <p class="weui_media_order-time">下单时间 {$info.create_time|time_format="Y-m-d H:i"} </p>
+                    <p class="weui_media_price">总价<strong>￥{$info.money}</strong></p>
+                </div>
+            </a>
+            <div class="weui_cell weui_cell_preferential" style="display:none;">
+                <div class="weui_cell_bd weui_cell_primary">
+                    <p class="weui_cell_preferential_icon"><empty name="info.cash.title">订单未使用优惠券<else/>{$info.cash.title}</empty></p>
+                </div>
+                <div class="weui_cell_ft weui_cell_price">－￥{$info.cash.cash_money|default=0}</div>
+            </div>
+            <div class="weui_cell weui_cell_preferential">
+                <div class="weui_cell_bd weui_cell_primary">
+                    <p>总价￥{$info.money} 优惠￥{$info.discount_money}</p>
+                </div>
+                <div class="weui_cell_ft weui_cell_price">实付<strong>￥{$info.pay_money}</strong></div>
+            </div>
+        </div>
+        <notempty name="pay_share">
+            <?php if ($info['is_jm'] != 1) { ?>
+            <a class="weui_cell_hongbao" href="javascript:;"></a>
+            <?php } ?>
+            <div style="position:fixed; top:0; left:0; width:100%; height:100%; display:none; background:rgba(0,0,0,0.7)" id="share_div" onclick="$(this).hide();"><img src="__IMG__/common/share_text.png" style="position:absolute; top: 5px ; right:5px; " /></div>
+            <script type="text/javascript">
+                $('.weui_cell_hongbao').click(function(){
+                    var shareTitle = "{:$pay_share['title']}";
+                    var shareDesc = "{:$pay_share['desc']}" ;
+                    var shareImg = "{:$pay_share['cover']}";
+                    var shareLink = "{:$pay_share['url']}";
+                    shareFun({shareTitle : shareTitle,shareDesc : shareDesc , shareImg : shareImg, shareLink : shareLink});
+                    <eq name="APP_TYPE" value="wechat">
+                    $('#share_div').show();
+                    </eq>
+                    /*
+                    Loading.show({
+                        msg: '点击右上角分享',
+                        autoClose:2000,
+                        isLoading: false,
+                    });*/
+                });
+            </script>
+        </notempty>
+    </div>
+</div>
+</block>
+<block name="script">
+<notempty name="pay_share">
+<script type="text/javascript">
+var shareTitle = "{:$pay_share['title']}";
+var shareDesc = "{:$pay_share['desc']}" ;
+var shareImg = "{:$pay_share['cover']}";
+var shareLink = "{:$pay_share['url']}";
+shareFun({shareTitle : shareTitle,shareDesc : shareDesc , shareImg : shareImg, shareLink : shareLink});  
+</script> 
+</notempty>                                    
+</block>

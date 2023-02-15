@@ -1,0 +1,586 @@
+<extend name="Public/base" />
+<block name="body">
+    <div id="jq-content" class="site-content site-report">
+        <div class="main-title">
+            <h2>商品流水</h2>
+        </div>
+        <form id="jq-search-form" class="wrap-form">
+            <div id="jq-search-check" class="layui-collapse" lay-accordion>
+                <dl class="wrap-dl checkmod">
+                    <dt>选择订单类型</dt>
+                    <dl class="jq-check">
+                        <dd>
+                            <div class="wrap-check-list">
+                               <label class="checkbox"><input type="checkbox" name="selectAll">全部订单类型</label>
+                            </div>
+                            <div id="jq-order" class="wrap-check-single">
+                                <p class="wrap-more"></p>
+                            </div>
+                        </dd>
+                    </dl>
+                </dl>
+                <dl class="wrap-dl checkmod layui-colla-item">
+                    <dt class="layui-colla-title wrap-title">选择区域仓库</dt>
+                    <dl class="jq-check layui-colla-content jq-source"></dl>
+                </dl>
+                <dl class="wrap-dl checkmod layui-colla-item">
+                    <dt class="layui-colla-title wrap-title">选择区域门店</dt>
+                    <dl class="jq-check layui-colla-content jq-source"></dl>
+                </dl>
+                <dl class="wrap-dl checkmod layui-colla-item">
+                    <dt class="layui-colla-title wrap-title">选择区域供应商</dt>
+                    <dl class="jq-check layui-colla-content jq-source"></dl>
+                </dl>
+                <dl class="wrap-dl checkmod">
+                    <dt>选择商品类别</dt>
+                    <dl class="jq-check">
+                        <dd>
+                            <div class="wrap-check-list">
+                               <label class="checkbox"><input type="checkbox" name="selectAll">全部商品类别</label>
+                            </div>
+                            <div class="wrap-check-single">
+                                <p class="wrap-more"></p>
+                            </div>
+                        </dd>
+                    </dl>
+                </dl>
+            </div>
+            <dl class="wrap-dl checkmod">
+                <dt>商品名称</dt>
+                <dd class="wrap-date">
+                    <!--<input type="text" name="goods_id" placeholder="请输入商品种类ID" num/>-->
+                    <input type="text" name="goods_name" placeholder="请输入商品名称" />
+                </dd>
+            </dl>
+            <dl class="wrap-dl checkmod">
+                <dt>时间区间</dt>
+                <dd class="wrap-date">
+                    <input type="text" name="s_date" class="time" placeholder="请选择开始日期" />
+                    <input type="text" name="e_date" class="time" placeholder="请选择结束日期" />
+                </dd>
+            </dl>
+            <button id="jq-search-btn" class="wrap-search submit-btn">搜索</button>
+        </form>
+        <!--<a id="jq-download" class="btn" href="javascript:void(0);">导出Excel</a>-->
+        <div class="data-table table-striped">
+            <table>
+                <thead>
+                    <tr>
+                        <th>商品ID</th>
+                        <th>商品名称</th>
+                        <th>商品种类</th>
+                        <th>商品数量</th>
+                        <th>创建人</th>
+                        <th>日期</th>
+                        <th>入库仓库/门店</th>
+                        <th>发货仓库/门店/供应商</th>
+                        <th>来源</th>
+                        <th>类型</th>
+                        <th>备注</th>
+                        <!--<th>操作</th>-->
+                    </tr>
+                </thead>
+                <tbody id="jq-list"></tbody>
+            </table>
+        </div>
+        <div id="jq-page" class="page"></div>
+    </div>
+    <script id="temp-check" type="text/html">
+        {{each items as list}}
+        <dd>
+            <div class="wrap-check-list">
+               <label class="checkbox"><input type="checkbox" name="selectAll" value="{{list.shequ_id}}" >{{list.shequ_name}}</label>
+            </div>
+            <div class="wrap-check-single">
+                <p class="wrap-more"></p>
+            </div>
+        </dd>
+        {{/each}}
+    </script>
+    <script id="temp-check-single" type="text/html">
+        {{each items as list}}
+        <label class="checkbox">
+            <input type="checkbox" name="selectActive" value="{{list.id}}" title="{{list.name}}">{{list.name}}
+        </label>
+        {{/each}}
+    </script>
+    <script id="temp-list" type="text/html">
+        {{each items as list index}}
+        <tr data-id="{{list.id}}">
+            <td>{{list.goods_id}}</td>
+            <td title="{{list.goods_name}}">
+            {{if list.goods_name != null}}
+                {{if list.goods_name.length > 19}}
+                    {{list.goods_name.slice(0,18) + '...'}}
+                {{else}}
+                    {{list.goods_name}}
+                {{/if}}
+            {{/if}}
+            </td>
+            <td>{{list.cate_name}}</td>
+            <td>{{list.num}}</td>
+            <td>{{list.admin_nickname}}</td>
+            <td>{{list.ptime}}</td>
+            <td>{{if list.ruku_store_name == ''}}
+                    {{list.ruku_warehouse_name}}
+                {{else}}
+                    {{list.ruku_store_name}}
+                {{/if}}
+            </td>
+            <td class="temp-ship"></td>
+            <td class="wrap-empty">{{list.s_type_name}}</td>
+            <td class="wrap-highlight">{{list.type_name}}</td>
+            <td title="{{list.remark}}">
+            {{if list.remark != null}}
+                {{if list.remark.length > 10 }}
+                    {{list.remark.slice(0,9) + '...'}}
+                {{else}}
+                    {{list.remark}}
+                {{/if}}
+            {{/if}}
+            </td>
+            <!--<td>
+                <a class="temp-view" href="javascript:void(0);">查看</a>
+            </td>-->
+        </tr>
+        {{/each}}
+    </script>
+</block>
+<block name="script">
+    <script type="text/javascript">
+    layui.use(['main'], function() {
+        var $ = layui.jquery,
+        layer = layui.layer;
+
+        var Global = {
+            listUrl: '/Erp/GoodsInOutRecord/index',
+            jump: window.location.pathname.match(/(\D*)index/)[1],
+            passId: 'id',
+            all: 0,
+            //goods_id: 0,
+            goods_name: '',
+            warehouse: 0,
+            store: 0,
+            supply: 0,
+            cate_id: 0,
+            lx: 0,
+            warehouse_arr: [],
+            store_arr: [],
+            supply_arr: [],
+            cate_id_arr: [],
+            lx_arr: []
+        }
+        $("a[href$='" + Global.jump + "index.html']").parent().addClass('layui-this');
+
+        var parameter = window.location.pathname.replace(/\//g,'.').split('.');
+        $.each( parameter, function(i,items){
+            switch(items){
+                case 'all':
+                Global.all = parameter[i+1];
+                break;
+                /*case 'goods_id':
+                Global.goods_id = parameter[i+1];
+                $('[name="goods_id"]').val( Global.goods_id );
+                break;*/
+                case 'goods_name':
+                Global.goods_name = decodeURIComponent( parameter[i+1] );
+                $('[name="goods_name"]').val( Global.goods_name );
+                break;
+                case 'warehouse':
+                Global.warehouse = decodeURIComponent( parameter[i+1] );
+                Global.warehouse_arr = Global.warehouse.split(',').map(function(items){
+                    return parseInt( items );
+                });
+                break;
+                case 'store':
+                Global.store = decodeURIComponent( parameter[i+1] );
+                Global.store_arr = Global.store.split(',').map(function(items){
+                    return parseInt( items );
+                });
+                break;
+                case 'supply':
+                Global.supply = decodeURIComponent( parameter[i+1] );
+                Global.supply_arr = Global.supply.split(',').map(function(items){
+                    return parseInt( items );
+                });
+                break;
+                case 'cate_id':
+                Global.cate_id = decodeURIComponent( parameter[i+1] );
+                Global.cate_id_arr = Global.cate_id.split(',').map(function(items){
+                    return parseInt( items );
+                });
+                break;
+                case 'lx':
+                Global.lx = decodeURIComponent( parameter[i+1] );
+                Global.lx_arr = Global.lx.split(',').map(function(items){
+                    return parseInt( items );
+                });
+                break;
+            }
+        });
+        /*$('[name="goods_id"]').keyup(function(){
+            if( $(this).attr('num') == '' ){
+                if( getExplor() == 'Safari' ) {
+                    $(this).val().replace(/\D/gi, '');
+                }else{
+                    $(this).val( $(this).val().replace(/\D/gi, '') );
+                }
+            }
+            if( $(this).val() != '' ){
+                $('[name="goods_name"]').val('');
+            }
+        })
+        $('[name="goods_name"]').keyup(function(){
+            if( $(this).val() != '' ){
+                $('[name="goods_id"]').val('');
+            }
+        })*/
+        var passData = $.dataJson({
+            all: Global.all,
+            goods_id: Global.goods_id,
+            goods_name: Global.goods_name,
+            warehouse: Global.warehouse,
+            store: Global.store,
+            supply: Global.supply,
+            cate_id: Global.cate_id,
+            lx: Global.lx
+        });
+        var typeData = {
+            warehouse: Global.warehouse_arr,
+            store: Global.store_arr,
+            supply: Global.supply_arr,
+            cate_id: Global.cate_id_arr,
+            lx: Global.lx_arr
+        } 
+        var data = $.parseJson( passData );
+
+        $.getData({
+             url: Global.listUrl + '?' + data,
+            load: true
+        }, function(res){
+            var oCheck = $('.jq-check'),
+                 oItem = $('.layui-colla-item'),
+               check_w = oCheck.actual('width');
+
+            $('.jq-source').append(template('temp-check', { items: res.content.area }));
+            oCheck.each(function(i){
+                var type = '';
+                switch(i){
+                    case 0:
+                    type = 'lx'
+                    break;
+                    case 1:
+                    type = 'warehouse';
+                    break;
+                    case 2:
+                    type = 'store';
+                    break;
+                    case 3:
+                    type = 'supply';
+                    break;
+                    case 4:
+                    type = 'cate_id'
+                    break;
+                };
+                $(this).find('dd').each(function(){
+                    var index = $(this).index();
+                    var oSingle = $(this).find('.wrap-check-single');
+                    if(i == 4){
+                       oSingle.prepend(template('temp-check-single', { items: res.content.goods_cates })); 
+                    }else if(i == 0){
+                       oSingle.prepend(template('temp-check-single', { items: res.content.lx })); 
+                    }else{
+                       oSingle.prepend(template('temp-check-single', { items: res.content.area[index][type] })); 
+                    }
+                    $(this).find('[name="selectAll"]').on({
+                        click:function(){
+                            $(this).parents('dd').find('[name="selectActive"]').prop('checked',this.checked);
+                        }
+                    });
+                    $(this).find('[name="selectActive"]').on({
+                        click:function(){
+                            var oForm = $(this).parents('dd'),
+                                 oAll = oForm.find('[name="selectAll"]'),
+                              oActive = oForm.find('[name="selectActive"]');
+                            oAll.prop('checked',oActive.length == oActive.filter(':checked').length);
+                            if(i == 0){
+                                var index = parseInt(this.value);
+                                switch(index){
+                                    case 0:
+                                    case 3:
+                                    case 4:
+                                    checkShow({
+                                        that: this,
+                                        type: 'store',
+                                        index: 1
+                                    });
+                                    break;
+                                    case 1:
+                                    case 2:
+                                    checkShow({
+                                        that: this,
+                                        type: 'warehouse',
+                                        index: 0
+                                    });
+                                    break;
+                                    case 5:
+                                    case 6:
+                                    checkShow({
+                                        that: this,
+                                        type: 'supply',
+                                        index: 2
+                                    });
+                                    break;
+                                }
+                            }
+                            function checkShow(options){
+                                if(options.that.checked){
+                                   $(options.that).attr( options.type,true ); 
+                                }else{
+                                   $(options.that).removeAttr( options.type ); 
+                                }
+                                var oList = oItem.eq(options.index);
+                                if( !oList.is(':visible') ){
+                                   oList.show();
+                                }
+                                if( !$('['+options.type+'="true"]').length > 0 ){
+
+                                    oList.hide().find('input').prop('checked',false);
+                                }
+                            }
+                        }
+                    });
+
+                    var arr = 0,
+                      index = 0,
+                       show = '展开<i class="layui-icon">&#xe61a;</i>',
+                       hide = '收缩<i class="layui-icon">&#xe61a;</i>',
+                       that = $(this),
+                  isChecked = true,
+                 orderIndex = i;
+                    that.find('.wrap-check-single label').each(function(){
+                        if( typeData[type].length > 0 ){
+                            var oSelect = $(this).find('[name="selectActive"]'),
+                             select_val = oSelect.val();
+                            $.each( typeData[type],function(i,items){
+                                if( items == select_val ){
+                                    if( orderIndex == 0 ){
+                                        switch(items){
+                                            case 0:
+                                            case 3:
+                                            case 4:
+                                            oSelect.attr( 'store',true ); 
+                                            oItem.eq(1).show();
+                                            break;
+                                            case 1:
+                                            case 2:
+                                            oSelect.attr( 'warehouse',true ); 
+                                            oItem.eq(0).show();
+                                            break;
+                                            case 5:
+                                            case 6:
+                                            oSelect.attr( 'supply',true ); 
+                                            oItem.eq(2).show();
+                                            break;
+                                        }
+                                    }
+                                    oSelect.prop('checked',true);
+                                }
+                            });
+                            var oAll = that.find('[name="selectAll"]'),
+                             oActive = that.find('[name="selectActive"]');
+                            oAll.prop('checked',oActive.length == oActive.filter(':checked').length);
+                        }
+                        if( isChecked ){
+                            var self = $(this),
+                              aWidth = parseInt( self.outerWidth() ) + 20;
+                            arr += aWidth;
+                            if(arr > check_w){
+                                index = self.index() - 1;
+                                $(this).parents('.wrap-check-single').find('.wrap-more').html(show).attr('show',1);
+                                that.find('.wrap-check-single label:gt('+index+')').hide();
+                                that.parents('.jq-check').css('width',check_w);
+                                isChecked = false;
+                            }
+                        }
+                    });
+                    that.find('.wrap-more').on({
+                        click:function(){
+                            if( $(this).attr('show') == 1 ){
+                                $(this).html(hide).removeAttr('show');
+                                $(this).parents('.wrap-check-single').find('label').show();
+                            }else{
+                                $(this).html(show).attr('show',1);
+                                $(this).parents('.wrap-check-single').find('label:gt('+index+')').hide();
+                            }
+                        }
+                    });
+                });
+            });
+            $(window).resize(function() {
+                if( $(window).width() > 1560 ){
+                    oCheck.css('width',check_w);
+                }else{
+                    oCheck.removeAttr('style');
+                };
+            });
+            dataShow(res);
+        });
+        function dataShow(res,callback){
+            var oDownload = $('#jq-download'),
+                    oList = $('#jq-list'),
+                    oPage = $('#jq-page'),
+                  oCharts = $('#jq-charts-default');
+
+            oDownload.attr('href','javascript:void(0);').unbind();
+
+            if( res.content.data == null || res.content.data.length == 0 ){
+                oList.html('<tr><td class="wrap-empty">暂无内容！</td></tr>');
+                oDownload.css('cursor','default');
+                $('#jq-page').html('');
+            }else{
+                oList.html(template('temp-list', { items: res.content.data }));
+                $.each( res.content.data,function(i,items){
+                    var url = Global.jump + 'view/'+Global.passId+'/'+items[Global.passId]+'.html',
+                        oId = $('[data-id='+items[Global.passId]+']'),
+                      oView = oId.find('.temp-view');
+                    switch( parseInt(items.type) ){
+                        case 0:
+                        oView.attr('href',url.replace('ex_Report/_addons/Report/_controller/GoodsInOutRecord','ex_order/_addons/Order/_controller/Order').replace('view','show') );
+                        break;
+                        case 1:
+                        oView.attr('href',url.replace('ex_Report/_addons/Report/_controller/GoodsInOutRecord','ex_Warehouse/_addons/Warehouse/_controller/WarehouseInStock') );
+                        break;
+                        case 2:
+                        oView.attr('href',url.replace('ex_Report/_addons/Report/_controller/GoodsInOutRecord','ex_Warehouse/_addons/Warehouse/_controller/WarehouseOutStock') );
+                        break;
+                        case 3:
+                        oView.attr('href',url.replace('ex_Report/_addons/Report/_controller/GoodsInOutRecord','ex_Warehouse/_addons/Warehouse/_controller/WarehouseLoss').replace('view/id','view2/s_o_out_id') );
+                        break;
+                        case 4:
+                        oView.attr('href',url.replace('ex_Report/_addons/Report/_controller/GoodsInOutRecord','ex_Warehouse/_addons/Warehouse/_controller/WarehouseLoss') );
+                        break;
+                        case 5:
+                        oView.attr('href',url.replace('ex_Report/_addons/Report/_controller/GoodsInOutRecord','ex_StoreModule/_addons/StoreModule/_controller/StoreInStock') );
+                        break;
+                        case 6:
+                        oView.attr('href',url.replace('ex_Report/_addons/Report/_controller/GoodsInOutRecord','ex_StoreModule/_addons/StoreModule/_controller/StoreOutStock') );
+                        break;
+                        case 7:
+                        oView.attr('href',url.replace('ex_Report/_addons/Report/_controller/GoodsInOutRecord','ex_StoreModule/_addons/StoreModule/_controller/StoreLoss').replace('view/id','view2/s_o_out_id') );
+                        break;
+                        case 8:
+                        oView.attr('href',url.replace('ex_Report/_addons/Report/_controller/GoodsInOutRecord','ex_StoreModule/_addons/StoreModule/_controller/StoreLoss') );
+                        break;
+                    }
+
+                    var name = '';
+                    if( items.fahuo_supply_name == '' && items.fahuo_warehouse_name == '' ){
+                        name = items.fahuo_store_name;
+                    }else if( items.fahuo_store_name == '' && items.fahuo_warehouse_name == '' ){
+                        name = items.fahuo_supply_name;
+                    }else{
+                        name = items.fahuo_warehouse_name;
+                    }
+                    oId.find('.temp-ship').html( name );
+
+                });
+
+                var data = $('#jq-search-form').find('input').serialize();
+                oDownload.fileDown({
+                     url: Global.fileUrl + '?' + data
+                }).removeAttr('style');
+
+                if( res.content.recordCount > res.content.pageSize ){
+                    var total = '<span class="rows">共'+res.content.recordCount+'条记录</span>';
+                    oPage.html( res.content.pager.replace( /\+/g, '%20' ).replace( new RegExp(Global.listUrl,'g'),Global.jump+'index' ) + total );
+                }else{
+                    oPage.html( res.content.pager );
+                }
+            }
+
+            /*  var arr = [];
+                $('#jq-search-form').find('[name="selectActive"]').each(function(){
+                    if(this.checked){
+                        arr.push( parseInt($(this).val()) );
+                    }
+                });
+                var data = $.parseJson( { supply_select: arr } ) + '&';
+                    data += $('#jq-search-form').find('[type="text"]').serialize() + '&isprint=1';
+                oDownload.fileDown({
+                    post: true,
+                     url: Global.listUrl,
+                    data: data
+                }).removeAttr('style');
+            */
+        }
+
+        $('#jq-search-btn').off().on({
+            click: function() {
+                var onOff = true;
+                $('#jq-order').find('[name="selectActive"]').each(function(){
+                    if(this.checked){
+                        onOff = false;
+                    }
+                });
+                if( onOff ){
+                    layer.msg( '请先勾选 “选择订单类型” 任一项或多项', {
+                        time: 2000
+                    });
+                    return false;
+                }
+                var mask = layer.load(2, {shade: [0.5,'#000']});
+                var json = {
+                    warehouse: [],
+                    store: [],
+                    supply: [],
+                    cate_id: [],
+                    lx: []
+                }
+                $('#jq-search-check').find('.wrap-dl').each(function(){
+                    var index = $(this).index();
+                    $(this).find('[name="selectActive"]').each(function(){
+                        if(this.checked){
+                            switch(index){
+                                case 0:
+                                json.lx.push( parseInt($(this).val()) );
+                                break;
+                                case 1:
+                                json.warehouse.push( parseInt($(this).val()) );
+                                break;
+                                case 2:
+                                json.store.push( parseInt($(this).val()) );
+                                break;
+                                case 3:
+                                json.supply.push( parseInt($(this).val()) );
+                                break;
+                                case 4:
+                                json.cate_id.push( parseInt($(this).val()) );
+                                break;
+                            };
+                        }
+                    });
+                });
+                for(var key in json){
+                    json[key] = json[key].toString();
+                }
+                var data = $.parseJson( json ) + '&';
+                    data += $('#jq-search-form').find('[type="text"]').serialize() + '&pageSize='+passData.pageSize + '&all=1';
+                $.getData({
+                     url: Global.listUrl + '?' + data
+                }, function(res){
+                    dataShow(res,true);
+                    window.history.pushState( {},'',Global.jump+'index.html' );
+                    layer.close(mask);
+                });
+                return false;
+            }
+        });
+        $(document).keydown(function(e) {
+            if (e.which == 13) {
+                $('#jq-search-btn').click();
+            }
+        });
+    });
+    </script>
+</block>

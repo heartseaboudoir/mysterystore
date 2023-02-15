@@ -1,0 +1,259 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>公众号配置</h2>
+    </div>
+    <ul class="tab-nav nav">
+        <li class="current" data-tab="tab1"><a href="javascript:void(0);">基础</a></li>
+        <li data-tab="tab2"><a href="javascript:void(0);">接口配置</a></li>
+        <li data-tab="tab3"><a href="javascript:void(0);">高级配置</a></li>
+        <li data-tab="tab4"><a href="javascript:void(0);">消息配置</a></li>
+    </ul>
+    <div class="tab-content">
+        <!-- 数据列表 -->
+        <form id="form" action="{:addons_url('Wechat://WechatAdmin/update')}" method="post" class="form-horizontal">
+            <div class="tab-pane in tab1">
+                <div class="form-item cf">
+                    <label class="item-label">公众号标题</label>
+                    <div class="controls">
+                        <input class="text input-large" type="text" value="{$data['title']}" name="title">
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">公众号原始ID<span class="check-tips">(必埴，设置后则不可修改, 可在<a target="_blank" href="https://mp.weixin.qq.com">微信公众平台</a>功能设置处查看)</span></label>
+                    <div class="controls">
+                        <input class="text input-large" type="text" value="{$data['config']['ukey']}" name="config[ukey]">
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">公众号微信号<span class="check-tips">(可在<a target="_blank" href="https://mp.weixin.qq.com">微信公众平台</a>功能设置处查看)</span></label>
+                    <div class="controls">
+                        <input class="text input-large" type="text" value="{$data['config']['wx_id']}" name="config[wx_id]">
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane tab2">
+                <div class="form-item cf">
+                    <label class="item-label">接口URL: <span class="check-tips">请将此地址复制到<a target="_blank" href="https://mp.weixin.qq.com">微信公众平台</a>接口URL项</span></label>
+                    <div class="controls">
+                        <span id="url">{:U('Api/Addons/execute', array('_addons' => 'Wechat', '_controller' => 'Index', '_action' => 'index'))}</span>
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">微信Token: <span class="check-tips">请与<a target="_blank" href="https://mp.weixin.qq.com">微信公众平台</a>Token保持一致</span></label>
+                    <div class="controls">
+                        weixin
+                        <input class="text input-large" type="hidden" value="weixin" name="config[token]">
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">消息加解密方式: <span class="check-tips">请与<a target="_blank" href="https://mp.weixin.qq.com">微信公众平台</a>Token保持一致</span></label>
+                    <div class="controls">
+                        <select name="config[encoding_type]">
+                            <option value="1" <eq name="data[config][encoding_type]" value="1">selected=""</eq>>明文模式</option>
+                            <option value="2" <eq name="data[config][encoding_type]" value="2">selected=""</eq>>兼容模式</option>
+                            <option value="3" <eq name="data[config][encoding_type]" value="3">selected=""</eq>>安全模式</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">EncodingAESKey(消息加解密密钥): <span class="check-tips">请与<a target="_blank" href="https://mp.weixin.qq.com">微信公众平台</a>Token保持一致，加密模式兼容模式或安全模式时，此值必须填写</span></label>
+                    <div class="controls">
+                        <input class="text input-large" type="text" value="{$data['config']['encodingAESKey']}" name="config[encodingAESKey]">
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane  tab3" >
+                <div class="form-item cf  ">
+                    <label class="item-label">AppId<span class="check-tips">请与<a target="_blank" href="https://mp.weixin.qq.com">微信公众平台</a>开发者凭据AppId保持一致</span></label>
+                    <div class="controls">
+                        <input type="text" value="{$data['config']['appid']}" class="text input-large" name="config[appid]">
+                    </div>
+                </div>
+                <div class="form-item cf  ">
+                    <label class="item-label">AppSecret:<span class="check-tips">请与<a target="_blank" href="https://mp.weixin.qq.com">微信公众平台</a>开发者凭据AppSecret保持一致</span></label>
+                    <div class="controls">
+                        <input type="text" value="{$data['config']['appsecret']}" class="text input-large" name="config[appsecret]">
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane tab4">
+                <div class="form-item cf  ">
+                    <label class="item-label">默认回复消息</label>
+                    <div class="controls">
+                        <label style="display:none;">回复格式：
+                            <select name="config[msgset][default][msgtype]">
+                                <option value="text" <if condition="$data['config']['msgset']['default']['msgtype'] == 'text'">selected=""</if>>文本</option>
+                            <!--
+                                <option value="image" <if condition="$data['config']['msgset']['default']['msgtype'] == 'image'">selected=""</if>>图片</option>
+                                <option value="voice" <if condition="$data['config']['msgset']['default']['msgtype'] == 'voice'">selected=""</if>>语音</option>
+                                <option value="video" <if condition="$data['config']['msgset']['default']['msgtype'] == 'video'">selected=""</if>>视频</option>
+                                <option value="music" <if condition="$data['config']['msgset']['default']['msgtype'] == 'music'">selected=""</if>>音乐</option>
+                                <option value="news" <if condition="$data['config']['msgset']['default']['msgtype'] == 'news'">selected=""</if>>图文</option>
+                            -->
+                            </select>
+                        </label>
+                        <p>回复内容：
+                            <textarea name="config[msgset][default][content]" class="textarea input-large" style="height: 250px;">{$data['config']['msgset']['default']['content']}</textarea>
+                        </p>
+                    </div>
+                </div><div class="form-item cf  ">
+                    <label class="item-label">首次关注回复消息</label>
+                    <div class="controls">
+                        <label style="display:none;">回复格式：
+                            <select name="config[msgset][subscribe][msgtype]">
+                                <option value="text" <if condition="$data['config']['msgset']['subscribe']['msgtype'] == 'text'">selected=""</if>>文本</option>
+                            <!--
+                                <option value="image" <if condition="$data['config']['msgset']['subscribe']['msgtype'] == 'image'">selected=""</if>>图片</option>
+                                <option value="voice" <if condition="$data['config']['msgset']['subscribe']['msgtype'] == 'voice'">selected=""</if>>语音</option>
+                                <option value="video" <if condition="$data['config']['msgset']['subscribe']['msgtype'] == 'video'">selected=""</if>>视频</option>
+                                <option value="music" <if condition="$data['config']['msgset']['subscribe']['msgtype'] == 'music'">selected=""</if>>音乐</option>
+                                <option value="news" <if condition="$data['config']['msgset']['subscribe']['msgtype'] == 'news'">selected=""</if>>图文</option>-->
+                            </select>
+                        </label>
+                        <p>回复内容：
+                            <textarea name="config[msgset][subscribe][content]" class="textarea input-large" style="height: 250px;">{$data['config']['msgset']['subscribe']['content']}</textarea>
+                        </p>
+                    </div>
+                </div>								<!--  -->
+            </div>
+            <div class="tab-pane tab5">
+                <div class="form-item cf">
+                    <label class="item-label">MCHID: <span class="check-tips">微信商户号</span></label>
+                    <div class="controls">
+                        <input class="text input-large" type="text" value="{$data['config']['zhifu']['MCHID']}" name="config[zhifu][MCHID]">
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">密钥key: <span class="check-tips">商户支付密钥，参考开户邮件设置</span></label>
+                    <div class="controls">
+                        <input class="text input-large" type="text" value="{$data['config']['zhifu']['key']}" name="config[zhifu][key]">
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">SSLCERT证书上传: <span class="check-tips">商户后台获取</span></label>
+                    <div class="controls">
+                        <input type="file" id="upload_file_SSLCERT">
+                        <input type="hidden" name="config[zhifu][SSLCERT]" value="{$data[config][zhifu][SSLCERT]}"/>
+                        <div class="upload-img-box">
+                                <present name="data[config]['zhifu'][SSLCERT_name]">
+                                        <div class="upload-pre-file"><span class="upload_icon_all"></span>{$data[config][zhifu][SSLCERT_name]}</div>
+                                </present>
+                        </div>
+                        <script type="text/javascript">
+                            //上传图片
+                            /* 初始化上传插件 */
+                            $("#upload_file_SSLCERT").uploadify({
+                                "height"          : 30,
+                                "swf"             : "__STATIC__/uploadify/uploadify.swf",
+                                "fileObjName"     : "download",
+                                "buttonText"      : "上传附件",
+                                "uploader"        : "{:U('File/upload',array('session_id'=>session_id()))}",
+                                "width"           : 120,
+                                'removeTimeout'	  : 1,
+                                "onUploadSuccess" : uploadFileSSLCERT,
+                                'onFallback' : function() {
+                                    alert('未检测到兼容版本的Flash.');
+                                }
+                            });
+                                function uploadFileSSLCERT(file, data){
+                                        var data = $.parseJSON(data);
+                                if(data.status){
+                                        var name = "config[zhifu][SSLCERT]";
+                                        $("input[name='"+name+"']").val(data.data);
+                                        $("input[name='"+name+"']").parent().find('.upload-img-box').html(
+                                                "<div class=\"upload-pre-file\"><span class=\"upload_icon_all\"></span>" + data.info + "</div>"
+                                        );
+                                } else {
+                                        updateAlert(data.info);
+                                        setTimeout(function(){
+                                        $('#top-alert').find('button').click();
+                                        $(that).removeClass('disabled').prop('disabled',false);
+                                    },1500);
+                                }
+                            }
+                        </script>
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">SSLKEY证书上传: <span class="check-tips">商户后台获取</span></label>
+                    <div class="controls">
+                        <input type="file" id="upload_file_SSLKEY">
+                        <input type="hidden" name="config[zhifu][SSLKEY]" value="{$data[config][zhifu][SSLKEY]}"/>
+                        <div class="upload-img-box">
+                                <present name="data[config]['zhifu'][SSLKEY_name]">
+                                        <div class="upload-pre-file"><span class="upload_icon_all"></span>{$data[config][zhifu][SSLKEY_name]}</div>
+                                </present>
+                        </div>
+                        <script type="text/javascript">
+                            //上传图片
+                            /* 初始化上传插件 */
+                            $("#upload_file_SSLKEY").uploadify({
+                                "height"          : 30,
+                                "swf"             : "__STATIC__/uploadify/uploadify.swf",
+                                "fileObjName"     : "download",
+                                "buttonText"      : "上传附件",
+                                "uploader"        : "{:U('File/upload',array('session_id'=>session_id()))}",
+                                "width"           : 120,
+                                'removeTimeout'	  : 1,
+                                "onUploadSuccess" : uploadFileSSLKEY,
+                                'onFallback' : function() {
+                                    alert('未检测到兼容版本的Flash.');
+                                }
+                            });
+                                function uploadFileSSLKEY(file, data){
+                                        var data = $.parseJSON(data);
+                                if(data.status){
+                                        var name = "config[zhifu][SSLKEY]";
+                                        $("input[name='"+name+"']").val(data.data);
+                                        $("input[name='"+name+"']").parent().find('.upload-img-box').html(
+                                                "<div class=\"upload-pre-file\"><span class=\"upload_icon_all\"></span>" + data.info + "</div>"
+                                        );
+                                } else {
+                                        updateAlert(data.info);
+                                        setTimeout(function(){
+                                        $('#top-alert').find('button').click();
+                                        $(that).removeClass('disabled').prop('disabled',false);
+                                    },1500);
+                                }
+                            }
+                        </script>
+                    </div>
+                </div>
+            </div>
+            <div class="form-item cf">
+                <button id="submit" class="btn submit-btn ajax-post hidden" target-form="form-horizontal" type="submit">确 定</button>
+                <button class="btn btn-return" onclick="javascript:history.back(-1); return false;">返 回</button>
+                <input type="hidden" value="{$data.id}" name="id" />
+            </div>
+        </form>
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+                    $(function() {
+                        highlight_subnav('{:addons_url('Wechat://WechatAdmin:/index')}');
+                        $('[name="config[ukey]"]').change(function(){
+                            var url = "{:U('Wechat/Wechat/Index', array('ukey' => '_UKEY'))}";
+                            url = url.replace('_UKEY', $('[name="config[ukey]"]').val());
+                            $('#url').html(url);
+                        })
+                        //全选节点
+                        $('.check-all').on('change', function() {
+                            $('.ids').prop('checked', this.checked);
+                        });
+                        showTab();
+                        $('[name="config[codelogin]"]').click(function(){
+                            if($(this).val() == $('.codelogin').attr("tval")){
+                                $('.codelogin').removeClass('hidden');
+                            }else{
+                                $('.codelogin').addClass('hidden');
+                            }
+                        });
+                    });
+
+    </script>
+</block>

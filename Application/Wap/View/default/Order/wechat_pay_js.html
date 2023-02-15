@@ -1,0 +1,29 @@
+<script type="text/javascript"> 
+    //调用微信JS api 支付
+    function jsApiCall()
+    {
+        WeixinJSBridge.invoke(
+                'getBrandWCPayRequest',
+                <?php echo $jsApiParameters; ?> ,
+                function (res) {
+                    //WeixinJSBridge.log(res.err_msg);
+                    if (res.err_msg == "get_brand_wcpay_request:ok") {
+                        location.href = "{:$success_url ? $success_url : U('Wap/order/pay_success', array('order_sn' => $info['order_sn']))}";
+                    } else {
+                        location.href = "{:$fail_url ? $fail_url : U('Wap/order/pay_fail', array('order_sn' => $info['order_sn']))}";
+                    }
+                }
+        );
+    }
+
+    if (typeof WeixinJSBridge == "undefined") {
+        if (document.addEventListener) {
+            document.addEventListener('WeixinJSBridgeReady', jsApiCall, false);
+        } else if (document.attachEvent) {
+            document.attachEvent('WeixinJSBridgeReady', jsApiCall);
+            document.attachEvent('onWeixinJSBridgeReady', jsApiCall);
+        }
+    } else {
+        jsApiCall();
+    }
+</script>

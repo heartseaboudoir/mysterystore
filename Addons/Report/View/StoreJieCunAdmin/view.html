@@ -1,0 +1,124 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <?php
+        if($stroe_name != ''){
+            $strhref .= "&stroe_name=" .$stroe_name;
+        }
+    ?>
+    <!-- 高级搜索 -->
+    <div class="cf">
+        <a href="{:addons_url('Report://StoreJieCunAdmin:/view')}?id={$id}&isprint=1{$strhref}" class="btn">导出Excel</a>
+        <div class="search-form fr cf">
+            <div class="sleft">
+                <input type="hidden" name="id" value="{$id}" />
+                <input type="text" name="stroe_name" class="text input-text search-input" style="" value="{$_GET['stroe_name']}" placeholder="门店名称" />
+                <a class="sch-btn" href="javascript:;" id="search" url="{:addons_url('Report://StoreJieCunAdmin:/view')}"><i class="btn-search"></i></a>
+            </div>
+        </div>
+    </div>
+    <div style="clear:both;"></div>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+                <tr>
+                    <th>标题</th>
+                    <th>总数量</th>
+                    <th>库存总零售金额</th>
+                    <th style="width:120px">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <notempty name="list">
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td>{$lv.title}</td>
+                    <td>{$lv.sum_num}</td>
+                    <td>{$lv.sum_amount}</td>
+                    <td>
+                        <a class="update" href="{:addons_url('Report://StoreJieCunAdmin:/viewchild?id='.$lv['id'] .'&jc_id='.$lv['jc_id'] )}" data-id="{$lv.id}">查看</a>
+                    </td>
+                </tr>
+            </volist>
+            <else/>
+            <tr><td colspan="4">暂无数据~</td></tr>
+            </notempty>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <link href="__STATIC__/datetimepicker/css/datetimepicker.css" rel="stylesheet" type="text/css">
+    <link href="__STATIC__/datetimepicker/css/dropdown.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+    <script type="text/javascript">
+        $(function() {
+            highlight_subnav('{:addons_url('Report://StoreJieCunAdmin:/index')}');
+            //搜索功能
+
+            $('.search-form input').focus(function(){
+                $(document).keypress(function (e) {
+                    // 回车键事件
+                    if (e.which == 13) {
+                        $("#search").click();
+                    }
+                });
+            });
+            $("#search").click(function() {
+                var url = $(this).attr('url');
+                var query = $('.search-form').find('input').serialize();
+                query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g, '');
+                query = query.replace(/^&/g, '');
+                if (url.indexOf('?') > 0) {
+                    url += '&' + query;
+                } else {
+                    url += '?' + query;
+                }
+                var query2 = $('#select-form').serialize();
+                if (url.indexOf('?') > 0) {
+                    url += '&' + query2;
+                } else {
+                    url += '?' + query2;
+                }
+                window.location.href = url;
+            });
+
+            /* 状态搜索子菜单 */
+            $(".search-form").find(".drop-down").hover(function() {
+                $("#sub-sch-menu").removeClass("hidden");
+            }, function() {
+                $("#sub-sch-menu").addClass("hidden");
+            });
+            $("#sub-sch-menu li").find("a").each(function() {
+                $(this).click(function() {
+                    var text = $(this).text();
+                    $("#sch-sort-txt").text(text).attr("data", $(this).attr("value"));
+                    $("#sub-sch-menu").addClass("hidden");
+                })
+            });
+            var _T;
+            $('#select-form input').change(function(){
+                clearTimeout(_T);
+                _T = setTimeout(function(){
+                    $("#search").click();
+                }, 1000);
+            });
+            $('.time').datetimepicker({
+                format: 'yyyy-mm-dd',
+                language: "zh-CN",
+                minView: 2,
+                autoclose: true
+            });
+        })
+    </script>
+</block>

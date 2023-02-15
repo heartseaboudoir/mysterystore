@@ -1,0 +1,215 @@
+<extend name="Public/base" />
+<block name="body">
+    <div id="jq-content" class="site-content">
+        <div class="main-title">
+            <h2>月末盘点单</h2>
+        </div>
+        <div class="search-form fr cf">
+            <form id="jq-search-form">
+                <div class="sleft">
+                    <input type="text" name="s_date" class="text input-text search-input time" placeholder="请选择开始日期" />
+                    <input type="text" name="e_date" class="text input-text search-input time" placeholder="请选择结束日期" />
+                    <a id="jq-search-btn" class="sch-btn" href="javascript:void(0);"><i class="btn-search"></i></a>
+                </div>
+            </form>
+        </div>
+        <a id="jq-add" class="btn" href="javascript:void(0);">新增</a>
+        <a id="jq-download" class="btn" href="javascript:void(0);">导出Excel</a>
+        <div class="data-table table-striped">
+            <table>
+                <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>盘点单号</th>
+                        <th>创建日期</th>
+                        <th>商品种类</th>
+                        <th>库存数量</th>
+                        <th>盘点数量</th>
+                        <th>管理员</th>
+                        <th>盘点仓库</th>
+                        <th>商品金额</th>
+                        <th>售价金额</th>
+                        <th>状态</th>
+                        <th>备注</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="jq-list"></tbody>
+            </table>
+        </div>
+        <div id="jq-page" class="page"></div>
+    </div>
+    <script id="temp-list" type="text/html">
+        {{each items as list index}}
+        <tr data-id="{{list.i_id}}">
+            <td class="temp-id">{{index+1}}</td>
+            <td>{{list.i_sn}}</td>
+            <td>{{list.ctime}}</td>
+            <td>{{list.g_type}}种</td>
+            <td>
+                {{if list.i_status == 0}}
+                {{list.ws_nums}}
+                {{else if list.i_status == 1}}
+                {{list.b_nums}}
+                {{else}}
+                {{/if}}
+            </td>
+            <td>{{list.g_nums}}</td>
+            <td>{{list.nickname}}</td>
+            <td>{{list.w_name}}</td>
+            <td>{{list.p_amounts}}</td>
+            <td>{{list.g_amounts}}</td>
+            <td class="wrap-highlight">
+                {{if list.i_status == 0}} 
+                    新增
+                {{else if list.i_status == 1}}
+                    已审核
+                {{else}}
+                    已报废
+                {{/if}}
+            </td>
+            <td title="{{list.remark}}">
+                {{if list.remark != null}}
+                    {{if list.remark.length > 10 }}
+                        {{list.remark.slice(0,9) + '...'}}
+                    {{else}}
+                        {{list.remark}}
+                    {{/if}}
+                {{/if}}
+            </td>
+            <td>
+                <a class="temp-view" href="javascript:void(0);">查看</a>
+                {{if list.i_status == 0}}
+                <a class="temp-verify" href="javascript:void(0);">审核</a>
+                <a class="temp-del" href="javascript:void(0);">删除</a>
+                {{/if}}
+            </td>
+        </tr>
+        {{/each}}
+    </script>
+</block>
+<block name="script">
+    <script type="text/javascript">
+    layui.use(['main'], function() {
+        var $ = layui.jquery,
+            layer = layui.layer;
+
+        var Global = {
+            listUrl: '/Erp/WarehouseInventory/monthlist',
+            addUrl: '/Erp/WarehouseInventory/newmonth',
+            tempUrl: '/Erp/WarehouseInventory/pass',
+            jump: window.location.pathname.match(/(\D*)monthlist/)[1],
+            passId: 'i_id'
+        }
+        $("a[href$='" + Global.jump + "monthlist.html']").parent().addClass('layui-this');
+
+        $('#jq-add').on({
+            click:function(){
+                $.postData({
+                    url: Global.addUrl
+                }, function(){
+                    window.location.reload();
+                });
+            }
+        });
+
+        var passData = $.dataJson(); 
+        var data = $.parseJson( passData );
+
+        $.postData({
+             url: Global.listUrl,
+            data: data,
+            load: true
+        }, function(res){
+            dataShow(res);
+        });
+        function dataShow(res,callback){
+            var oDownload = $('#jq-download'),
+                    oList = $('#jq-list'),
+                    oPage = $('#jq-page');
+
+            oDownload.attr('href','javascript:void(0);').unbind();
+
+            if( res.content.list == null || res.content.list.length == 0 ){
+                oList.html('<tr><td class="wrap-empty">暂无内容！</td></tr>');
+                oDownload.css('cursor','default');
+            }else{
+                oList.html(template('temp-list', { items: res.content.list }));
+                $.each( res.content.list,function(i,items){
+                    var url = Global.jump + 'view/id/'+items[Global.passId]+'.html',
+                        oId = $('[data-id='+items[Global.passId]+']');
+                    oId.find('.temp-view').attr('href',url);
+
+                    if( passData.p > 1 && callback == undefined ){
+                        var id = parseInt( oId.find('.temp-id').html() ),
+                           sum = passData.p * passData.pageSize -  passData.pageSize;
+                        oId.find('.temp-id').html( id + sum );
+                    }else{
+                        oId.find('.temp-id').html( id );
+                    }
+
+                });
+
+                var data = $('#jq-search-form').find('input').serialize() + '&isprint=1';
+                oDownload.fileDown({
+                    post: true,
+                     url: Global.listUrl,
+                    data: data
+                }).removeAttr('style');
+
+                $('.temp-verify').tempConfirm({
+                    url: Global.tempUrl
+                },function(self){
+                    var aId = parseInt( self.parents('tr').attr('data-id') );
+                    return {
+                         id: aId,
+                       pass: 1
+                    }
+                },function(options){
+                    window.location.reload();
+                });
+
+                $('.temp-del').tempConfirm({
+                    url: Global.tempUrl
+                },function(self){
+                    var aId = parseInt( self.parents('tr').attr('data-id') );
+                    return {
+                         id: aId,
+                       pass: 2
+                    }
+                },function(options){
+                    window.location.reload();
+                });
+            }
+
+            if( res.content.recordCount > res.content.pageSize ){
+                var total = '<span class="rows">共'+res.content.recordCount+'条记录</span>';
+                oPage.html( res.content.pager.replace( new RegExp(Global.listUrl,'g'),Global.jump+'monthlist' ) + total );
+            }else{
+                oPage.html( res.content.pager );
+            }
+            if( !res.content.show_del ){
+                $('.temp-del').remove();
+            }
+        }
+
+        $('#jq-search-btn').off().on({
+            click: function() {
+                var data = $('#jq-search-form').find('input').serialize() + '&pageSize='+passData.pageSize;
+                $.postData({
+                     url: Global.listUrl,
+                    data: data,
+                }, function(res){
+                    dataShow(res,true);
+                    window.history.pushState( {},'',Global.jump+'monthlist.html' );
+                });
+            }
+        });
+        $(document).keydown(function(e) {
+            if (e.which == 13) {
+                $('#jq-search-btn').click();
+            }
+        });
+    });
+    </script>
+</block>

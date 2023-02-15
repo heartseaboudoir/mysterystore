@@ -1,0 +1,123 @@
+<extend name="Public/base" />
+
+<block name="body">
+        <script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+	<!-- 标题栏 -->
+	<div class="main-title">
+		<h2>{$meta_title}</h2>
+	</div>
+        <ul class="tab-nav nav">
+            <li class="current" data-tab="tab1"><a href="javascript:void(0);">基础</a></li>
+            <li class="" data-tab="tab2"><a href="javascript:void(0);">供应商</a></li>
+        </ul>
+        <div class="tab-content">
+            <!-- 数据列表 -->
+            <form id="form" action="" method="post" class="form-horizontal">
+                <div class="tab-pane in tab1">
+                        <div class="form-item cf">
+                            <label class="item-label">商品名</label>
+                            <div class="controls">
+                                {$data.title}
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">商品编号<span class="check-tips"></span></label>
+                            <div class="controls">
+                                {$data.code}
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">商品条形码<span class="check-tips"></span></label>
+                            <div class="controls">
+                                <textarea class="textarea input-large" style="height:150px;">{$data.bar_code}</textarea>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">分类</label>
+                            <div class="controls">
+                                {$data.cate_title}
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <div class="form-item cf">
+                                <label class="item-label">商品展示图<span class="check-tips"></span></label>
+                                <div class="controls">
+                                    <div class="upload-img-box">
+                                        <notempty name="data[cover_id]">
+                                            <div class="upload-pre-item"><img src="{$data[cover_id]|get_cover='path'}"/></div>
+                                        </notempty>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">供应商</label>
+                            <div class="controls">
+                                {$data.dealer_title}
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">计件单位<span class="check-tips"></span></label>
+                            <div class="controls">
+                                {$data.unit}
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">系统售价<span class="check-tips"></span></label>
+                            <div class="controls">
+                                {$data.sell_price}
+                            </div>
+                        </div>
+                    <div class="form-item cf">
+                        <label class="item-label">保质期(天)<span class="check-tips"></span></label>
+                        <div class="controls">
+                            {$data.expired_days}
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane tab2">
+                    <empty name="store.dealer">
+                        <p>还未选择供应商</p>
+                    <else/>
+                        <div class="form-item cf">
+                            <label class="item-label">供应商</label>
+                            <div class="controls">
+                                {$store.dealer.title}
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">供应商LOGO</label>
+                            <div class="controls">
+                                <empty name="store.dealer.cover_id">
+                                    无
+                                <else/>
+                                <img src="{$store.dealer.cover_id}" style="max-height:100px; max-height:400px;" />
+                                </empty>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">描述</label>
+                            <div class="controls">
+                                {$store.dealer.description|default="无"}
+                            </div>
+                        </div>
+                    </empty>
+                </div>
+                <div class="form-item cf">
+                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                </div>
+            </form>
+        </div>
+</block>
+<block name="script">
+	<script type="text/javascript">
+		$(function(){
+                    highlight_subnav('{:addons_url('Goods://GoodsStoreAdmin:/index')}');
+                    //全选节点
+                    $('.check-all').on('change',function(){
+                        $('.ids').prop('checked',this.checked);
+                    });showTab();
+		});
+                
+	</script>
+</block>

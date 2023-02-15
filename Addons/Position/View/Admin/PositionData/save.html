@@ -1,0 +1,233 @@
+<extend name="Public/base" />
+
+<block name="body">
+        <script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+	<!-- 标题栏 -->
+	<div class="main-title">
+		<h2>{$meta_title}</h2>
+	</div>
+        <div class="tab-content">
+            <!-- 数据列表 -->
+            <form id="form" action="{:addons_url('Position://PositionDataAdmin:/update')}" method="post" class="form-horizontal">
+                <p style="background:#060; color:#fff; padding:5px;">推荐位备注：{$position.remark|default="无"}</p>
+                <div class="tab-pane in tab1">
+                        <style>
+                            .product_obj{margin-right:15px; display:inline-block;}
+                            .product_obj img{height:80px;}
+                            .product_obj p{margin:5px 0;}
+                        </style>
+                        <div class="form-item cf">
+                            <label class="item-label">关联方式</label>
+                            <div class="controls">
+                                <select name="bind_type">
+                                    <option value="">请选择</option>
+                                    <volist name="bind_config" id="lv">
+                                        <option value="{$key}" <eq name="key" value="$data[bind_type]">selected</eq> data-url="{:addons_url('Position://PositionDataAdmin:/get_form_lists', array('type' => $key))}">{$lv}</option>
+                                    </volist>
+                                </select>
+                                <a href="javascript:;" id="select_product" <if condition="!$data['bind_type'] || $data['bind_type'] eq 'link'">style="display:none"</if> class="btn" data-url="">选择关联内容</a>
+                            </div>
+                        </div>
+                        <div class="form-item cf select_type_div module_type" <if condition="!$data['bind_type'] || $data['bind_type'] eq 'link'">style="display:none"</if>>
+                            <label class="item-label">已关联的内容</label>
+                            <div class="controls">
+                                <div id="action_div">
+                                <notempty name="data.bind_data">
+                                <div class="product_obj">
+                                    <p>
+                                        <notempty name="data.bind_data.pic_url"><img src="{$data.bind_data.pic_url}" /><br></notempty>
+                                        <a <notempty name="data.bind_data.url">href="{$data.bind_data.url}" target="_blank"<else/>href="javascript:;"</notempty> data-id="{$data.bind_id}">{$data.bind_data.title}</a>
+                                    </p>
+                                    <p><a href="javascript:;" data-id="{$data.bind_id}" class="btn del">删除</a></p>
+                                    <input type="hidden" name="bind_id" value="{$data.bind_id}" />
+                                </div>
+                                </notempty>
+                                </div>
+                                <p style="<notempty name="data.bind_data">display:none;</notempty>" id="active_msg">未关联内容~</p>
+                            </div>
+                        </div>
+                        <div id="data_div" <empty name="data">style="display:none;"</empty>>
+                        <div class="form-item cf">
+                            <label class="item-label">标题</label>
+                            <div class="controls">
+                                <input type="text" class="text input-large" name="title" value="{$data.title}" />
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <div class="form-item cf">
+                                <label class="item-label">推荐展示图<span class="check-tips"></span></label>
+                                <div class="controls">
+                                    <input type="file" id="upload_picture_cover_id">
+                                    <input type="hidden" name=cover_id id=cover_id value="{$data[cover_id]}"/>
+                                    <div class="upload-img-box">
+                                        <notempty name="data[cover_id]">
+                                            <div class="upload-pre-item"><img src="{$data[cover_id]|get_cover='path'}"/></div>
+                                        </notempty>
+                                    </div>
+                                    <script type="text/javascript">
+                                    //上传图片
+                                    /* 初始化上传插件 */
+                                    $("#upload_picture_cover_id").uploadify({
+                                        "height"          : 30,
+                                        "swf"             : "__STATIC__/uploadify/uploadify.swf",
+                                        "fileObjName"     : "download",
+                                        "buttonText"      : "上传图片",
+                                        "uploader"        : "{:U('File/uploadPicture',array('session_id'=>session_id()))}",
+                                        "width"           : 120,
+                                        'removeTimeout'	  : 1,
+                                        'fileTypeExts'	  : '*.jpg; *.png; *.gif;',
+                                        "onUploadSuccess" : uploadPicturecover_id,
+                                        'onFallback' : function() {
+                                            alert('未检测到兼容版本的Flash.');
+                                        }
+                                    });
+                                    function uploadPicturecover_id(file, data){
+                                        var data = $.parseJSON(data);
+                                        var src = '';
+                                        if(data.status){
+                                                $("#cover_id").val(data.id);
+                                                src = data.url || '__ROOT__' + data.path
+                                                $("#cover_id").parent().find('.upload-img-box').html(
+                                                        '<div class="upload-pre-item"><img src="__ROOT__' + src + '"/></div>'
+                                                );
+                                        } else {
+                                                updateAlert(data.info);
+                                                setTimeout(function(){
+                                                $('#top-alert').find('button').click();
+                                                $(that).removeClass('disabled').prop('disabled',false);
+                                            },1500);
+                                        }
+                                    }
+                                    </script>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">描述<span class="check-tips"></span></label>
+                            <div class="controls">
+                                <textarea class="textarea input-large" name="description">{$data.description}</textarea>
+                            </div>
+                        </div>
+                        <div class="form-item cf select_type_div link_type" <neq name="data.bind_type" value="link">style="display:none;"</neq>>
+                            <label class="item-label">链接地址<span class="check-tips">（不为空时，优先使用链接地址）</span></label>
+                            <div class="controls">
+                                <input type="text" class="text input-large" name="url" value="{$data.url}" />
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">状态<span class="check-tips"></span></label>
+                            <div class="controls">
+                                <label><input type="radio" name="status" value="1" checked /> 正常</label>
+                                <label><input type="radio" name="status" value="2" <eq name="data.status" value="2">checked</eq> /> 禁止</label>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">最后更新时间<span class="check-tips"></span></label>
+                            <div class="controls">
+                                {$info.update_time|time_format="Y-m-d H:i"}
+                            </div>
+                        </div>
+                        </div>
+                </div>
+                <div class="form-item cf">
+                    <button id="submit" class="btn submit-btn ajax-post hidden" target-form="form-horizontal" type="submit">确 定</button>
+                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                    <input type="hidden" value="{$data.id}" name="id" />
+                    <input type="hidden" value="{$position.id}" name="pos_id" />
+                </div>
+            </form>
+        </div>
+</block>
+<block name="script">
+    <script type="text/javascript" src="__STATIC__/artDialog/lib/sea.js"></script>
+    <script type="text/javascript">
+            seajs.config({
+              alias: {
+                "jquery": "jquery-1.10.2.js"
+              }
+            });
+            seajs.use(['__STATIC__/artDialog/src/dialog-plus'], function (dialog) {
+                window.dialog = dialog;
+                
+                $('[name="bind_type"]').on('change', function(){
+                    var val = $(this).val();
+                    
+                    $('#action_div').html('');
+                    $('.select_type_div').hide();
+                    $('#select_product').hide();
+                    if(val != ''){
+                        if(val == 'link'){
+                            $('.link_type').show();
+                        }else if(val != ''){
+                            $('.module_type').show();
+                            $('#active_msg').show();
+                            $('#select_product').show();
+                            $('#select_product').click();
+                        }
+                        $('#data_div').show();
+                    }else{
+                        $('#data_div').hide();
+                    }
+                    
+                });
+                $('#select_product').on('click', function(){
+                    var bind_type = $('[name="bind_type"]').val();
+                    if(!bind_type){
+                        alert('请选择关联模块');
+                        return false;
+                    }
+                    var url = $('[name="bind_type"] option:selected').data('url');
+                    
+                    top.dialog({
+                            id: '_lists'+bind_type,
+                            title: '关联内容列表',
+                            url: url,
+                            width: 800,
+                            height:530,
+                            onclose: function () {
+                                var data = this.returnValue;
+                                
+                                if (data.ids) {
+                                    $('[name="action_ids"]').val(data.ids);
+                                }
+                                var l = '';
+                                $.each(data.data, function(x, y){
+                                    l += '<div class="product_obj">'+
+                                        '    <p>'+(y.pic ? '<img src="'+y.pic+'" /><br>' : '') + '<a href="javascript:;" data-id="'+y.id+'">'+y.title+'</a></p>'+
+                                        '    <p><a href="javascript:;" data-id="'+y.id+'" class="btn del">删除</a></p>'+
+                                        '    <input type="hidden" name="bind_id" value="'+y.id+'" />'+
+                                        '</div>';
+                                    if($('[name="title"]').val() == ''){
+                                        $('[name="title"]').val(y.title);
+                                    }
+                                });
+                                if(l){
+                                    $('#active_msg').hide();
+                                    $('#action_div').html(l);
+                                    $('.module_type').show();
+                                }
+                            },
+                    })
+                    .showModal();
+                })
+            });
+            $('#action_div').delegate('.del', 'click',function(){
+                if(confirm('确定要删除吗？')){
+                    $(this).parents('.product_obj').remove();
+                    if($('#action_div').find('.product_obj').length == 0){
+                        $('#active_msg').show();
+                    }
+                }
+            });
+    </script>
+	<script type="text/javascript">
+		$(function(){
+                    highlight_subnav('{:addons_url('Position://PositionAdmin:/index')}');
+                    //全选节点
+                    $('.check-all').on('change',function(){
+                        $('.ids').prop('checked',this.checked);
+                    });showTab();
+		})
+                
+	</script>
+</block>

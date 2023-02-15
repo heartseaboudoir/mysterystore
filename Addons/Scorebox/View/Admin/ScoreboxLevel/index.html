@@ -1,0 +1,55 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <a class="btn" href="{:addons_url('Scorebox://ScoreboxLevelAdmin:/save')}">添 加</a>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+                <tr>
+                    <th>等级称号</th>
+                    <th>等级图标</th>
+                    <th>经验底限</th>
+                    <th>优惠折扣(％)</th>
+                    <th>添加时间</th>
+                    <th>更新时间</th>
+                    <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td>{$lv.title}</td>
+                    <td><notempty name="lv.icon"><img src="{$lv.icon|get_cover=path}" style="max-height:40px" /><else/>-</notempty></td>
+                    <td>{$lv.exper}</td>
+                    <td>{$lv.sale|default=0} %</td>
+                    <td><empty name="lv.create_time">-<else/>{$lv.create_time|time_format="Y-m-d H:i"}</empty></td>
+                    <td><empty name="lv.update_time">-<else/>{$lv.update_time|time_format="Y-m-d H:i"}</empty></td>
+                    <td>
+                        <a class="update" href="{:addons_url('Scorebox://ScoreboxLevelAdmin:/save?id='.$lv['id'])}" data-id="{$lv.id}">编辑</a>
+                    </td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $(function() {
+            highlight_subnav('{:addons_url('Scorebox://ScoreboxLevelAdmin:/index')}');
+            //全选节点
+            $('.check-all').on('change', function() {
+                $('.ids').prop('checked', this.checked);
+            });
+        })
+    </script>
+</block>

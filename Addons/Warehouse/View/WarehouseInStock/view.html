@@ -1,0 +1,177 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <a class="btn" href="{:addons_url('Warehouse://WarehouseInStock:/view')}?id={$id}&isprint=1">导出Excel</a>
+        <!-- 数据列表 -->
+        <form id="form" action="{:addons_url('Warehouse://WarehouseInStock:/updatewarehouse')}" method="post" class="form-horizontal">
+            <div class="tab-pane in tab1">
+                    <div class="form-item cf">
+                        <div class="controls goods_div">
+                            <label>入库单号：{$list.w_in_s_sn}</label>
+                            <label>创建日期：{$list.ctime}</label>
+                            <label>商品种类：{$list.g_type}种</label>
+                            <label>商品数量：{$list.g_nums}</label>
+                            <label>售价金额：{$list.g_amounts}</label>
+                        </div>
+                        <div class="controls goods_div0">
+                            <?php if($list['w_in_s_type'] == 0){
+                            echo '<label>来源：<font color="blue">采购单</font></label>';
+                                echo '<label>验收单号：' .$list['w_in_sn'] .'</label>';
+                                echo '<label>采购单号：' .$list['p_sn'] .'</label>';
+                            }else{
+                                if($list['w_in_s_type'] == 1){
+                                    echo '<label>来源：<font color="red">店铺退货</font></label>';
+                                }else{
+                                    if($list['w_in_s_type'] == 2){
+                                        echo '<label>来源：<font color="red">仓库调拨</font></label>';
+                                    }else{
+                                        if($list['w_in_s_type'] == 3){
+                                            echo '<label>来源：<font color="blue">盘盈入库</font></label>';
+                                        }else{
+                                            if($list['w_in_s_type'] == 4){
+                                                echo '<label>来源：<font color="red">门店返仓</font></label>';
+                                            }else{
+                                                echo '<label>来源：<font color="green">其它</font></label>';
+                                            }
+                                        }
+                                    }
+                                }
+                            }?>
+                        </div>
+                        <div class="controls goods_div1">
+                            <label>管理员：{$list.nickname}</label>
+                            <label>收货仓库：{$list.w_name}</label>
+                            <label>供应商：{$list.s_name}</label>
+                        </div>
+                        <div class="controls goods_div3">
+                            <label>单据状态：
+                                <?php
+                        switch ($list['w_in_s_status'])
+                        {
+                        case 0:
+                          echo '<font color="black">新增</font>';
+                                break;
+                                case 1:
+                                echo '<font color="blue">已入库</font>';
+                                break;
+                                default:
+                                echo "其它";
+                                }
+                                ?></label>
+                            <?php if($list['pnickname'] != ''){ ?>
+                                <label>处理人：{$list.pnickname}</label>
+                                <label>处理时间：{$list.ptime}</label>
+                            <?php } ?>
+                        </div>
+                        <div class="controls goods_div4">
+                            <label>备注：
+                                <?php
+                            if($list['w_in_s_status'] == 0)
+                            {
+                                echo '<input type="text" class="text input-min remark" style="width: 200px;" name="remark" value="' .$list['remark']. '" />';
+                                }else{
+                                    echo $list['remark'];
+                                }
+                                ?>
+                            </label>
+                        </div>
+                    </div>
+            </div>
+        <!-- 数据列表 -->
+        <div class="data-table table-striped">
+            <table>
+                <thead>
+                <tr>
+                    <th>商品id</th>
+                    <th>商品名称</th>
+                    <th>商品类别</th>
+                    <th>商品属性</th>
+                    <th>商品条码</th>
+                    <th>售价金额</th>
+                    <th>库存数量</th>
+                    <?php
+                    if($list['w_in_s_type'] == 3){
+                        echo '
+                        <th>盘盈数量</th>
+                            <th>入库数量</th>
+                            ';
+                        }else{
+                            echo '
+                            <th>申请数量</th>
+                            <th>入库数量</th>
+                            ';
+                        }
+                    ?>
+                    <?php if($list['w_in_type'] == 0){ ?>
+                    <th>过期日期</th>
+                    <?php } ?>
+                    <th>备注</th>
+                </tr>
+                </thead>
+                <tbody>
+                <volist name="data" id="lv" key="vo">
+                    <tr class="data_list">
+                        <td>{$lv.goods_id}</td>
+                        <td><a href="{:addons_url('Goods://GoodsInfo:/index?id='.$lv['goods_id'])}" target="_blank">{$lv.goods_name}</a></td>
+                        <td>{$lv.cate_name}</td>
+                        <td>{$lv.value_name}</td>
+                        <td>{$lv.bar_code|subtext=18}</td>
+                        <td>{$lv.sell_price}</td>
+                        <td>{$lv.stock_num}</td>
+                        <?php
+                    if($list['w_in_s_type'] == 3){
+                        echo '
+                           <td><font color="blue">' .$lv['p_num'] .'</font></td>
+                                <td>' .$lv['g_num'] .'</td>
+                            ';
+                        }else{
+                            echo '
+                                <td><font color="blue">' .$lv['y_num'] .'</font></td>
+                                <td>' .$lv['g_num'] .'
+                            ';
+                        }
+                        ?>
+                        <input type="hidden" class="text input-min w_in_d_id" style="width: 100px;" name="w_in_d_id[]" value="{$lv['w_in_s_d_id']}" />
+                        <?php if($list['w_in_type'] == 0){ ?>
+                        <td>{$lv.endtime}</td>
+                        <?php } ?>
+                        <td>{$lv.remark}</td>
+                    </tr>
+                </volist>
+                <tr>
+                    <td colspan="12">
+                        <?php
+                    if($list['w_in_s_status'] == 0)
+                    {
+                        echo '<input type="hidden" class="text input-min w_in_s_id" style="width: 100px;" name="w_in_s_id" value="' .$list['w_in_s_id'] .'" />
+                            <button id="submit" class="btn submit-btn hidden" target-form="form-horizontal" name="submit" type="submit">修改入库单</button>';
+                        }else{
+                            echo '已处理后不能修改';
+                        }
+                        ?>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </form>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+
+    <script type="text/javascript" src="__STATIC__/artDialog/lib/sea.js"></script>
+    <script type="text/javascript">
+        var Global = {
+            jump: window.location.pathname.match(/(\D*)view/)[1],
+        }
+        $("a[href$='" + Global.jump + "index.html']").parent().addClass('layui-this');
+    </script>
+
+</block>

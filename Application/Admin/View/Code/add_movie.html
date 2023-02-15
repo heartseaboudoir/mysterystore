@@ -1,0 +1,74 @@
+<extend name="Public/base" />
+
+
+
+<block name="body">
+	<script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/Public/res/code/ueditor/ueditor.config.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/Public/res/code/ueditor/ueditor.all.min.js"> </script>
+    <script type="text/javascript" charset="utf-8" src="/Public/res/code/ueditor/lang/zh-cn/zh-cn.js"></script>    
+	<div class="main-title cf">
+		<h2><?php if ($new) { echo '新增';} else { echo '修改';} ?>内容-视频</h2>
+	</div>
+	<!-- 标签页导航 -->
+<div class="tab-wrap">
+	<div class="tab-content">
+	<!-- 表单 -->
+    <form id="form" action="{:U('add')}" method="post" class="form-horizontal">
+        <script type="text/plain" id="upload_ue"></script>
+        <input type="hidden" name="id" value="<?php echo $data['id'];?>">
+        <input type="hidden" name="type" value="2">
+        <div class="form-item cf">
+            <label class="item-label">标题<span class="check-tips"></span></label>
+            <div class="controls">
+                <input type="text" class="text input-large" name="title" value="<?php echo $data['title'];?>">
+            </div>
+        </div>
+        <div class="form-item cf">
+            <label class="item-label">说明<span class="check-tips"></span></label>
+            <div class="controls">
+                <input type="text" class="text input-large" name="info" value="<?php echo $data['info'];?>">
+            </div>
+        </div>     
+        <div class="form-item cf">
+            <label class="item-label">作者<span class="check-tips"></span></label>
+            <div class="controls">
+                <input type="text" class="text input-large" name="author" value="<?php echo $data['author'];?>">
+            </div>
+        </div>          
+        <div class="form-item cf">
+            <label class="item-label">状态<span class="check-tips"></span></label>
+            <div class="controls">
+                <label class="radio">
+                <input type="radio" value="1"  name="status" <?php if ($data['status'] == 1) {echo 'checked';}?>>启用
+                </label>
+                <label class="radio">
+                <input type="radio" value="0" name="status" <?php if ($data['status'] == 0) {echo 'checked';}?>>停用
+                </label>                
+            </div>
+        </div>          
+        <div class="form-item cf">
+            <label class="item-label">视频链接<span class="check-tips"></span></label>
+            <div class="controls">
+                <input type="text" class="text input-large" name="content" value="<?php echo $data['content'];?>">
+            </div>
+        </div>   
+		<div class="form-item cf">
+			<button class="btn submit-btn ajax-post hidden" id="submit" type="submit" target-form="form-horizontal">确 定</button>
+			<a class="btn btn-return" href="{:U('article/index?cate_id='.$cate_id)}">返 回</a>
+		</div>
+	</form>
+	</div>
+</div>
+</block>
+
+<block name="script">
+<script type="text/javascript">
+
+
+$('#submit').click(function(){
+	$('#form').submit();
+});
+
+</script>
+</block>

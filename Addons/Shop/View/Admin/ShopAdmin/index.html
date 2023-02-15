@@ -1,0 +1,104 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <div class="cf">
+        <div class="search-form fr cf">
+            <div class="sleft">
+                <input type="text" name="keyword" class="text input-text search-input" style="" value="{$_GET['keyword']}" placeholder="昵称或用户ID" />
+                <a class="sch-btn" href="javascript:;" id="search" url="{:addons_url('Shop://ShopAdmin:/index')}"><i class="btn-search"></i></a>
+            </div>
+        </div>
+    </div>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+                <tr>
+                    <th>用户</th>
+                    <th style="width:100px">星级</th>
+                    <th style="width:120px">开店时间</th>
+                    <th style="width:100px">已上架商品数</th>
+                    <th style="width:120px">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <notempty name="list">
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td><img src="{$lv.uid|get_header_pic}" class="header_pic" />{$lv.uid|get_nickname}</td>
+                    <td>{$lv.star|D('Addons://Shop/Shop')->get_t_star}</td>
+                    <td>{$lv.create_time|time_format}</td>
+                    <td><a href="{:addons_url('Shop://ShopArticleAdmin:/index?shop_uid='.$lv['uid'])}" target="_blank">{$lv.goods_num}</a></td>
+                    <td>
+                        <a class="update" href="{:addons_url('Shop://ShopAdmin:/save?id='.$lv['id'])}" data-id="{$lv.id}">查看</a> |
+                        <a class="update" href="{:addons_url('Shop://ShopAssessAdmin:/index?uid='.$lv['uid'])}" data-id="{$lv.id}">店铺评价</a>
+                    </td>
+                </tr>
+            </volist>
+            <else/>
+            <tr><td colspan="5">暂无数据~</td></tr>
+            </notempty>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $(function() {
+            highlight_subnav('{:addons_url('Shop://ShopAdmin:/index')}');
+            //全选节点
+            $('.check-all').on('change', function() {
+                $('.ids').prop('checked', this.checked);
+            });
+            //搜索功能
+            $('.search-form input').focus(function(){
+                $(document).keypress(function (e) {
+                    // 回车键事件 
+                    if (e.which == 13) {
+                        $("#search").click();
+                    }
+                });
+            });
+            $("#search").click(function() {
+                var url = $(this).attr('url');
+                var query = $('.search-form').find('input').serialize();
+                query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g, '');
+                query = query.replace(/^&/g, '');
+                if (url.indexOf('?') > 0) {
+                    url += '&' + query;
+                } else {
+                    url += '?' + query;
+                }
+                var query2 = $('#select-form').serialize();
+                if (url.indexOf('?') > 0) {
+                    url += '&' + query2;
+                } else {
+                    url += '?' + query2;
+                }
+                window.location.href = url;
+            });
+
+            /* 状态搜索子菜单 */
+            $(".search-form").find(".drop-down").hover(function() {
+                $("#sub-sch-menu").removeClass("hidden");
+            }, function() {
+                $("#sub-sch-menu").addClass("hidden");
+            });
+            $("#sub-sch-menu li").find("a").each(function() {
+                $(this).click(function() {
+                    var text = $(this).text();
+                    $("#sch-sort-txt").text(text).attr("data", $(this).attr("value"));
+                    $("#sub-sch-menu").addClass("hidden");
+                })
+            });
+        })
+    </script>
+</block>

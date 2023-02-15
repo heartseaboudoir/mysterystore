@@ -1,0 +1,217 @@
+<extend name="Base/common"/>
+<block name="body">
+    <script>
+        var url = "__CSS__/mainEdit.css?t={:date('ymdHi')}";
+        document.getElementsByTagName('link')[0].setAttribute('href',url);
+    </script>
+    <style type="text/css" media="screen"> 
+        .getCoupons-bd-form input[type="text"] {
+            height: 45px;
+            margin-top: 0;
+            margin-bottom: 10px;
+            text-align: left;
+            color: #000;
+            border-color: #000;
+            border-radius: 20px;
+        }
+        #sub_btn {
+            background: #000;
+            border-radius: 20px;
+        }
+    </style>
+    <include file="CashCoupon/coupon_bg" />
+    <div class="getCoupons">
+    <div class="getCoupons-bd">
+        <div class="getCoupons-bd-form">
+            <div style="display:none;" class="coupons-words">恭喜您抽中<strong><switch name="info.type"><case value="1">{$info.money}元</case><case value="2">{$info.discount}折</case></switch></strong>优惠券</div>
+            <div class="coupons-getVildCode">
+                <input type="text" placeholder="请输入手机号码" id="mobile" maxlength="11">
+                <a class="btn" href="javascript:;" id="send" style="outline: none;">获取验证码</a>
+            </div>
+            <input type="text" placeholder="请输入验证码" id="code">
+            <input type="submit" value="确认提交" id="sub_btn">
+        </div>
+        <!--
+        <notempty name="config.remark">
+        <div class="getCoupons-bd-spec">
+            <h3><span>活动规则</span></h3>
+            <p>{$config['rule_content']}</p>
+        </div>
+        </notempty>
+        -->
+    </div>
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+    $('.getCoupons-bd').css('height',window.screen.availHeight +'px');
+        /*$('body').css('background', '#b92f50');
+        
+        function getTimer($el, duration) {
+            var timer = new Timer({
+                duration: duration,
+                format: '重新发送(ss秒)'
+            })
+
+            var text = $el.text()
+
+            timer.on('change', function () {
+                $el.text('重新发送(' + this.duration / 1000 + '秒)')
+            })
+
+            timer.on('start', function () {
+                this.duration = duration
+                $el.addClass('disable')
+            })
+
+            timer.on('end', function () {
+                $el.text(text)
+                $el.removeClass('disable')
+            })
+
+            timer.duration = 0
+
+            return timer
+        }
+
+        var $getVildCode = $('#send');
+        var timer = getTimer($getVildCode, 60 * 1000);*/
+        var timerFlag = null;
+        function countdown(num){
+          var oSend = $('#send');
+          timerFlag = setInterval(function(){
+            if( num == 0 ){
+              oSend.html('获取验证码').removeAttr('verify');
+              clearInterval(timerFlag);
+              return false;
+            }
+            num--;
+            oSend.html( '剩余 ' + num + ' 秒' );
+          },1000);
+        }
+        $('#send').click(function(){
+            /*if($(this).hasClass('disable')) return false;
+            var mobile = $("#mobile").val();
+            var url = '{:U("CashCoupon/get_mobile_code")}';
+            Loading.show({
+                msg: '正在发送',
+                isLoading: true
+            });
+            $.ajax({
+                type:'get',
+                url :url,
+                data : {mobile:mobile},
+                dataType:'json',
+                success:function(data){
+                    Loading.hide();
+                    if(data.status == 1){
+                        if (timer.duration === 0) {
+                            timer.start();
+                        }
+                    }
+                    Loading.show({
+                        msg: data.info,
+                        autoClose:2000,
+                        isLoading: false
+                    });
+                }
+            });*/
+            var telephone = $("#mobile").val();
+            if( telephone == '' ) {
+              Loading.show({
+                  msg: '请输入手机号码',
+                  autoClose: 2000,
+                  isLoading: false
+              });
+              return false;
+            }
+            var self = $(this);
+            if( typeof self.attr('verify') != 'undefined' ){
+              return false;
+            }
+            $.ajax({
+                type:'get',
+                url : '{:U("CashCoupon/get_mobile_code")}',
+                data : {mobile:telephone},
+                dataType:'json',
+                success:function(data){
+                  if(data.status == 1){
+                    self.attr('verify',true);
+                    countdown(60);
+                  }
+                  Loading.show({
+                      msg: data.info,
+                      autoClose:2000,
+                      isLoading: false
+                  });
+                }
+            });
+            return false;
+        });
+        
+        $("#sub_btn").click(function () {
+            if ($(this).data('act') == 1) {
+                //return false;
+            }
+            var mobile = $("#mobile").val();
+            if (mobile == '') {
+                Loading.show({
+                    msg: '请输入手机号码',
+                    autoClose:2000,
+                    isLoading: false
+                });
+                return false;
+            }
+            if(!(/^1\d{10}$/.test(mobile))){
+                Loading.show({
+                    msg: '请输入正确的手机号码',
+                    autoClose:2000,
+                    isLoading: false
+                });
+                return false;
+            }
+            var sms_code = $('#code').val();
+            if (sms_code == '') {
+                Loading.show({
+                    msg: '请输入验证码',
+                    autoClose:2000,
+                    isLoading: false
+                });
+                return false;
+            }
+            $(this).data('act', 1);
+            Loading.show({
+                msg: '正在领取',
+                isLoading: true
+            });
+
+            var url = "{:U('CashCoupon/user_receive', array('cash_code' => $_GET['cash_code']))}";
+            $.get(url, {mobile: mobile, sms_code : sms_code}, success, "json");
+            return false;
+
+            function success(data) {
+                Loading.hide();
+                Loading.show({
+                    msg: data.info,
+                    autoClose:2000,
+                    isLoading: true
+                });   
+                
+                if (!data.status) {
+                    $("#sub_btn").data('act', 0);
+                }
+                if(data.url != ''){
+                    window.location.href = data.url;
+                }
+            }
+        });
+        
+        shareTitle = "{:$pay_share['title']}";
+        shareDesc = "{:$pay_share['desc']}";
+        shareImg = "{:$pay_share['cover']}";
+        shareLink = "{:$pay_share['url']}";
+        <eq name="APP_TYPE" value="wechat">
+        shareFun();
+        </eq>
+    </script>
+</block>

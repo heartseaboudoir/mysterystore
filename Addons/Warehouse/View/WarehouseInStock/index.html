@@ -1,0 +1,191 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <!-- 高级搜索 -->
+    <div class="search-form fr cf">
+        <form id="search-form" onsubmit="return false;">
+            <div class="search-form fr cf">
+                <label id="msg" name="msg"></label>
+                <div class="sleft">
+                    <input type="text" name="s_date" class="text input-text search-input time" value="{$s_date}" placeholder="请选择开始日期" />
+                    <input type="text" name="e_date" class="text input-text search-input time" value="{$e_date}" placeholder="请选择结束日期" />
+                    <a class="sch-btn" href="javascript:;" id="search" url="{:addons_url('Warehouse://WarehouseInStock:/index')}?v={$v}"><i class="btn-search"></i></a>
+                </div>
+            </div>
+        </form>
+    </div>
+    <a class="btn" href="{:addons_url('Warehouse://WarehouseInStock:/index')}?isprint=1">导出Excel</a>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+                <tr>
+                    <th>序号</th>
+                    <th>入库单号</th>
+                    <th>入库日期</th>
+                    <th>商品种类</th>
+                    <th>商品数量</th>
+                    <th>管理员</th>
+                    <th>收货仓库</th>
+                    <th>供应商</th>
+                    <th>售价金额</th>
+                    <th>来源</th>
+                    <th>关联单号</th>
+                    <th>当前状态</th>
+                    <th>备注</th>
+                    <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php $i=0; ?>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <?php $i++; ?>
+                    <td>{$i}</td>
+                    <td>{$lv.w_in_s_sn}</td>
+                    <td>{$lv.ctime}</td>
+                    <td>{$lv.g_type}种</td>
+                    <td>{$lv.g_nums}</td>
+                    <td>{$lv.nickname}</td>
+                    <td>{$lv.w_name}</td>
+                    <td>{$lv.s_name}</td>
+                    <td>{$lv.g_amounts}</td>
+                    <td><?php if($lv['w_in_s_type'] == 0){
+                            echo '<font color="blue">采购单</font>';
+                         }else{
+                            if($lv['w_in_s_type'] == 1){
+                                echo '<font color="red">店铺退货</font>';
+                            }else{
+                                if($lv['w_in_s_type'] == 2){
+                                    echo '<font color="green">仓库调拨</font>';
+                                }else{
+                                    if($lv['w_in_s_type'] == 3){
+                                        echo '<font color="blue">盘盈入库</font>';
+                                    }else{
+                                        if($lv['w_in_s_type'] == 4){
+                                            echo '<font color="red">门店返仓</font>';
+                                        }else{
+                                            echo '<font color="red">其它</font>';
+                                        }
+                                    }
+                                }
+                            }
+                         }?></td>
+                    <td><?php if($lv['w_in_s_type'] == 0){
+                            echo $lv['p_sn'];
+                        }else{
+                            if($lv['w_in_s_type'] == 1){
+                                echo $lv['s_out_id'];
+                            }else{
+                                if($lv['w_in_s_type'] == 2){
+                                    echo $lv['w_out_id'];
+                                }else{
+                                    if($lv['w_in_s_type'] == 3){
+                                        echo $lv['i_sn'];
+                                    }else{
+                                        if($lv['w_in_s_type'] == 4){
+                                            echo $lv['s_back_sn'];
+                                        }else{
+                                            echo $lv['o_out_id'];
+                                        }
+                                    }
+                                }
+                            }
+                        }?></td>
+                    <td><?php
+                    if($lv['w_in_s_status'] == 0){
+                            echo '<font color="blue">新增</font>';
+                        }else{
+                            if($lv['w_in_s_status'] == 1){
+                                echo '<font color="blue">已入库</font>';
+                             }else{
+                                echo('其它');
+                             }
+                        }?></td>
+                    <td>{$lv.remark|subtext=18}</td>
+                    <td>
+                    <?php if($lv['w_in_s_status'] == 0){ ?>
+                        【<a class="" href="{:addons_url('Warehouse://WarehouseInStock:/view?id='.$lv['w_in_s_id'])}" data-id="{$lv.w_in_s_id}">查看</a>】 |
+                        【<a class="" href="{:addons_url('Warehouse://WarehouseInStock:/pass')}?id={$lv['w_in_s_id']}&pass=1" data-id="{$lv.w_in_s_id}">审核入库</a>】
+                        <?php }else{ ?>
+                        【<a class="" href="{:addons_url('Warehouse://WarehouseInStock:/view?id='.$lv['w_in_s_id'])}" data-id="{$lv.w_in_s_id}">查看</a>】| <font color="blue">已审核</font>
+                    <?php } ?>
+                    </td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <link href="__STATIC__/datetimepicker/css/datetimepicker.css" rel="stylesheet" type="text/css">
+    <link href="__STATIC__/datetimepicker/css/dropdown.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+    <script type="text/javascript">
+        highlight_subnav('{:addons_url('Warehouse://WarehouseInStock:/index')}');
+            //搜索功能
+                $('.search-form input').focus(function(){
+                    $(document).keypress(function (e) {
+                        // 回车键事件
+                        if (e.which == 13) {
+                            $("#search").click();
+                        }
+                    });
+                });
+        $("#search").click(function() {
+            var url = $(this).attr('url');
+            var query = $('.search-form').find('input').serialize();
+            query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g, '');
+            query = query.replace(/^&/g, '');
+            if (url.indexOf('?') > 0) {
+                url += '&' + query;
+            } else {
+                url += '?' + query;
+            }
+            var query2 = $('#select-form').serialize();
+            if (url.indexOf('?') > 0) {
+                url += '&' + query2;
+            } else {
+                url += '?' + query2;
+            }
+            window.location.href = url;
+        });
+
+        // 状态搜索子菜单
+        $(".search-form").find(".drop-down").hover(function() {
+            $("#sub-sch-menu").removeClass("hidden");
+        }, function() {
+            $("#sub-sch-menu").addClass("hidden");
+        });
+        $("#sub-sch-menu li").find("a").each(function() {
+            $(this).click(function() {
+                var text = $(this).text();
+                $("#sch-sort-txt").text(text).attr("data", $(this).attr("value"));
+                $("#sub-sch-menu").addClass("hidden");
+            })
+        });
+        var _T;
+        $('#select-form input').change(function(){
+            clearTimeout(_T);
+            _T = setTimeout(function(){
+                $("#search").click();
+            }, 1000);
+        });
+        $('.time').datetimepicker({
+            format: 'yyyy-mm-dd',
+            language: "zh-CN",
+            minView: 2,
+            autoclose: true
+        });
+    </script>
+
+</block>

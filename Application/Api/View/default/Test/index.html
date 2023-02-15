@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-cn" class="no-js"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>测试</title>
+	</head>
+	<body>
+		<form action="/Api/Order/add_order" enctype="multipart/form-data" method="POST">
+		<p>/Api/Order/add_order</p>
+			<p>name <input type="text" name="consignee[name]" value="11" /></p>
+			<p>tel <input type="text" name="consignee[tel]" value="11" /></p>
+			<p>address <input type="text" name="consignee[address]" value="11" /></p>
+			<p>id <input type="text" name="id" value="11" /></p>
+			<p>size <input type="text" name="size" value="11" /></p>
+			<p>color <input type="text" name="color" value="1"></p>
+			<p>num <input type="text" name="num" value="1"></p>
+			<p>pay_type <input type="text" name="pay_type" value="1"></p>
+			<p>good<p>
+			<p>type <input type="text" name="goods[type]" value="1"></p>
+			<p>id <input type="text" name="goods[id]" value="1"></p>
+			<p>num <input type="text" name="goods[num]" value="1"></p>
+			<p>size <input type="text" name="goods[size]" value="1"></p>
+			<p>color <input type="text" name="goods[color]" value="1"></p>
+			<input type="hidden" name="_print" value="1" />
+			<input type="text" name="uid" value="11" />
+			<input type="text" name="token" value="46cbe9eacb8835560838" />
+			<input type="text" name="randcode" value="123123123"/>
+			<button type="submit">提交</button>
+		</form>
+		<form action="/Api/Order/get_order" enctype="multipart/form-data" method="POST">
+		<p>/Api/Order/get_order</p>
+			<p>order_sn <input type="text" name="order_sn" value="11" /></p>
+			<input type="hidden" name="_print" value="1" />
+			<input type="text" name="uid" value="11" />
+			<input type="text" name="token" value="46cbe9eacb8835560838" />
+			<input type="text" name="randcode" value="123123123"/>
+			<button type="submit">提交</button>
+		</form>
+		<form action="/Api/Order/get_order_lists" enctype="multipart/form-data" method="POST">
+		<p>/Api/Order/get_order_lists</p>
+			<p>order_sn <input type="text" name="order_sn" value="11" /></p>
+			<input type="hidden" name="_print" value="1" />
+			<input type="text" name="uid" value="11" />
+			<input type="text" name="token" value="46cbe9eacb8835560838" />
+			<input type="text" name="randcode" value="123123123"/>
+			<button type="submit">提交</button>
+		</form>
+</body></html>

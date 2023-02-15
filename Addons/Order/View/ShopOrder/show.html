@@ -1,0 +1,371 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>查看订单（{$data['status_text']}）</h2>
+    </div>
+    <ul class="tab-nav nav">
+        <li class="current" data-tab="tab1"><a href="javascript:void(0);">基本信息</a></li>
+        <li class="" data-tab="tab4"><a href="javascript:void(0);">订单详情</a></li>
+        <li data-tab="tab2"><a href="javascript:void(0);">商品详情</a></li>
+        <eq name="data[status]" value="2">
+        <li data-tab="tab3"><a href="javascript:void(0);">支付详细</a></li>
+        </eq>
+        <li data-tab="tab5"><a href="javascript:void(0);">收发货信息</a></li>
+    </ul>
+    <div class="tab-content pos_fixed">
+        <!-- 数据列表 -->
+        <form id="form" action="{:addons_url('Order://ShopOrder:/update')}" method="post" class="form-horizontal">
+            <div class="tab-pane in tab1">
+                <div class="form-item cf">
+                    <label class="item-label">订单号</label>
+                    <div class="controls">
+                        {$data['order_sn']}
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">创建人</label>
+                    <div class="controls">
+                        <a href="{:U('Member/show', array('id' => $data['uid']))}"><img src="{$data.uid|get_header_pic}" class="header_pic" />{$data.uid|get_nickname}</a>
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">店铺用户</label>
+                    <div class="controls">
+                        <a href="{:U('Member/show', array('id' => $data['store_id']))}"><img src="{$data.store_id|get_header_pic}" class="header_pic" />{$data.store_id|get_nickname}</a>
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">订单总金额</label>
+                    <div class="controls">
+                        ￥{$data['money']}
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">支付方式</label>
+                    <div class="controls">
+                        <eq name="data.status" value="2">
+                            <switch name="data.pay_type">
+                                <case value="1">微信</case>
+                                <case value="2">支付宝</case>
+                                <default/>
+                            </switch>
+                        <else/>
+                            未支付
+                        </eq>
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">状态</label>
+                    <div class="controls">
+                        {$data['status_text']}
+                        
+                        <gt name="data.refund_status" value="0">
+                            <a href="{:addons_url('Order://OrderRefundAdmin:/index', array('keyword' => $data['order_sn']))}" target="_blank">
+                            (<switch name="data.refund_status"><case value="1">已申请退款</case><case value="2">退款中</case><case value="3">退款已拒绝</case><case value="4">退款成功</case></switch>)
+                            </a>
+                        </gt>
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">创建订单时间</label>
+                    <div class="controls">
+                        {$data['create_time_text']}
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">最后更新时间</label>
+                    <div class="controls">
+                        {$data['update_time_text']}
+                    </div>
+                </div>
+                <div class="form-item cf btn_item">
+                    <if condition="in_array($data['status'], array(2,4)) && in_array($data['refund_status'], array(0,3))">
+                    <a class="btn submit-btn" href="{:addons_url('Order://OrderRefundAdmin:/do_refund', array('order_sn' => $data['order_sn']))}">发起退款</a>
+                    </if>
+                    <a class="btn btn-return" href="{:addons_url('Order://ShopOrder:/index')}">返 回</a>
+                </div>
+            </div>
+            <div class="tab-pane tab4">
+                <div class="form-item cf">
+                    <label class="item-label">订单总金额</label>
+                    <div class="controls">
+                        ￥{$data['money']}
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">实际支付金额</label>
+                    <div class="controls">
+                        ￥{$data['pay_money']}
+                    </div>
+                </div>
+                <eq name="data.type" value="online">
+                <div class="form-item cf">
+                    <label class="item-label">运费</label>
+                    <div class="controls">
+                        ￥{$data.express_money}
+                    </div>
+                </div>
+                </eq>
+                <div class="form-item cf">
+                    <label class="item-label">使用的优惠券</label>
+                    <div class="controls">
+                        <notempty name="data.cash_code">优惠金额：￥{$data['cash_money']|default=0}<else/>未使用</notempty>
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">会员等级优惠<span class="check-tips">（总金额除去优惠券金额后的会员折扣优惠）</span></label>
+                    <div class="controls">
+                        ￥{$data['user_discount_money']|default=0}
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">操作的平台<span class="check-tips">（点击结算时记录平台）</span></label>
+                    <div class="controls">
+                        <switch name="data.pay_app">
+                            <case value="account_app">蜜狗客户端</case>
+                            <case value="wechat">微信端</case>
+                            <case value="alipay">支付宝端</case>
+                            <default/> 未结算
+                        </switch>
+                    </div>
+                </div>
+                <div class="form-item cf btn_item">
+                    <a class="btn btn-return" href="{:addons_url('Order://ShopOrder:/index')}">返 回</a>
+                </div>
+            </div>
+            <div class="tab-pane tab2">
+                    <label class="item-label">共有{:count($detail)}个商品</label>
+                    <div class="data-table table-striped">
+                    <table>
+                        <thead> 
+                            <tr>
+                                <th>商品名</th>
+                                <th>展示图</th>
+                                <th>售价</th>
+                                <th>数量</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <volist name="detail" id="v">
+                            <tr>
+                                <td>{$v.title}</td>
+                                <td>
+                                    <div class="upload-img-box">
+                                        <notempty name="v[cover_id]">
+                                            <div class="upload-pre-item"><img src="{$v['cover_id']|get_cover='path'}" style="max-height: 80px; max-width: 100px;"/></div>
+                                        </notempty>
+                                    </div>
+                                </td>
+                                <td>{$v.price}</td>
+                                <td>{$v.num}</td>
+                            </tr>
+                        </volist>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="form-item cf btn_item">
+                    <a class="btn btn-return" href="{:addons_url('Order://ShopOrder:/index')}">返 回</a>
+                </div>
+            </div>
+            
+            <div class="tab-pane tab3">
+                <switch name="log[pay_type]">
+                    <case value="1">
+                        <div class="form-item cf">
+                            <label class="item-label">支付方式</label>
+                            <div class="controls">
+                                微信
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">openid</label>
+                            <div class="controls">
+                                {$wx_user.openid}
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">昵称</label>
+                            <div class="controls">
+                                {$wx_user.nickname}
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">头像</label>
+                            <div class="controls">
+                                <img src="{$wx_user.headimgurl}" style="max-height:150px; max-width:200px;" />
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">微信支付订单号</label>
+                            <div class="controls">
+                                {$wx_pay_log.return_data.transaction_id}
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">支付完成时间</label>
+                            <div class="controls">
+                                <?php $time_end = substr($wx_pay_log['return_data']['time_end'],0,4).'-'.substr($wx_pay_log['return_data']['time_end'],4,2).'-'.substr($wx_pay_log['return_data']['time_end'],6,2).' '.substr($wx_pay_log['return_data']['time_end'],8,2).':'.substr($wx_pay_log['return_data']['time_end'],10,2).':'.substr($wx_pay_log['return_data']['time_end'],12,2)?>
+                                {$time_end}
+                            </div>
+                        </div>
+                    </case>
+                    <case value="2"><div class="form-item cf">
+                            <label class="item-label">支付方式</label>
+                            <div class="controls">
+                                支付宝
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">支付宝交易号</label>
+                            <div class="controls">
+                                {$ali_pay_log.return_data.trade_no}
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">买家支付宝用户号</label>
+                            <div class="controls">
+                                {$pay_log.return_data.buyer_id}
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">买家支付帐号</label>
+                            <div class="controls">
+                                {$ali_pay_log.return_data.buyer_logon_id}
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">买家支付金额</label>
+                            <div class="controls">
+                                {$ali_pay_log.return_data.total_fee}
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">交易付款时间</label>
+                            <div class="controls">
+                                {$ali_pay_log.return_data.gmt_payment}
+                            </div>
+                        </div>
+                    </case>
+                </switch>
+                
+            </div>
+            <style>
+                .receipt_div input:read-only{
+                    background-color: #eee;
+                    color:#888;
+                }
+            </style>
+            <div class="tab-pane tab5">
+                <div class="form-item cf">
+                    <label class="item-label" style="display:inline-block;">
+                        收货人信息
+                    </label>
+                    <div class="controls receipt_div">
+                        <strong>姓名：</strong>
+                        <input type="text" class="text input-3x" value="{$data.receipt_info.name}" placeholder="收货人姓名" readonly="" /> 
+                        <strong>联系电话：</strong>
+                        <input type="text" class="text input-3x" value="{$data.receipt_info.mobile}" placeholder="联系电话" readonly="" />
+                        <p style="margin:5px 0;">
+                        <strong>地址：</strong>
+                        <input type="text" class="text input-2x" value="{$data.receipt_info.sheng_title}" placeholder="省份" readonly="" />
+                        <input type="text" class="text input-2x" value="{$data.receipt_info.shi_title}" placeholder="城市" readonly="" />
+                        <input type="text" class="text input-2x" value="{$data.receipt_info.qu_title}" placeholder="地区" readonly="" />
+                        </p>
+                        <p style="margin:5px 0 5px 46px;">
+                        <input type="text" class="text input-large" name="receipt_info[address]" value="{$data.receipt_info.address}" placeholder="详细地址" readonly="" />
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="form-item cf">
+                    <label class="item-label" style="display:inline-block;">发货物流信息<span class="check-tips"></span></label>
+                    <button class="btn" type="button" id="edit_send">修改发货信息</button>
+                    <div class="controls" style="padding-left:20px;">
+                        <eq name="data.status" value="1">
+                        用户还未支付~
+                        <else/>
+                        <div class="form-item cf send_div">
+                            <label class="item-label">物流公司<span class="check-tips"></span></label>
+                            <input type="text" class="text input-min" name="express_info[company]" disabled="" readonly="" value="{$data.express_info.company}" placeholder="" />
+                            <input type="hidden" name="express_info[name]" value="{$data.express_info.name}" />
+                            <a href="javascript:;" class="btn" id="select_product" style="display:none;">选择物流</a>
+                            <label class="item-label">物流单号<span class="check-tips"></span></label>
+                            <input type="text" class="text input-min" name="express_info[no]" readonly="" value="{$data.express_info.no}" placeholder="" />
+                            <label class="item-label do_send" style="display:none;"><input type="checkbox" name="express_do" value="1" /> 确认发货<span class="check-tips">（信息填写完毕并校验无误后，请勾选，不勾选时，不做保存操作）</span></label>
+                            
+                            <label class="item-label" style="margin-left:0;">发货时间<span class="check-tips"></span></label>
+                            {$data.express_time|time_format="Y-m-d H:i"}
+                        </div>
+                        <div>
+                            <a href="{:addons_url('Order://OrderExpressAdmin/log_info', array('order_sn' => $data['order_sn']))}" target="_blank" class="btn">查看物流信息</a>
+                        </div>
+                        </eq>
+                    </div>
+                </div>
+                <button id="submit" class="btn submit-btn ajax-post hidden" target-form="form-horizontal" type="submit">确 定</button>
+            </div>
+            
+            <input type="hidden" value="{$data.id}" name="id" />
+            <input type="hidden" value="{$data.uid}" name="uid" />
+        </form>
+    </div>
+</block>
+<block name="script">
+        <link href="__STATIC__/datetimepicker/css/datetimepicker.css" rel="stylesheet" type="text/css">
+        <php>if(C('COLOR_STYLE')=='blue_color') echo '<link href="__STATIC__/datetimepicker/css/datetimepicker_blue.css" rel="stylesheet" type="text/css">';</php>
+        <link href="__STATIC__/datetimepicker/css/dropdown.css" rel="stylesheet" type="text/css">
+        <script type="text/javascript" src="__STATIC__/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+        <script type="text/javascript" src="__STATIC__/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+        <script type="text/javascript" src="__STATIC__/artDialog/lib/sea.js"></script>
+        <script type="text/javascript">
+        $(function() {
+            highlight_subnav('{:addons_url('Order://ShopOrder:/index')}');
+            showTab();
+            
+            $('.date').datetimepicker({
+                format: 'yyyy-mm-dd',
+                language:"zh-CN",
+                minView:2,
+                autoclose:true
+            });
+            $('#edit_send').click(function(){
+                $('.send_div input').attr('readonly', false);
+                $('#select_product,.do_send').show();
+                $(this).remove();
+            });
+            seajs.config({
+              alias: {
+                "jquery": "jquery-1.10.2.js"
+              }
+            });
+            seajs.use(['__STATIC__/artDialog/src/dialog-plus'], function (dialog) {
+                window.dialog = dialog;
+                
+                $('#select_product').on('click', function(){
+                    var url = "{:addons_url('Order://OrderExpressAdmin/get_form_lists')}";
+                    
+                    top.dialog({
+                            id: '_listsDig',
+                            title: '快递公司列表',
+                            url: url,
+                            width: 800,
+                            height:530,
+                            onclose: function () {
+                                var data = this.returnValue;
+                                var l = '';
+                                $.each(data.data, function(x, y){
+                                    $('[name="express_info[company]"]').val(y.title);
+                                    $('[name="express_info[name]"]').val(y.id);
+                                });
+                            },
+                    })
+                    .showModal();
+                })
+            });
+        });
+
+    </script>
+</block>

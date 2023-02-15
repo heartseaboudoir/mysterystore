@@ -1,0 +1,82 @@
+<extend name="Public/base"/>
+
+<block name="body">
+	<div class="main-title">
+		<h2>{$meta_title}</h2>
+	</div>
+        <a href="{:U('Tags/save')}" class="btn add">添加</a>
+	<div class="data-table table-striped">
+		<table>
+			<thead>
+				<tr>
+                                        <th style="width:80px;">排序</th>
+					<th style="width:80px;">ID</th>
+					<th>标签名</th>
+					<th style="width:120px;">操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				<notempty name="list">
+				<volist name="list" id="lv">
+					<tr>
+                                                <td><input type="text" class="input-mini text listorder" value="{$lv.listorder}" data-id="{$lv.id}" maxlength="4"/></td>
+						<td>{$lv.id}</td>
+						<td>{$lv.tag}</td>
+						<td>
+                                                    <a title="编辑" href="{:U('save?id='.$lv['id'])}">编辑</a>
+                                                    <a title="删除" class="ajax-get confirm" href="{:U('remove?id='.$lv['id'])}">删除</a>
+						</td>
+					</tr>
+				</volist>
+				<else/>
+				<td colspan="6" class="text-center"> aOh! 暂时还没有内容! </td>
+				</notempty>
+			</tbody>
+		</table>
+		<!-- 分页 -->
+	    <div class="page">
+	        {$_page}
+	    </div>
+	</div>
+</block>
+
+<block name="script">
+<script type="text/javascript">
+$(function(){
+	//搜索功能
+	$("#search").click(function(){
+		var url = $(this).attr('url');
+        var query  = $('.search-form').find('input').serialize();
+        query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g,'');
+        query = query.replace(/^&/g,'');
+        if( url.indexOf('?')>0 ){
+            url += '&' + query;
+        }else{
+            url += '?' + query;
+        }
+		window.location.href = url;
+	});
+	//回车搜索
+	$(".search-input").keyup(function(e){
+		if(e.keyCode === 13){
+			$("#search").click();
+			return false;
+		}
+	});
+        $('.listorder').on('change', function(){
+            var id = $(this).data('id'),
+                value = $(this).val();
+            $.ajax({
+                type: 'get',
+                url : "{:U('listorder')}",
+                data: {listorder:value, id:id},
+                success:function(msg){
+                    if(msg.status == 1){
+                        window.location.reload();
+                    }
+                }
+            });
+        });
+});
+</script>
+</block>

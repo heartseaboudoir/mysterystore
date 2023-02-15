@@ -1,0 +1,145 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <script type="text/javascript">
+        document.getElementById('jq-nav-left').style.display = 'none';
+        document.getElementById('jq-main-box').style.left = '0';
+    </script>
+    <div class="main-title">
+        <h2>读取设置</h2>
+    </div>
+<div class="tab-content">
+    <!-- 访问授权 -->
+    <div class="tab-pane in">
+        <form action="{:addons_url('MessageWarn://MessageWarn:/updateMessageWarnSet')}" enctype="application/x-www-form-urlencoded" method="POST" class="form-horizontal auth-form">
+            <!--来源:0.商品过期提醒,1.内部消息,2.其它,3.汇总信息,4.单条信息-->
+            <dl class="checkmod">
+                <dt class="hd">
+                    <label class="checkbox"><input class="m_type rules_all" type="checkbox" name="m_type[]" value="0">商品过期提醒</label>
+                </dt>
+                <dd class="bd">
+
+                </dd>
+            </dl>
+            <dl class="checkmod">
+                <dt class="hd">
+                    <label class="checkbox"><input class="m_type rules_all" type="checkbox" name="m_type[]" value="1">内部消息</label>
+                </dt>
+                <dd class="bd">
+
+                </dd>
+            </dl>
+            <dl class="checkmod">
+                <dt class="hd">
+                    <label class="checkbox"><input class="m_type rules_all" type="checkbox" name="m_type[]" value="2">其它</label>
+                </dt>
+                <dd class="bd">
+
+                </dd>
+            </dl>
+            <dl class="checkmod">
+                <dt class="hd">
+                    <label class="checkbox"><input class="m_type rules_all" type="checkbox" name="m_type[]" value="3">汇总信息</label>
+                </dt>
+                <!--1.门店汇总2.仓库汇总3.采购汇总-->
+                <dd class="bd">
+                    <label class="checkbox">
+                        <input class="m_sum_tpye rules_one" type="checkbox" name="m_sum_tpye[]" value="1"/>门店日报汇总提醒
+                    </label>
+                    <label class="checkbox">
+                        <input class="m_sum_tpye rules_one" type="checkbox" name="m_sum_tpye[]" value="2"/>仓库日报汇总提醒
+                    </label>
+                    <label class="checkbox">
+                        <input class="m_sum_tpye rules_one" type="checkbox" name="m_sum_tpye[]" value="3"/>采购日报汇总提醒
+                    </label>
+                </dd>
+            </dl>
+            <dl class="checkmod">
+                <dt class="hd">
+                    <label class="checkbox"><input class="m_type rules_all" type="checkbox" name="m_type[]" value="4">单条信息</label>
+                </dt>
+                <!--    //信息其他类型：4.门店入库 5.门店出库 6.仓库入库 7.仓库出库 8.采购申请  9.采购退货提醒
+	            //10.仓库调拨 11.仓库返仓拒绝 12.门店调拨申请 13.门店退货申请 14.门店发货申请 15.门店调拨申请被拒 16.门店返仓申请 17.门店返仓申请被拒-->
+                <dd class="bd">
+                    <label class="checkbox">
+                        <input class="m_only_tpye rules_one" type="checkbox" name="m_only_tpye[]" value="4"/>门店入库提醒
+                    </label>
+                    <label class="checkbox">
+                        <input class="m_only_tpye rules_one" type="checkbox" name="m_only_tpye[]" value="5"/>门店出库提醒
+                    </label>
+                    <label class="checkbox">
+                        <input class="m_only_tpye rules_one" type="checkbox" name="m_only_tpye[]" value="6"/>仓库入库提醒
+                    </label>
+                    <label class="checkbox">
+                        <input class="m_only_tpye rules_one" type="checkbox" name="m_only_tpye[]" value="7"/>仓库出库提醒
+                    </label>
+                    <label class="checkbox">
+                        <input class="m_only_tpye rules_one" type="checkbox" name="m_only_tpye[]" value="8"/>采购申请提醒
+                    </label>
+                    <label class="checkbox">
+                        <input class="m_only_tpye rules_one" type="checkbox" name="m_only_tpye[]" value="9"/>采购退货提醒
+                    </label>
+                    <label class="checkbox">
+                        <input class="m_only_tpye rules_one" type="checkbox" name="m_only_tpye[]" value="10"/>仓库调拨提醒
+                    </label>
+                    <label class="checkbox">
+                        <input class="m_only_tpye rules_one" type="checkbox" name="m_only_tpye[]" value="11"/>仓库返仓拒绝提醒
+                    </label>
+                    <label class="checkbox">
+                        <input class="m_only_tpye rules_one" type="checkbox" name="m_only_tpye[]" value="12"/>门店调拨申请提醒
+                    </label>
+                    <label class="checkbox">
+                        <input class="m_only_tpye rules_one" type="checkbox" name="m_only_tpye[]" value="13"/>门店退货申请提醒
+                    </label>
+                    <label class="checkbox">
+                        <input class="m_only_tpye rules_one" type="checkbox" name="m_only_tpye[]" value="14"/>门店发货申请提醒
+                    </label>
+                    <label class="checkbox">
+                        <input class="m_only_tpye rules_one" type="checkbox" name="m_only_tpye[]" value="15"/>门店调拨申请被拒提醒
+                    </label>
+                    <label class="checkbox">
+                        <input class="m_only_tpye rules_one" type="checkbox" name="m_only_tpye[]" value="16"/>门店返仓申请提醒
+                    </label>
+                    <label class="checkbox">
+                        <input class="m_only_tpye rules_one" type="checkbox" name="m_only_tpye[]" value="17"/>门店返仓申请被拒提醒
+                    </label>
+                </dd>
+            </dl>
+            <button type="submit" class="btn submit-btn ajax-post" target-form="auth-form">确 定</button>
+            <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+        </form>
+    </div>
+</div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $(function(){
+            var m_type = [{$m_type}];
+            var m_sum_type = [{$m_sum_type}];
+            var m_only_type = [{$m_only_type}];
+            $('.m_type').each(function(){
+                if( $.inArray( parseInt(this.value,10),m_type )>-1 ){
+                    $(this).prop('checked',true);
+                }
+            });
+            $('.m_sum_tpye').each(function(){
+                if( $.inArray( parseInt(this.value,10),m_sum_type )>-1 ){
+                    $(this).prop('checked',true);
+                }
+            });
+            $('.m_only_tpye').each(function(){
+                if( $.inArray( parseInt(this.value,10),m_only_type )>-1 ){
+                    $(this).prop('checked',true);
+                }
+            });
+            //父->子选节点
+            $('.rules_all').on('change',function(){
+                $(this).closest('dl').find('dd').find('input').prop('checked',this.checked);
+            });
+            //子->父级节点
+            $('.rules_one').on('change',function(){
+                $(this).closest('dl').find('dt').find('input').prop('checked',this.checked);
+            });
+        });
+    </script>
+</block>

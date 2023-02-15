@@ -1,0 +1,153 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <a class="btn" href="{:addons_url('Goods://GoodsAdmin:/save')}">添加</a> 
+    <!-- 高级搜索 -->
+    <div class="search-form fr cf">
+        <form id="search-form" onsubmit="return false;">
+        <div class="sleft">
+            <div class="drop-down">
+                <span id="sch-sort-txt" class="sort-txt" data="{$status}"><empty name="_GET[status]">所有<else/><eq name="_GET[status]" value="1">上架<else/>下架</eq></empty></span>
+                <i class="arrow arrow-down"></i>
+                <ul id="sub-sch-menu" class="nav-list hidden">
+                    <li><a href="javascript:;" value="">所有</a></li>
+                    <li><a href="javascript:;" value="1">上架</a></li>
+                    <li><a href="javascript:;" value="2">下架</a></li>
+                </ul>
+            </div>
+            <input type="text" name="title" class="search-input" value="{:I('title')}" placeholder="请输入关键字">
+            <a class="sch-btn" href="javascript:;" id="search" url="{:addons_url('Goods://GoodsAdmin:/index')}"><i class="btn-search"></i></a>
+        </div>
+        <div class="btn-group-click adv-sch-pannel fl">
+            <button class="btn">高 级<i class="btn-arrowdown"></i></button>
+            <div class="dropdown cf">
+                <div class="row">
+                    <label>分类：</label>
+                    <select name="cate_id">
+                        <option value="0">不限</option>
+                        <volist name="cate_ls" id="lv">
+                            <option value="{$key}" <eq name="key" value="$_GET['cate_id']">selected</eq>>{$lv}</option>
+                        </volist>
+                    </select>
+                </div>
+            </div>
+        </div>
+            <form>
+    </div>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead> 
+                <tr>
+                    <th>排序</th>
+                    <th>ID</th>
+                    <th width="150">商品名</th>
+                    <th width="80">展示图</th>
+                    <th>分类</th>
+                    <th width="80">默认售价</th>
+                    <th width="30">热销</th>
+                    <th width="40">状态</th>
+                    <th width="100">更新时间</th>
+                    <th width="100">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td><input type="text" class="input-mini text listorder" value="{$lv.listorder}" item_id="{$lv.id}" maxlength="4"/></td>
+                    <td>{$lv.id}</td>
+                    <td>{$lv.title}</td>
+                    <td>
+                        <div class="upload-img-box">
+                            <notempty name="lv[cover_id]">
+                                <div class="upload-pre-item"><img src="{$lv['cover_id']|get_cover='path'}" style="max-height: 60px; max-width: 80px;"/></div>
+                            </notempty>
+                        </div>
+                    </td>
+                    <td>{$cate_ls[$lv[cate_id]]}</td>
+                    <td>{$lv.sell_price}</td>
+                    <td><span style="font-weight:bold;"><eq name="lv[is_hot]" value="1">√<else/>X</eq></span></td>
+                    <td>{$lv.status_text}</td>
+                    <td>{$lv.update_time_text}</td>
+                    <td>
+                        <a class="update" href="{:addons_url('Goods://GoodsAdmin:/save?id='.$lv['id'])}" data-id="{$lv.id}">编辑</a>
+                        <a class="confirm ajax-get" href="{:addons_url('Goods://GoodsAdmin:/delete?id='.$lv['id'])}" data-id="{$lv.id}">删除</a>
+                    </td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $(function () {
+            highlight_subnav('{:addons_url('Goods://GoodsAdmin:/index')}');
+            //搜索功能
+            $('.search-form input').focus(function(){
+                $(document).keypress(function (e) {
+                    // 回车键事件 
+                    if (e.which == 13) {
+                        $("#search").click();
+                    }
+                });
+            });
+            $("#search").click(function () {
+                var url = $(this).attr('url');
+                var status = $("#sch-sort-txt").attr("data");
+                var query = $('#search-form').serialize();
+                query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g, '');
+                query = query.replace(/^&/g, '');
+                if (status != '') {
+                    query = 'status=' + status + "&" + query;
+                }
+                if (url.indexOf('?') > 0) {
+                    url += '&' + query;
+                } else {
+                    url += '?' + query;
+                }
+                window.location.href = url;
+            });
+
+            /* 状态搜索子菜单 */
+            $(".search-form").find(".drop-down").hover(function () {
+                $("#sub-sch-menu").removeClass("hidden");
+            }, function () {
+                $("#sub-sch-menu").addClass("hidden");
+            });
+            $("#sub-sch-menu li").find("a").each(function () {
+                $(this).click(function () {
+                    var text = $(this).text();
+                    $("#sch-sort-txt").text(text).attr("data", $(this).attr("value"));
+                    $("#sub-sch-menu").addClass("hidden");
+                })
+            });
+            //全选节点
+            $('.check-all').on('change', function () {
+                $('.ids').prop('checked', this.checked);
+            });
+            $('.listorder').on('change', function () {
+                var id = $(this).attr('item_id'),
+                        value = $(this).val();
+                $.ajax({
+                    type: 'get',
+                    url: "{:addons_url('Goods://GoodsAdmin:/listorder')}",
+                    data: {listorder: value, id: id},
+                    success: function (msg) {
+                        if (msg.status == 1) {
+                            window.location.reload();
+                        }
+                    }
+                });
+            });
+        })
+    </script>
+</block>

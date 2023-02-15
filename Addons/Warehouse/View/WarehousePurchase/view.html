@@ -1,0 +1,222 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <a class="btn" href="{:addons_url('Warehouse://WarehousePurchase:/view')}?id={$id}&isprint=1">导出Excel</a>
+        <!-- 数据列表 -->
+        <form id="form" action="{:addons_url('Warehouse://WarehousePurchase:/update')}" method="post" class="form-horizontal">
+            <div class="tab-pane in tab1">
+                    <div class="form-item cf">
+                        <div class="controls goods_div">
+                            <label>申请单号：{$list.p_r_sn}</label>
+                            <label>创建日期：{$list.ctime}</label>
+                            <label>商品种类：{$list.g_type}种</label>
+                            <label>商品数量：{$list.g_nums}</label>
+                            <label>售价金额：{$list.g_amounts}</label>
+                        </div>
+                        <div class="controls goods_div1">
+                            <label>申请人：{$list.nickname}</label>
+                            <label>申请来源：{$list.w_name}</label>
+                        </div>
+                        <div class="controls goods_div2">
+                            <label>备注：{$list.remark}</label>
+                        </div>
+                    </div>
+            </div>
+        </form>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+            <tr>
+                <th>商品id</th>
+                <th>商品名称</th>
+                <th>商品类别</th>
+                <th>商品属性</th>
+                <th>商品条码</th>
+                <th>售价</th>
+                <th>库存数量</th>
+                <th>申请数量</th>
+                <th>商品备注</th>
+                <th>申请结果</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="data" id="lv" key="vo">
+                <tr>
+                    <td>{$lv.goods_id}</td>
+                    <td><a href="{:addons_url('Goods://GoodsInfo:/index?id='.$lv['goods_id'])}" target="_blank">{$lv.goods_name}</a></td>
+                    <td>{$lv.cate_name}</td>
+                    <td>{$lv.value_name}</td>
+                    <td>{$lv.bar_code|subtext=18}</td>
+                    <td>{$lv.sell_price}</td>
+                    <td>{$lv.stock_num}</td>
+                    <td>{$lv.g_num}</td>
+                    <td>{$lv.remark}</td>
+                    <td><?php if($lv['is_pass'] == 0){
+                    echo('新增');
+                    }else{
+                        if($lv['is_pass'] == 1){
+                            echo('拒绝');
+                        }else{
+                            if($lv['is_pass'] == 2){
+                                echo('已通过');
+                            }else{
+                                echo('其它');
+                            }
+                        }
+                    }
+                    ?></td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+
+    <script type="text/javascript" src="__STATIC__/artDialog/lib/sea.js"></script>
+    <script type="text/javascript">
+        var Global = {
+            jump: window.location.pathname.match(/(\D*)view/)[1],
+        }
+        $("a[href$='" + Global.jump + "index.html']").parent().addClass('layui-this');
+        function get_goods(obj){
+            var bar_code = $(obj).val();
+            var goods_title = $(obj).parents('.goods_div').find('.goods_title');
+            var goods_id = $(obj).parents('.goods_div').find('.goods_id');
+            var id_code = $(obj).parents('.goods_div').find('.id_code');
+            var goods_message = $(obj).parents('.goods_div').find('.goods_message');
+            var g_num = $(obj).parents('.goods_div').find('.g_num');
+            if(bar_code != ''){
+                $.ajax({
+                    type:'get',
+                    url : "{:addons_url('Warehouse://WarehousePurchase:/get_one')}",
+                    data:{bar_code: bar_code, get_store:1},
+                    dataType:'json',
+                    success:function(data){
+                        if(data.status == 1){
+                            var l = '<option> - 请先选择分类 - </option>';
+                            $.each(data, function(x, y){
+                                l += '<option value="'+y.id+'">'+y.title+'</option>';
+                            });
+                            $('[name="goods_id"]').html(l);
+                            goods_title.css('color', '#635c73');
+                            goods_title.val(data.data.title);
+                            goods_id.val(data.data.id);
+                            id_code.val('');
+                        }else{
+                            if(data.status == 2){
+                                goods_message.css('color', 'red');
+                                goods_message.html('商品已存在,将编辑商品数量');
+                                goods_title.css('color', '#635c73');
+                                goods_title.val(data.data.title);
+                                goods_id.val(data.data.id);
+                                g_num.val(data.data1.g_num);
+                                //goods_id.val(0);
+                            }else {
+                                goods_message.css('color', 'red');
+                                goods_message.html('商品不存在');
+                                goods_id.val(0);
+                            }
+                        }
+                    }
+                });
+            }else{
+                goods_title.val('');
+                goods_id.val(0);
+            }
+        }
+        $('.tab1').delegate('.bar_code', 'change', function(){
+            get_goods(this);
+        });
+
+        function get_goods_id(obj){
+            var id_code = $(obj).val();
+            var goods_title = $(obj).parents('.goods_div').find('.goods_title');
+            var goods_id = $(obj).parents('.goods_div').find('.goods_id');
+            var bar_code = $(obj).parents('.goods_div').find('.bar_code');
+            var goods_message = $(obj).parents('.goods_div').find('.goods_message');
+            var g_num = $(obj).parents('.goods_div').find('.g_num');
+            if(id_code != ''){
+                $.ajax({
+                    type:'get',
+                    url : "{:addons_url('Warehouse://WarehousePurchase:/get_one_id')}",
+                    data:{id_code: id_code, bar_code: bar_code.val(), get_store:1},
+                    dataType:'json',
+                    success:function(data){
+                        if(data.status == 1){
+                            var l = '<option> - 请先选择分类 - </option>';
+                            $.each(data, function(x, y){
+                                l += '<option value="'+y.id+'">'+y.title+'</option>';
+                            });
+                            $('[name="goods_id"]').html(l);
+                            goods_title.css('color', '#635c73');
+                            goods_title.val(data.data.title);
+                            goods_id.val(data.data.id);
+                            bar_code.val('');
+                            goods_message.html('');
+                        }else{
+                            if(data.status == 2){
+                                goods_message.css('color', 'red');
+                                goods_message.html('商品已存在,将编辑商品数量');
+                                goods_title.css('color', '#635c73');
+                                goods_title.val(data.data.title);
+                                goods_id.val(data.data.id);
+                                g_num.val(data.data1.g_num);
+                                //goods_id.val(0);
+                            }else {
+                                goods_message.css('color', 'red');
+                                goods_message.html('商品不存在');
+                                goods_id.val(0);
+                            }
+                        }
+                    }
+                });
+            }else{
+                goods_title.val('');
+                goods_id.val(0);
+            }
+        }
+        $('.tab1').delegate('.id_code', 'change', function(){
+            get_goods_id(this);
+        });
+        seajs.config({
+            alias: {
+                "jquery": "jquery-1.10.2.js"
+            }
+        });
+        seajs.use(['__STATIC__/artDialog/src/dialog-plus'], function (dialog) {
+            window.dialog = dialog;
+
+            $('#select_product').on('click', function(){
+                var url = "{:addons_url('Warehouse://WarehousePurchase:/get_goods_lists')}";
+
+                top.dialog({
+                            id: 'product_lists',
+                            title: '可绑定商品列表',
+                            url: url,
+                            width: 500,
+                            height:430,
+                            //quickClose: true,
+                            onclose: function () {
+                                var data = this.returnValue;
+                                if (data.id) {
+                                    $('.id_code').val(data.id);
+                                    get_goods_id($('.id_code'));
+                                }
+                            },
+                        })
+                        .showModal();
+            })
+        });
+    </script>
+
+</block>

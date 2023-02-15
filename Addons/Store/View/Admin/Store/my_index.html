@@ -1,0 +1,63 @@
+<extend name="Public/base" />
+<block name="body">
+    <script type="text/javascript">
+    document.getElementById('jq-nav-left').style.display = 'none';
+    document.getElementById('jq-main-box').style.left = '0';
+    </script>
+    <div id="jq-content" class="site-info">
+        <div class="main-title wrap-obj">
+            <h2>短内信息</h2>
+        </div>
+        <div class="wrap-list">
+            <ul id="jq-list"></ul>
+            <a class="wrap-more" href="{:addons_url('MessageWarn://MessageWarn:/index')}">查看更多&nbsp;>></a>
+        </div>
+    </div>
+    <script id="temp-list" type="text/html">
+        {{each items as list index}} 
+        <li class="{{if list.m_status == '0'}} wrap-default {{/if}}">
+            <a href="/Admin/Addons/ex_MessageWarn/_addons/MessageWarn/_controller/MessageWarn/_action/view/m_id/{{list.m_id}}.html">
+                <h1><em>{{list.ctime}}</em><span></span>【{{list.m_type_name}}】{{list.message_title}}</h1>
+            </a>
+        </li>
+        {{/each}}
+    </script>
+</block>
+<block name="script">
+    <script type="text/javascript">
+    layui.use(['main'], function() {
+        var $ = layui.jquery,
+            layer = layui.layer;
+
+        var Global = {
+            listUrl: '/Erp/MessageWarn/getMessageList'
+        }
+
+        /*var passData = {
+            m_status: 100,
+            m_type: 100
+        }; 
+        var data = $.parseJson( passData );*/
+
+        $.getData({
+             url: Global.listUrl,
+            load: true
+        }, function(res){
+            dataShow(res);
+        });
+        function dataShow(res){
+            var oList = $('#jq-list');
+
+            if( res.content == null || res.content.length == 0 ){
+                oList.html('<li class="wrap-empty">暂无内容！</li>');
+            }else{
+                oList.html(template('temp-list', { items: res.content }));
+            }
+
+        }
+    });
+    </script>
+</block>
+<!--<li class="wrap-default"><h1><em>3月16日</em><span></span>GO区块链积分商城</h1>
+    <p>前端采用 layui 框架，做一个有梦想的区块链积分商城。面对广大友友后期会推出特别惊喜。前端采用 layui 框架，做一个有梦想的区块链积分商城。面对广大友友后期会推出特别惊喜。</p>
+</li>-->

@@ -1,0 +1,228 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <ul class="tab-nav nav">
+        <li class="current" data-tab="tab1"><a href="javascript:void(0);">基础</a></li>
+        <notempty name="data[id]">
+            <li data-tab="tab2"><a href="javascript:void(0);">区域管理员</a></li>
+            <li data-tab="tab3"><a href="javascript:void(0);">区域财务管理员</a></li>
+            <li data-tab="tab4"><a href="javascript:void(0);">区域合作载体管理员</a></li>
+            <li data-tab="tab5"><a href="javascript:void(0);">采购管理员</a></li>
+            <li data-tab="tab8"><a href="javascript:void(0);">加盟商</a></li>
+        </notempty>
+    </ul>
+    <div class="tab-content">
+        <!-- 数据列表 -->
+        <div class="tab-pane in tab1">
+            <form id="form" action="{:addons_url('Store://ShequAdmin:/update')}" method="post" class="form-horizontal">
+                <div class="form-item cf">
+                    <label class="item-label">区域名</label>
+                    <div class="controls">
+                        <input type="text" class="text input-min" name="title" value="{$data.title}" />
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">是否可用新版ERP</label>
+                    <div class="controls">
+                        <input type="radio" name="newerp" value="0" <?php if ($data['newerp'] == 0) {echo 'checked';}?> />否 &nbsp;&nbsp;&nbsp;&nbsp;
+                        <input type="radio" name="newerp" value="1" <?php if ($data['newerp'] != 0) {echo 'checked';}?> />是
+                    </div>
+                </div>                
+                <div class="form-item cf">
+                    <button id="submit" class="btn submit-btn ajax-post hidden" target-form="form-horizontal" type="submit">确 定</button>
+                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                    <input type="hidden" value="{$data.id}" name="id" />
+                </div>
+            </form>
+        </div>
+        <notempty name="data[id]">
+            <div class="tab-pane tab2">
+                <a class="btn" href="{:addons_url('Store://MemberAdmin:/save', array('type' => 2, 'group' => 2, 'store_id' => $data['id']))}">添加</a> 
+                <!-- 数据列表 -->
+                <div class="data-table table-striped">
+                    <table>
+                        <thead> 
+                            <tr>
+                                <th>登录名</th>
+                                <th>昵称</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <notempty name="member_ls[2]">
+                        <volist name="member_ls[2]" id="lv" key="vo">
+                            <tr>
+                                <td>{$lv.uid|get_username}</td>
+                                <td>{$lv.uid|get_nickname}</td>
+                                <td>
+                                    <a class="confirm ajax-get" href="{:addons_url('Store://MemberAdmin:/delete', array('id' => $lv['uid'], 'type' => 2, 'group' => 2, 'store_id' => $data['id']))}" data-id="{$lv.uid}">删除</a>
+                                </td>
+                            </tr>
+                        </volist>
+                        <else/>
+                            <tr><td colspan="3">暂无数据~</td></tr>
+                        </notempty>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="form-item cf">
+                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                </div>
+            </div>
+            <div class="tab-pane tab3">
+                <a class="btn" href="{:addons_url('Store://MemberAdmin:/save', array('type' => 2, 'group' => 3, 'store_id' => $data['id']))}">添加</a> 
+                <!-- 数据列表 -->
+                <div class="data-table table-striped">
+                    <table>
+                        <thead> 
+                            <tr>
+                                <th>登录名</th>
+                                <th>昵称</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <notempty name="member_ls[3]">
+                            <volist name="member_ls[3]" id="lv" key="vo">
+                                <tr>
+                                    <td>{$lv.uid|get_username}</td>
+                                    <td>{$lv.uid|get_nickname}</td>
+                                    <td>
+                                        <a class="update" href="{:addons_url('Store://MemberAdmin:/save?id='.$lv['uid'])}" data-id="{$lv.uid}">编辑</a>
+                                        <a class="confirm ajax-get" href="{:addons_url('Store://MemberAdmin:/delete', array('id' => $lv['uid'], 'type' => 2, 'group' => 3, 'store_id' => $data['id']))}" data-id="{$lv.uid}">删除</a>
+                                    </td>
+                                </tr>
+                            </volist>
+                        <else/>
+                            <tr><td colspan="3">暂无数据~</td></tr>
+                        </notempty>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="form-item cf">
+                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                </div>
+            </div>
+            <div class="tab-pane tab4">
+                <a class="btn" href="{:addons_url('Store://MemberAdmin:/save', array('type' => 2, 'group' => 10, 'store_id' => $data['id']))}">添加</a> 
+                <!-- 数据列表 -->
+                <div class="data-table table-striped">
+                    <table>
+                        <thead> 
+                            <tr>
+                                <th>登录名</th>
+                                <th>昵称</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <notempty name="member_ls[10]">
+                            <volist name="member_ls[10]" id="lv" key="vo">
+                                <tr>
+                                    <td>{$lv.uid|get_username}</td>
+                                    <td>{$lv.uid|get_nickname}</td>
+                                    <td>
+                                        <a class="update" href="{:addons_url('Store://MemberAdmin:/save?id='.$lv['uid'])}" data-id="{$lv.uid}">编辑</a>
+                                        <a class="confirm ajax-get" href="{:addons_url('Store://MemberAdmin:/delete', array('id' => $lv['uid'], 'type' => 2, 'group' => 10, 'store_id' => $data['id']))}" data-id="{$lv.uid}">删除</a>
+                                    </td>
+                                </tr>
+                            </volist>
+                        <else/>
+                            <tr><td colspan="3">暂无数据~</td></tr>
+                        </notempty>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="form-item cf">
+                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                </div>
+            </div>
+            <div class="tab-pane tab5">
+                <a class="btn" href="{:addons_url('Store://MemberAdmin:/save', array('type' => 2, 'group' => 15, 'store_id' => $data['id']))}">添加</a> 
+                <!-- 数据列表 -->
+                <div class="data-table table-striped">
+                    <table>
+                        <thead> 
+                            <tr>
+                                <th>登录名</th>
+                                <th>昵称</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <notempty name="member_ls[15]">
+                            <volist name="member_ls[15]" id="lv" key="vo">
+                                <tr>
+                                    <td>{$lv.uid|get_username}</td>
+                                    <td>{$lv.uid|get_nickname}</td>
+                                    <td>
+                                        <a class="update" href="{:addons_url('Store://MemberAdmin:/save?id='.$lv['uid'])}" data-id="{$lv.uid}">编辑</a>
+                                        <a class="confirm ajax-get" href="{:addons_url('Store://MemberAdmin:/delete', array('id' => $lv['uid'], 'type' => 2, 'group' => 15, 'store_id' => $data['id']))}" data-id="{$lv.uid}">删除</a>
+                                    </td>
+                                </tr>
+                            </volist>
+                        <else/>
+                            <tr><td colspan="3">暂无数据~</td></tr>
+                        </notempty>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="form-item cf">
+                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                </div>
+            </div> 
+            <div class="tab-pane tab8">
+                <a class="btn" href="{:addons_url('Store://MemberAdmin:/save', array('type' => 2, 'group' => 17, 'store_id' => $data['id']))}">添加</a> 
+                <!-- 数据列表 -->
+                <div class="data-table table-striped">
+                    <table>
+                        <thead> 
+                            <tr>
+                                <th>登录名</th>
+                                <th>昵称</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <notempty name="member_ls[17]">
+                            <volist name="member_ls[17]" id="lv" key="vo">
+                                <tr>
+                                    <td>{$lv.uid|get_username}</td>
+                                    <td>{$lv.uid|get_nickname}</td>
+                                    <td>
+                                        <a class="update" href="{:addons_url('Store://MemberAdmin:/save?id='.$lv['uid'])}" data-id="{$lv.uid}">编辑</a>
+                                        <a class="confirm ajax-get" href="{:addons_url('Store://MemberAdmin:/delete', array('id' => $lv['uid'], 'type' => 2, 'group' => 17, 'store_id' => $data['id']))}" data-id="{$lv.uid}">删除</a>
+                                    </td>
+                                </tr>
+                            </volist>
+                        <else/>
+                            <tr><td colspan="3">暂无数据~</td></tr>
+                        </notempty>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="form-item cf">
+                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                </div>
+            </div>                         
+        </notempty>
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $(function () {
+            highlight_subnav('{:addons_url('Store://ShequAdmin:/index')}');
+            //全选节点
+            $('.check-all').on('change', function () {
+                $('.ids').prop('checked', this.checked);
+            });
+            showTab();
+        });
+
+    </script>
+</block>

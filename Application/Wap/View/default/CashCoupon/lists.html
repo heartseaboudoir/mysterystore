@@ -1,0 +1,96 @@
+<extend name="Base/common"/>
+<block name="body">
+<div class="weui_tab" id="tabs">
+    <div class="weui_navbar">
+        <div class="weui_navbar_item weui_bar_item_on">
+            未使用（{$lists1.count}）
+        </div>
+        <div class="weui_navbar_item">
+            已使用（{$lists2.count}）
+        </div>
+        <div class="weui_navbar_item">
+            已过期（{$lists3.count}）
+        </div>
+    </div>
+    <div class="weui_tabs">
+        <div class="weui_tab_bd weui_tab_bd_on" data-type="1">
+        </div>
+        <div class="weui_tab_bd" data-type="2">
+        </div>
+        <div class="weui_tab_bd" data-type="3">
+        </div>
+    </div>
+</div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        TabsRender({}, '#tabs');
+
+        function loadDataFactory(baseUrl, type) {
+            var pageNum = 1;
+            return function (next) {
+                $.get(baseUrl + '?page=' + pageNum + '&type=' + type).then(function (res) {
+                    pageNum++
+
+                    // do something
+                    if (res.data.length === 0) {
+                        // end of loading
+                        next({
+                            isEnd: true
+                        })
+                    } else {
+                        // res.data 应该为 html 字符串, 如果不是要做转换
+                        var l = '';
+                        $.each(res.data,function(x,y){
+                            l += '<a '+ (y.back_url ? ('href="'+y.back_url+'"') : '')+' class="couponsList_item '+ (y.status == 1 ? '' : 'couponsList_item-disable')+'">'+
+                                    '<div class="couponsList_item_bd">'+
+                                    '    <div class="couponsList_item_bd_l">'+
+                                    '        <div class="price">'+
+                                    '            <small class="unit">￥</small>'+
+                                                y.cash_money+
+                                    '        </div>'+
+                                    '        <div class="use-scope">全场通用</div>'+
+                                    '    </div>'+
+                                    '    <div class="couponsList_item_bd_r">'+
+                                    '        <div class="name">'+y.title+'</div>'+
+                                    '        <div class="use-specification">'+y.description+'</div>'+
+                                    '    </div>'+
+                                    '</div>'+
+                                    '<div class="couponsList_item_ft">'+
+                                    '    <span class="effective-time">'+y.last_day+'</span>'+
+                                    '    <span class="data-time">'+y.last_time_text+'</span>'+
+                                    '</div>'+
+                                '</a>';
+                        });
+                        
+                        next(l)
+                    }
+                }, function (err) {
+                    next(err)
+                })
+            }
+        }
+        
+        $('.weui_tab_bd').each(function () {
+            var url = "{:U('CashCoupon/lists', array('callback' => $_GET['callback']))}";
+            var scroll = ScrollLoadRender({
+                loadData: loadDataFactory(url, $(this).data('type'))
+            }, this)
+
+            $(this).data('scroll', scroll)
+        })
+
+        TabsRender({
+            onTabChange: function () {
+                var $tab = $('.weui_tab_bd_on')
+                if (!$tab.hasClass('js-loaded')) {
+                    $tab.addClass('js-loaded').data('scroll').load()
+                }
+            },
+            onInit: function () {
+                // init first tab data
+                $('.weui_tab_bd_on').addClass('js-loaded').data('scroll').load()
+            }
+        }, '#tabs');
+    </script>
+</block>

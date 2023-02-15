@@ -1,0 +1,159 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>广州市宅客电子商务有限责任公司</title>
+	<link href="__STATIC__/bootstrap/css/bootstrap.css" rel="stylesheet">
+	<link href="__STATIC__/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+	<link href="__STATIC__/bootstrap/css/docs.css" rel="stylesheet">
+	<link href="__STATIC__/bootstrap/css/onethink.css" rel="stylesheet">
+
+	<!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+	<!--[if lt IE 9]>
+	<script src="__STATIC__/bootstrap/js/html5shiv.js"></script>
+	<![endif]-->
+
+	<!--[if lt IE 9]>
+	<script type="text/javascript" src="__STATIC__/jquery-1.10.2.min.js"></script>
+	<![endif]-->
+	<!--[if gte IE 9]><!-->
+	<script type="text/javascript" src="__STATIC__/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="__STATIC__/bootstrap/js/bootstrap.min.js"></script>
+	<!--<![endif]-->
+	<!-- 页面header钩子，一般用于加载插件CSS文件和代码 -->
+	<style>
+		.tdbiao{
+			width:30%;
+		}
+		.tdinfo{
+			overflow:hidden;/*文本超出时隐藏*/
+			white-space:nowrap;/*规定表格单元格中的内容不换行。*/
+			text-overflow:ellipsis;
+		}
+
+	</style>
+</head>
+<body>
+<!-- 头部 -->
+<!-- 导航条
+================================================== -->
+<div class="navbar navbar-inverse navbar-fixed-top">
+	<div class="navbar-inner">
+		<div class="container">
+			<a class="brand" href="/">神秘商店</a>
+			<button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<div class="nav-collapse collapse">
+				<ul class="nav">
+				</ul>
+			</div>
+			<div class="nav-collapse collapse pull-right">
+
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- /头部 -->
+
+<!-- 主体 -->
+
+<header class="jumbotron subhead" id="overview">
+	<div class="container">
+		<h2>{$data['title']}</h2>
+	</div>
+</header>
+
+<div id="main-container" class="container">
+	<div class="row">
+		<div class="main-content">
+			<hr>
+				<h3 style="text-align:center;">商品资料</h3>
+			<div style="margin:5px 0; text-align:center;">
+				<img src="{$data['cover_id']|get_cover='path'}" align="absbottom"  style="max-width:35%;">
+				<div  style='margin-left:10px;max-width:50%;float:left;font-size:14px;'>
+				<table width="99%" style="table-layout:fixed">
+					<tr>
+						<td class="tdbiao">商品条码</td>
+						<td class="tdinfo" title="{$data['bar_code']}">{$data['bar_code']}</td>
+					</tr>
+					<tr>
+						<td class="tdbiao">商品分类</td>
+						<td class="tdinfo">{$cate_ls['title']}</td>
+					</tr>
+					<tr>
+						<td class="tdbiao"> 商品属性</td>
+						<td class="tdinfo">{$attrvalue}</td>
+					</tr>
+					<tr>
+						<td class="tdbiao">商品系统售价</td>
+						<td class="tdinfo">{$data['sell_price']}</td>
+					</tr>
+					<tr>
+						<td class="tdbiao">计价单位</td>
+						<td class="tdinfo">{$data['unit']}</td>
+					</tr>
+					<tr>
+						<td class="tdbiao">门店名称</td>
+						<td class="tdinfo">{$storeinfo['name']}</td>
+					</tr>
+					<tr>
+						<td class="tdbiao">门店数量</td>
+						<td class="tdinfo">{$storeinfo['num']}</td>
+					</tr>
+					<tr>
+						<td class="tdbiao">仓库名称</td>
+						<td class="tdinfo">{$warehouseinfo['name']}</td>
+					</tr>
+					<tr>
+						<td class="tdbiao">仓库数量</td>
+						<td class="tdinfo">{$warehouseinfo['num']}</td>
+					</tr>
+					<tr>
+						<td class="tdbiao">保质期</td>
+						<td class="tdinfo">{$data['expired_days']}天</td>
+					</tr>
+					<tr>
+						<td class="tdbiao"> 上下架状态</td>
+						<td class="tdinfo">{$data['status']== 1 ?"上架" : "下架"}</td>
+					</tr>
+				</table>
+				</div>
+				<div style="clear:both "></div>
+			</div>
+			<hr>
+		</div>
+
+	</div>
+</div>
+
+<script type="text/javascript">
+    $(function(){
+        $(window).resize(function(){
+            $("#main-container").css("min-height", $(window).height() - 343);
+        }).resize();
+    })
+</script>
+<!-- /主体 -->
+
+<!-- 底部 -->
+
+<!-- 底部
+================================================== -->
+<footer class="footer">
+	<div class="container">
+		<p> ©2015 <strong><a href="/">神秘商店</a></strong> </p>
+	</div>
+</footer>
+<!-- 用于加载js代码 -->
+<!-- 页面footer钩子，一般用于加载插件JS文件和JS代码 -->
+<div class="hidden"><!-- 用于加载统计代码等隐藏元素 -->
+
+</div>
+
+<!-- /底部 -->
+</body>
+</html>

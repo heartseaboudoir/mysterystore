@@ -1,0 +1,144 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <!-- 高级搜索 -->
+    <div class="search-form fr cf">
+        <form id="search-form" onsubmit="return false;">
+            <div class="search-form fr cf">
+                <label id="msg" name="msg"></label>
+                <div class="sleft">
+                    <input type="text" name="s_date" class="text input-text search-input time" value="{$s_date}" placeholder="请选择开始日期" />
+                    <input type="text" name="e_date" class="text input-text search-input time" value="{$e_date}" placeholder="请选择结束日期" />
+                    <a class="sch-btn" href="javascript:;" id="search" url="{:addons_url('Warehouse://WarehousePurchase:/index')}?v={$v}"><i class="btn-search"></i></a>
+                </div>
+            </div>
+        </form>
+    </div>
+    <a class="btn" href="{:addons_url('Warehouse://WarehousePurchase:/index')}?isprint=1">导出Excel</a>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+                <tr>
+                    <th>序号</th>
+                    <th>采购申请单号</th>
+                    <th>申请日期</th>
+                    <th>申请种类</th>
+                    <th>申请数量</th>
+                    <th>申请人</th>
+                    <th>申请仓库/门店</th>
+                    <th>售价金额</th>
+                    <th>申请结果</th>
+                    <th>备注</th>
+                    <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php $i=0; ?>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <?php $i++; ?>
+                    <td>{$i}</td>
+                    <td>{$lv.p_r_sn}</td>
+                    <td>{$lv.ctime}</td>
+                    <td>{$lv.g_type}种</td>
+                    <td>{$lv.g_nums}</td>
+                    <td>{$lv.nickname}</td>
+                    <td><?php if($lv['store_id'] == 0){ ?>{$lv.w_name}<?php }else{ ?>{$lv.w_name}/{$lv.store_name}<?php } ?></td>
+                    <td>{$lv.g_amounts}</td>
+                    <td><?php if($lv['is_pass'] == 0){
+                        echo('新增');
+                     }else{
+                        if($lv['is_pass'] == $lv['g_type']){
+                            echo('全部拒绝');
+                         }else{
+                            if($lv['is_pass'] == $lv['g_type'] * 2){
+                                echo('全部通过');
+                             }else{
+                                echo('部分处理');
+                             }
+
+                         }
+                     }?></td>
+                    <td>{$lv.remark|subtext=18}</td>
+                    <td>
+                        <a class="" href="{:addons_url('Warehouse://WarehousePurchase:/view?id='.$lv['p_r_id'])}" data-id="{$lv.id}">查看</a> |
+                        <a class="jq-confirm" href="{:addons_url('Warehouse://WarehousePurchase:/again?id='.$lv['p_r_id'])}" data-id="{$lv.id}">再次申请</a>
+                    </td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <link href="__STATIC__/datetimepicker/css/datetimepicker.css" rel="stylesheet" type="text/css">
+    <link href="__STATIC__/datetimepicker/css/dropdown.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+    <script type="text/javascript">
+        highlight_subnav('{:addons_url('Warehouse://WarehousePurchase:/index')}');
+            //搜索功能
+                $('.search-form input').focus(function(){
+                    $(document).keypress(function (e) {
+                        // 回车键事件
+                        if (e.which == 13) {
+                            $("#search").click();
+                        }
+                    });
+                });
+        $("#search").click(function() {
+            var url = $(this).attr('url');
+            var query = $('.search-form').find('input').serialize();
+            query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g, '');
+            query = query.replace(/^&/g, '');
+            if (url.indexOf('?') > 0) {
+                url += '&' + query;
+            } else {
+                url += '?' + query;
+            }
+            var query2 = $('#select-form').serialize();
+            if (url.indexOf('?') > 0) {
+                url += '&' + query2;
+            } else {
+                url += '?' + query2;
+            }
+            window.location.href = url;
+        });
+
+        // 状态搜索子菜单
+        $(".search-form").find(".drop-down").hover(function() {
+            $("#sub-sch-menu").removeClass("hidden");
+        }, function() {
+            $("#sub-sch-menu").addClass("hidden");
+        });
+        $("#sub-sch-menu li").find("a").each(function() {
+            $(this).click(function() {
+                var text = $(this).text();
+                $("#sch-sort-txt").text(text).attr("data", $(this).attr("value"));
+                $("#sub-sch-menu").addClass("hidden");
+            })
+        });
+        var _T;
+        $('#select-form input').change(function(){
+            clearTimeout(_T);
+            _T = setTimeout(function(){
+                $("#search").click();
+            }, 1000);
+        });
+        $('.time').datetimepicker({
+            format: 'yyyy-mm-dd',
+            language: "zh-CN",
+            minView: 2,
+            autoclose: true
+        });
+    </script>
+</block>

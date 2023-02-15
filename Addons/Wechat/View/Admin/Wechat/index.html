@@ -1,0 +1,53 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>公众号列表</h2>
+    </div>
+    <div style="margin-bottom:10px;">
+        <a class="btn" href="{:addons_url('Wechat://WechatAdmin:/save')}">添加公众号</a>
+    </div>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+                <tr>
+                    <th>标题</th>
+                    <th>公众号原始ID</th>
+                    <th>微信号</th>
+                    <th>状态</th>
+                    <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td>{$lv.title}</td>
+                    <td>{$lv.ukey}</td>
+                    <td>{$lv.config.wx_id}</td>
+                    <td>{$lv.status_text}</td>
+                    <td>
+                        <a class="update" href="{:addons_url('Wechat://WechatAdmin:/save?id='.$lv['id'])}" data-id="{$lv.id}">编辑</a>
+                        <a class="delete confirm ajax-get" href="{:addons_url('Wechat://WechatAdmin:/delete?id='.$lv['id'])}" data-id="{$lv.id}">删除</a>
+                    </td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $(function() {
+            //全选节点
+            $('.check-all').on('change', function() {
+                $('.ids').prop('checked', this.checked);
+            });
+        })
+    </script>
+</block>

@@ -1,0 +1,53 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+                <tr>
+                    <th>店铺用户</th>
+                    <th>评价用户</th>
+                    <th style="width:100px">商品星级</th>
+                    <th style="width:100px">服务星级</th>
+                    <th style="width:120px">评价时间</th>
+                    <th style="width:120px">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td><a href="{:U('Member/show', array('id' => $lv['uid']))}"><img src="{$lv.uid|get_header_pic}" class="header_pic" />{$lv.uid|get_nickname}</a></td>
+                    <td><a href="{:U('Member/show', array('id' => $lv['create_uid']))}"><img src="{$lv.create_uid|get_header_pic}" class="header_pic" />{$lv.create_uid|get_nickname}</a></td>
+                    <td>{$lv.goods_star}</td>
+                    <td>{$lv.shop_star}</td>
+                    <td>{$lv.create_time|time_format}</td>
+                    <td>
+                        <a class="update" href="{:addons_url('Shop://ShopAssessAdmin:/save?id='.$lv['id'])}" data-id="{$lv.id}">查看</a>
+                        <a class="update" href="{:addons_url('Shop://ShopAssessAdmin:/remove?id='.$lv['id'])}" data-id="{$lv.id}">删除</a>
+                    </td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $(function() {
+            highlight_subnav('{:addons_url('Shop://ShopAssessAdmin:/index')}');
+            //全选节点
+            $('.check-all').on('change', function() {
+                $('.ids').prop('checked', this.checked);
+            });
+        })
+    </script>
+</block>

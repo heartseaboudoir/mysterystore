@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>code page</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="stylesheet" href="/Public/res/Wap/code/css/show.css" media="all">
+    <script type="text/javascript" src="/Public/res/Wap/code/js/jquery-2.1.4.js"></script>
+</head>
+
+<body>
+标题：<?php echo $data['title']; ?><br>
+说明：<?php echo $data['info']; ?><br>
+作者：<?php echo $data['author']; ?><br>
+时间：<?php echo date('Y-m-d', $data['author']); ?><br>
+链接：<?php echo $data['content']; ?><br>
+</body>
+</html>

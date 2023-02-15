@@ -1,0 +1,233 @@
+<extend name="Public/base" />
+
+<block name="body">
+<div class="site-search">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <!-- 高级搜索 -->
+    <div class="search-form fr cf">
+        <form id="search-form" onsubmit="return false;">
+            <div class="search-form fr cf">
+                <label id="msg" name="msg"></label>
+                <div class="fl layui-form">
+                    <div class="layui-input-inline">
+                        <input type="text" name="goods_name" value="{$goods_name}" placeholder="请输入商品名" class="layui-input">
+                    </div>
+                    <div class="layui-input-inline">
+                        <input type="text" name="sn" value="{$sn}" placeholder="请输入单号" class="layui-input">
+                    </div>
+                    <div class="layui-input-inline">
+                        <select name="select_warehouse_id" lay-filter="aihao" lay-search>
+                            <option value="">请选择仓库</option>
+                            <volist name="warehouse" id="l1">
+                                <option value="{$l1.w_id}" <?php if($warehouse_id == $l1['w_id']){ echo('selected'); } ?>>{$l1.w_name}</option>
+                            </volist>
+                        </select>
+                    </div>
+                    <div class="layui-input-inline">
+                        <select name="select_store_id" lay-filter="aihao" lay-search>
+                            <option value="">请选择门店</option>
+                            <volist name="store" id="l2">
+                                <option value="{$l2.id}" <?php if($store_id == $l2['id']){ echo('selected'); } ?>>{$l2.title}</option>
+                            </volist>
+                        </select>
+                    </div>
+                    <div class="layui-input-inline">
+                        <select name="select_supply_id" lay-filter="aihao" lay-search>
+                            <?php if($lv0['supply_id'] == ''){ echo('<option value="" selected>请选择供应商</option>'); } ?>
+                            <volist name="supply" id="l2">
+                                <option value="{$l2.s_id}" <?php if($supply_id == $l2['s_id']){ echo('selected'); } ?>>{$l2.s_name}</option>
+                            </volist>
+                        </select>
+                    </div>
+                </div>
+                <div class="sleft">
+                    <input type="text" name="s_date" class="text input-text search-input time" value="{$s_date}" placeholder="请选择开始日期" />
+                    <input type="text" name="e_date" class="text input-text search-input time" value="{$e_date}" placeholder="请选择结束日期" />
+                    <a class="sch-btn" href="javascript:void(0);" id="search" url="{:addons_url('Purchase://PurchaseError:/index')}?v={$v}"><i class="btn-search"></i></a>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+                <tr>
+                    <th>序号</th>
+                    <th>采购单号</th>
+                    <th>采购日期</th>
+                    <th>采购种类</th>
+                    <th>采购数量</th>
+                    <th>管理员</th>
+                    <th>收货门店/仓库</th>
+                    <th>供应商</th>
+                    <th>售价金额</th>
+                    <th>采购金额</th>
+                    <th>询价单</th>
+                    <th>采购结果</th>
+                    <th>备注</th>
+                    <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php $i=0; ?>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <?php $i++; ?>
+                    <td>{$i}</td>
+                    <td>{$lv.p_sn}</td>
+                    <td>{$lv.ctime}</td>
+                    <td>{$lv.g_type}种</td>
+                    <td>{$lv.g_nums}</td>
+                    <td>{$lv.nickname}</td>
+                    <td><?php if($lv['w_name']!= ''){ ?>
+                        {$lv['w_name']|subtext=9}
+                        <?php }else{ ?>
+                        {$lv['store_name']|subtext=9}
+                        <?php } ?></td>
+                    <td>{$lv.s_name}</td>
+                    <td>{$lv.g_amounts}</td>
+                    <td><?php if($lv['p_amounts'] > 0){
+                        echo $lv['p_amounts'];
+                        }else{
+                        echo $lv['p_amounts1'];
+                        }?></td>
+                    <td>{$lv.p_s_sn}</td>
+                    <td><?php if($lv['p_status'] == 0){
+                        echo('新增');
+                                //echo '/' .$lv['nickname'];
+                     }else{
+                        if($lv['p_status'] == 1){
+                            echo '<font color="blue">已审核</font>';
+                                if($lv['pnickname'] != ''){
+                                echo  '/' .$lv['w_in_sn'] .$lv['s_in_sn'] .'/验收:' .$lv['win_nums'] .$lv['sin_nums'] .'/退货:' .$lv['wout_num'] .$lv['sout_num'];
+                                }
+                                if($lv['w_in_status'] == 1 || $lv['s_in_status'] == 1){
+                                    echo '<font color="blue">已验收</font>';
+                                }
+                                if($lv['w_in_status'] == 3 || $lv['s_in_status'] == 3){
+                                    echo '<font color="blue">部分验收，部分退货</font>';
+                                }
+                         }else{
+                            if($lv['p_status'] == 2){
+                                echo '<font color="red">已作废</font>';
+                                if($lv['pnickname'] != ''){
+                                //echo '/' .$lv['pnickname'];
+                                }
+                             }else{
+                                echo('其它');
+                             }
+
+                         }
+                     }?></td>
+                    <td>{$lv.remark|subtext=5}</td>
+                    <td>
+                        <?php
+                    switch ($lv['p_status'])
+                    {
+                    case 0:
+                        ?>
+                        <?php
+                      break;
+                    case 1:
+                        ?>
+                        <a class="" href="{:addons_url('Purchase://PurchaseError:/view?id='.$lv['p_id'])}" data-id="{$lv.id}">编辑</a>&nbsp;|
+                        <a class="jq-confirm" href="{:addons_url('Purchase://PurchaseError:/pass')}?id={$lv['p_id']}&pass=3" data-id="{$lv.id}">处理</a>&nbsp;|
+                        <!--<font color="blue">已审核</font>&nbsp;-->
+                        <?php
+                            break;
+                        case 2:
+                        ?>
+                        <a class="" href="{:addons_url('Purchase://Purchase:/view?id='.$lv['p_id'])}" data-id="{$lv.id}">查看</a>&nbsp;|
+                        <font color="red">已作废</font>&nbsp;
+                        <?php
+                            break;
+                        default:
+                            echo('其它');
+                            break;
+                        }
+                        ?>
+                    </td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</div>
+</block>
+<block name="script">
+<script type="text/javascript">
+    layui.use(['main','form'], function() {
+        var $ = layui.jquery,
+         form = layui.form;
+    });
+</script>
+<link href="__STATIC__/datetimepicker/css/datetimepicker.css" rel="stylesheet" type="text/css">
+<link href="__STATIC__/datetimepicker/css/dropdown.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="__STATIC__/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+<script type="text/javascript" src="__STATIC__/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+<script type="text/javascript">
+    highlight_subnav('{:addons_url('Purchase://Purchase:/index')}');
+        //搜索功能
+            $('.search-form input').focus(function(){
+                $(document).keypress(function (e) {
+                    // 回车键事件
+                    if (e.which == 13) {
+                        $("#search").click();
+                    }
+                });
+            });
+    $("#search").click(function() {
+        var url = $(this).attr('url');
+        var query = $('.search-form').find('input,select').serialize();
+        query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g, '');
+        query = query.replace(/^&/g, '');
+        if (url.indexOf('?') > 0) {
+            url += '&' + query;
+        } else {
+            url += '?' + query;
+        }
+        var query2 = $('#select-form').serialize();
+        if (url.indexOf('?') > 0) {
+            url += '&' + query2;
+        } else {
+            url += '?' + query2;
+        }
+        window.location.href = url;
+    });
+
+    // 状态搜索子菜单
+    $(".search-form").find(".drop-down").hover(function() {
+        $("#sub-sch-menu").removeClass("hidden");
+    }, function() {
+        $("#sub-sch-menu").addClass("hidden");
+    });
+    $("#sub-sch-menu li").find("a").each(function() {
+        $(this).click(function() {
+            var text = $(this).text();
+            $("#sch-sort-txt").text(text).attr("data", $(this).attr("value"));
+            $("#sub-sch-menu").addClass("hidden");
+        })
+    });
+    var _T;
+    $('#select-form input').change(function(){
+        clearTimeout(_T);
+        _T = setTimeout(function(){
+            $("#search").click();
+        }, 1000);
+    });
+    $('.time').datetimepicker({
+        format: 'yyyy-mm-dd',
+        language: "zh-CN",
+        minView: 2,
+        autoclose: true
+    });
+</script>
+</block>

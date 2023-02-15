@@ -1,0 +1,31 @@
+<extend name="Base/common"/>
+<block name="body">
+<div class="weui_tab">
+    <div class="weui_tab_bd">
+        <div class="weui_cells weui_cells_access mt0">
+            <a class="weui_cell weui_cell_avator" href="javascript:;">
+                <div class="weui_cell_bd weui_cell_primary">
+                    <p>头像</p>
+                </div>
+                <div class="weui_cell_ft weui_cell_ft_avator">
+                    <img src="{$member.header_pic}" alt="">
+                </div>
+            </a>
+        </div>
+        <div class="weui_cells weui_cells_access">
+            <a class="weui_cell" href="{:U('User/update_nickname')}">
+                <div class="weui_cell_bd weui_cell_primary">
+                    <p>昵称</p>
+                </div>
+                <div class="weui_cell_ft">{$member.nickname}</div>
+            </a>
+            <a class="weui_cell" href="{:U('Document/show', array('name' => 'user_level'))}">
+                <div class="weui_cell_bd weui_cell_primary">
+                    <p>会员等级</p>
+                </div>
+                <div class="weui_cell_ft">{$member.score_data.level_title}</div>
+            </a>
+        </div>
+    </div>
+</div>
+</block>

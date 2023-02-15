@@ -1,0 +1,52 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+                <tr>
+                    <th>用户昵称</th>
+                    <th>可消费的蜜糖</th>
+                    <th>获得的总蜜糖</th>
+                    <th>等级</th>
+                    <th>经验</th>
+                    <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td>{$lv.uid|get_nickname}</td>
+                    <td>{$lv.score}</td>
+                    <td>{$lv.all_score}</td>
+                    <td>{$lv.level.title}</td>
+                    <td>{$lv.exper}</td>
+                    <td>
+                        <a class="update" href="{:addons_url('Scorebox://ScoreboxLogAdmin:/index?uid='.$lv['uid'])}" data-id="{$lv.id}">查看记录</a>
+                    </td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $(function() {
+            highlight_subnav('{:addons_url('Scorebox://ScoreboxAdmin:/index')}');
+            //全选节点
+            $('.check-all').on('change', function() {
+                $('.ids').prop('checked', this.checked);
+            });
+        })
+    </script>
+</block>

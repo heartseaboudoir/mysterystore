@@ -1,0 +1,287 @@
+<extend name="Public/base" />
+<style>
+    .div-inline{ width:100px;height:50px;border:1px solid #F00}
+</style>
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <?php
+     if($s_date != ''){
+        $strhref .= '&s_date=' .$s_date;
+     }
+     if($e_date != ''){
+        $strhref .= '&e_date=' .$e_date;
+     }
+     ?>
+    <div style="clear:both;"></div>
+        <!-- 累计用户 -->
+    <div style="width: 100%;height:250px;float:left;">
+        <div id="sum_user" style="width: 20%;height:200px;float:left;border:3px solid #F00;margin:5px 5px;text-align:center;line-height:100px; "><table style="width:100%;"><tr><td style="text-align:center;width:100%;vertical-align:middle;background-color:red"><font size="4" style="color: white;">累计用户</font></td></tr><tr><td><font size="6">{$usercount}</font></td></tr></table></div>
+        <!-- 过去7天活跃用户 -->
+        <div id="7user" style="width: 20%;height:200px;float:left;border:3px solid #F00;margin:5px 5px;text-align:center;line-height:100px;"><table style="width:100%;"><tr><td style="text-align:center;width:100%;vertical-align:middle;background-color:red"><font size="4" style="color: white;">过去7天活跃用户</font></td></tr><tr><td><font size="6">{$usercount7}</font></td></tr></table></div>
+        <!-- 过去30天活跃用户 -->
+        <div id="30user" style="width: 20%;height:200px;float:left;border:3px solid #F00;margin:5px 5px;text-align:center;line-height:100px;"><table style="width:100%;"><tr><td style="text-align:center;width:100%;vertical-align:middle;background-color:red"><font size="4" style="color: white;">过去30天活跃用户</font></td></tr><tr><td><font size="6">{$usercount30}</font></td></tr></table></div>
+        <!-- 过去7天日客单价 -->
+        <div id="7avg" style="width: 20%;height:200px;float:left;border:3px solid #F00;margin:5px 5px;text-align:center;line-height:100px;"><table style="width:100%;"><tr><td style="text-align:center;width:100%;vertical-align:middle;background-color:red"><font size="4" style="color: white;">过去7天日客单价</font></td></tr><tr><td><font size="6">{$avg_p}</font></td></tr></table></div>
+    </div>
+
+    <div style="width: 100%;height:800px;float:left;">
+        <!--<a href="{:addons_url('Report://Sale:/general')}?isprint=1" class="btn">导出Excel</a>
+        <a href="{:addons_url('Report://MemberSale:/m_sale')}?v=1&s_date={$s_date}&e_date={$e_date}" class="btn">切换成列表</a>-->
+        <a href="{:addons_url('Report://Sale:/general')}?v=1{$strhref}" class="btn">新用户</a>
+        <a href="{:addons_url('Report://Sale:/general')}?v=2{$strhref}" class="btn">活跃用户</a>
+        <a href="{:addons_url('Report://Sale:/general')}?v=3{$strhref}" class="btn">消费次数</a>
+        <a href="{:addons_url('Report://Sale:/general')}?v=4{$strhref}" class="btn">消费金额</a>
+        <a href="{:addons_url('Report://Sale:/general')}?v=5{$strhref}" class="btn">累计用户</a>
+        <a href="{:addons_url('Report://Sale:/general')}?v=6{$strhref}" class="btn">日客单价</a>
+        <a href="{:addons_url('Report://Sale:/general')}?v=7{$strhref}" class="btn">平均日消费次数</a>
+        <!-- 高级搜索 -->
+        <div class="search-form fr cf">
+            <form id="search-form" onsubmit="return false;">
+                <div class="search-form fr cf">
+                    <label id="msg" name="msg"></label>
+                    <div class="sleft">
+                        <input type="text" name="s_date" class="text input-text search-input time" value="{$s_date}" placeholder="请选择开始日期" />
+                        <input type="text" name="e_date" class="text input-text search-input time" value="{$e_date}" placeholder="请选择结束日期" />
+                        <a class="sch-btn" href="javascript:;" id="search" url="{:addons_url('Report://Sale:/general')}?v={$v}"><i class="btn-search"></i></a>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <!-- 第一个图表 -->
+        <div id="first" style="width: 100%;height:700px;float:left;"></div>
+        <!-- 分页 -->
+        <div class="page" style="float:left;width: 100%;">
+            {$_page}
+        </div>
+    </div>
+    <div style="width: 100%;height:500px;float:left;">
+        <!-- 空格 -->
+        <div style="width: 10%;height:100px;float:left;">&nbsp;</div>
+        <!-- 第二个图表 -->
+        <div id="second" style="width: 45%;height:500px;float:left;"></div>
+        <!-- 第三个图表 -->
+        <div id="third" style="width: 45%;height:500px;float:left;"></div>
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/echarts.js"></script>
+    <link href="__STATIC__/datetimepicker/css/datetimepicker.css" rel="stylesheet" type="text/css">
+    <link href="__STATIC__/datetimepicker/css/dropdown.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+    <script type="text/javascript">
+        highlight_subnav('{:addons_url('Report://Sale:/general')}');
+            //搜索功能
+            $('.search-form input').focus(function(){
+                $(document).keypress(function (e) {
+                    // 回车键事件
+                    if (e.which == 13) {
+                        $("#search").click();
+                    }
+                });
+            });
+        $("#search").click(function() {
+            var url = $(this).attr('url');
+            var query = $('.search-form').find('input').serialize();
+            query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g, '');
+            query = query.replace(/^&/g, '');
+            if (url.indexOf('?') > 0) {
+                url += '&' + query;
+            } else {
+                url += '?' + query;
+            }
+            var query2 = $('#select-form').serialize();
+            if (url.indexOf('?') > 0) {
+                url += '&' + query2;
+            } else {
+                url += '?' + query2;
+            }
+            window.location.href = url;
+        });
+
+        // 状态搜索子菜单
+        $(".search-form").find(".drop-down").hover(function() {
+            $("#sub-sch-menu").removeClass("hidden");
+        }, function() {
+            $("#sub-sch-menu").addClass("hidden");
+        });
+        $("#sub-sch-menu li").find("a").each(function() {
+            $(this).click(function() {
+                var text = $(this).text();
+                $("#sch-sort-txt").text(text).attr("data", $(this).attr("value"));
+                $("#sub-sch-menu").addClass("hidden");
+            })
+        });
+        var _T;
+        $('#select-form input').change(function(){
+            clearTimeout(_T);
+            _T = setTimeout(function(){
+                $("#search").click();
+            }, 1000);
+        });
+        $('.time').datetimepicker({
+            format: 'yyyy-mm-dd',
+            language: "zh-CN",
+            minView: 2,
+            autoclose: true
+        });
+    </script>
+    <script type="text/javascript">
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('first'));
+        // 显示标题，图例和空的坐标轴
+        /*grid: {
+         left: '3%',
+         right: '4%',
+         bottom: '3%',
+         containLabel: true
+         },
+         toolbox: {
+         feature: {
+         saveAsImage: {}
+         }
+         },*/
+        option = {
+            title: {
+                text: '{$legendstr}',
+                subtext: '{$title_top10_1_sub}'
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data:['{$legendstr}']
+            },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: [{$xstr}],
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [
+                {
+                    name:'{$legendstr}',
+                    type:'line',
+                    stack: '总量',
+                    data:[{$datastr}]
+                }
+            ]
+        };
+        myChart.setOption(option);
+        myChart.on('click', function (params) {
+            var ids = params.dataIndex;
+            var uidary = params.seriesId;
+            var uida = uidary.split(',');
+            var uid = uida[ids];
+            var str = '{:addons_url('Report://Sale:/newuserlist')}?v={$v}&s_date={$s_date}&e_date={$e_date}';
+                    window.location.href = str;
+        });
+
+        var myChart1 = echarts.init(document.getElementById('second'));
+        var datas_name = '{$xstr_top10_1}'.split(',');
+        var datas_value = '{$datastr_top10_1}'.split(',');
+        option1 = {
+            title : {
+                text: '{$title_top10_1}',
+                subtext: '{$title_top10_1_sub}',
+                x:'center'
+            },
+            tooltip : {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+            series : [
+                {
+                    name: '销售数量',
+                    type: 'pie',
+                    radius : '55%',
+                    center: ['50%', '60%'],
+                    data:[
+                        {value:datas_value[0], name:datas_name[0]},
+                        {value:datas_value[1], name:datas_name[1]},
+                        {value:datas_value[2], name:datas_name[2]},
+                        {value:datas_value[3], name:datas_name[3]},
+                        {value:datas_value[4], name:datas_name[4]},
+                        {value:datas_value[5], name:datas_name[5]},
+                        {value:datas_value[6], name:datas_name[6]},
+                        {value:datas_value[7], name:datas_name[7]},
+                        {value:datas_value[8], name:datas_name[8]},
+                        {value:datas_value[9], name:datas_name[9]},
+                    ],
+                    itemStyle: {
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }
+            ]
+        };
+        myChart1.setOption(option1);
+        myChart1.on('click', function (params) {
+            var ids = params.dataIndex;
+            var uidary = params.seriesId;
+            var uida = uidary.split(',');
+            var uid = uida[ids];
+            var str = '{:addons_url('Report://Sale:/goods_top10')}?s_date={$s_date}&e_date={$e_date}';
+                    window.location.href = str;
+        });
+
+        var myChart2 = echarts.init(document.getElementById('third'));
+        var datas_name2 = '{$xstr_top10_2}'.split(',');
+        var datas_value2 = '{$datastr_top10_2}'.split(',');
+        option2 = {
+            title : {
+                text: '{$title_top10_2}',
+                subtext: '{$title_top10_2_sub}',
+                x:'center'
+            },
+            tooltip : {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+            series : [
+                {
+                    name: '分类销量',
+                    type: 'pie',
+                    radius : '55%',
+                    center: ['50%', '60%'],
+                    data:[
+                        {value:datas_value2[0], name:datas_name2[0]},
+                        {value:datas_value2[1], name:datas_name2[1]},
+                        {value:datas_value2[2], name:datas_name2[2]},
+                        {value:datas_value2[3], name:datas_name2[3]},
+                        {value:datas_value2[4], name:datas_name2[4]},
+                        {value:datas_value2[5], name:datas_name2[5]},
+                        {value:datas_value2[6], name:datas_name2[6]},
+                        {value:datas_value2[7], name:datas_name2[7]},
+                        {value:datas_value2[8], name:datas_name2[8]},
+                        {value:datas_value2[9], name:datas_name2[9]},
+                    ],
+                    itemStyle: {
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }
+            ]
+        };
+        myChart2.setOption(option2);
+        myChart2.on('click', function (params) {
+            var ids = params.dataIndex;
+            var uidary = params.seriesId;
+            var uida = uidary.split(',');
+            var uid = uida[ids];
+            var str = '{:addons_url('Report://Sale:/cate_top10')}?s_date={$s_date}&e_date={$e_date}';
+                    window.location.href = str;
+        });
+    </script>
+</block>

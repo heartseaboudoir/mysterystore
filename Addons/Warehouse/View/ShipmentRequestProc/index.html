@@ -1,0 +1,155 @@
+<extend name="Public/base" />
+<block name="body">
+	<div id="jq-content" class="site-content">
+	    <div class="main-title">
+	        <h2>发货申请表</h2>
+	    </div>
+	    <div class="search-form fr cf">
+	        <form id="jq-search-form">
+	            <div class="search-form fr cf">
+	                <label id="msg" name="msg"></label>
+	                <div class="sleft">
+	                    <input type="text" name="s_date" class="text input-text search-input time" placeholder="请选择开始日期" />
+	                    <input type="text" name="e_date" class="text input-text search-input time" placeholder="请选择结束日期" />
+	                    <a id="jq-search-btn" class="sch-btn" href="javascript:void(0);"><i class="btn-search"></i></a>
+	                </div>
+	            </div>
+	        </form>
+	    </div>
+	    <a id="jq-download" class="btn">导出Excel</a>
+	    <div class="data-table table-striped">
+	        <table>
+	            <thead>
+	                <tr>
+	                    <th>序号</th>
+	                    <th>申请单号</th>
+	                    <th>申请日期</th>
+	                    <th>申请种类</th>
+	                    <th>申请数量</th>
+	                    <th>申请人</th>
+	                    <th>申请来源</th>
+	                    <th>发货仓库</th>
+	                    <th>售价金额</th>
+	                    <th>备注</th>
+	                    <th>操作</th>
+	                </tr>
+	            </thead>
+	            <tbody id="jq-list"></tbody>
+	        </table>
+	    </div>
+	    <div id="jq-page" class="page"></div>
+	</div>
+    <script id="temp-list" type="text/html">
+        {{each items as list index}}
+        <tr data-id="{{list.w_out_id}}">
+            <td>{{index+1}}</td>
+            <td>{{list.w_out_sn}}</td>
+            <td>{{list.ctime}}</td>
+            <td>{{list.g_type}}种</td>
+            <td>{{list.g_nums}}</td>
+            <td>{{list.admin_nickname}}</td>
+            <td>
+				{{if list.store_name == null || list.store_name == '' }} 
+					{{list.warehouse_name1}}
+				{{else}}
+					{{list.store_name}}
+				{{/if}}
+            </td>
+            <td>{{list.warehouse_name2}}</td>
+            <td>{{list.g_amount}}</td>
+            <td title="{{list.remark}}">
+            {{if list.remark != null}}
+                {{if list.remark.length > 19 }}
+                    {{list.remark.slice(0,18) + '...'}}
+                {{else}}
+                    {{list.remark}}
+                {{/if}}
+            {{/if}}
+            </td>
+            <td>
+                <a href="/Admin/Addons/ex_Warehouse/_addons/Warehouse/_controller/ShipmentRequestProc/_action/view/id/{{list.w_out_id}}.html">查看</a>
+                {{if list.w_out_status == 0}}
+                <a class="temp-verify" href="javascript:void(0);">审核出库</a>
+                <a class="temp-goods" href="javascript:void(0);">全部缺货</a>
+                {{/if}}
+            </td>
+        </tr>
+        {{/each}}
+    </script>
+</block>
+<block name="script">
+    <script type="text/javascript">
+    layui.use(['main'], function() {
+        var $ = layui.jquery,
+            layer = layui.layer;
+
+        var aId = parseInt(window.location.pathname.match(/\/(\w+).html/)[1]) || 1;    
+        $.getData({
+             url: '/Erp/ShipmentRequestProc/index?p='+aId,
+            load: true
+        }, function(res){
+            dataShow(res);
+        });
+        function dataShow(res){
+            var oDownload = $('#jq-download'),
+                    oList = $('#jq-list'),
+                    oPage = $('#jq-page');
+
+            oDownload.attr('href','javascript:void(0);').unbind();
+
+            if( res.content.data == null || res.content.data.length == 0 ){
+                oList.html('<tr><td class="wrap-empty">暂无内容！</td></tr>');
+                oDownload.css('cursor','default');
+            }else{
+                oList.html(template('temp-list', { items: res.content.data }));
+                var data = $('.search-form').find('input').serialize();
+                oDownload.fileDown({
+                     url: '/Erp/ShipmentRequestProc/exportWarehouseOutListExcel?'+data
+                }).removeAttr('style');
+            }
+
+            if( res.content.recordCount > 15){
+                var rDefault = /\/Erp\/ShipmentRequestProc\/index/g,
+                       rEdit = '/Admin/Addons/ex_Warehouse/_addons/Warehouse/_controller/ShipmentRequestProc/_action/index';
+                oPage.html( res.content.pager.replace(rDefault,rEdit) );
+            }else{
+                oPage.html( res.content.pager );
+            }
+
+            $('.temp-verify').tempConfirm({
+                url: '/Erp/ShipmentRequestProc/checkForWarehouseOut'
+            },function(options){
+                var aId = parseInt( options.parents('tr').attr('data-id') );
+                return {'w_out_id': aId};
+            },function(options){
+                window.location.reload();
+            });
+            $('.temp-goods').tempConfirm({
+                url: '/Erp/ShipmentRequestProc/allOutOfStock'
+            },function(options){
+                var aId = parseInt( options.parents('tr').attr('data-id') );
+                return {'w_out_id': aId};
+            },function(options){
+                window.location.reload();
+            });
+        }
+            
+        $('#jq-search-btn').off().on({
+            click: function() {
+                var data = $('.search-form').find('input').serialize();
+                $.getData({
+                    url: '/Erp/ShipmentRequestProc/index?'+data,
+                }, function(res){
+                    dataShow(res);
+                });
+            }
+        });
+        $(document).keydown(function(e) {
+            if (e.which == 13) {
+                $('#jq-search-btn').click();
+            }
+        });
+
+    });
+    </script>
+</block>

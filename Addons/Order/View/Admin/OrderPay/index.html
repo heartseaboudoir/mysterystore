@@ -1,0 +1,47 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead> 
+                <tr>
+                    <th>订单号</th>
+                    <th>金额</th>
+                    <th>平台</th>
+                    <th>时间</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td>{$lv.order_sn}</td>
+                    <td>{$lv.money}</td>
+                    <td><switch name="lv.pay_type"><case value="1">微信</case><case value="2">支付宝</case></switch></td>
+                    <td>{$lv.create_time|time_format="Y-m-d H:i:s"}</td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        highlight_subnav('{:addons_url('Order://OrderPayAdmin:/index')}');
+        $(function() {
+            //全选节点
+            $('.check-all').on('change', function() {
+                $('.ids').prop('checked', this.checked);
+            });
+        })
+    </script>
+</block>

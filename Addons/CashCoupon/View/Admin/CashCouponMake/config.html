@@ -1,0 +1,119 @@
+<extend name="Public/base" />
+
+<block name="body">
+	<!-- 标题栏 -->
+	<div class="main-title">
+		<h2>{$meta_title}</h2>
+	</div>
+        <ul class="tab-nav nav">
+            <li class="current" data-tab="tab1"><a href="javascript:void(0);">基础</a></li>
+            <li data-tab="tab2"><a href="{:U('ShareConfig/edit', array('name' => 'pay_share'))}" onclick="if(!confirm('跳转前请确认当前页面信息已提交保存？')){ return false;}">分享设置</a></li>
+        </ul>
+        <div class="tab-content">
+            <!-- 数据列表 -->
+            <form id="form" action="{:addons_url('CashCoupon://CashCouponMakeAdmin:/config')}" method="post" class="form-horizontal">
+                <div class="tab-pane in tab1">
+                <p style="margin:5px 0; background:#008a00; color:#fff; padding:5px;">配置保存后，对新生成的优惠券有效</p>
+                        <div class="form-item cf">
+                            <label class="item-label">生成优惠券的标题<span class="check-tips">（描述优惠券，若为空，则自动生成优惠券标题）</span></label>
+                            <div class="controls">
+                                <input class="text input-min" type="text" value="{$data['make_title']}" name="make_title" maxlength="20">
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">生成优惠券的描述<span class="check-tips">（描述其他信息， 如 满100减20）</span></label>
+                            <div class="controls">
+                                <input class="text input-large" type="text" value="{$data['make_description']}" name="make_description" maxlength="80">
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">生成的抽取次数<span class="check-tips">(生成后的购物包可被抽取的次数，设置后只对下一次生成的购物包生效)</span></label>
+                            <div class="controls">
+                                <input class="text input-2x" type="text" value="{$data['num']|default=0}" name="num" >
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">最小抽取金额<span class="check-tips">（最小可抽取到的金额数，为大于0,保存2位小数）</span></label>
+                            <div class="controls">
+                                <input class="text input-mini" type="text" value="{$data['min_money']}" name="min_money" >
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">最大抽取金额<span class="check-tips">（最大可抽取到的金额数，为大于0,保存2位小数）</span></label>
+                            <div class="controls">
+                                <input class="text input-mini" type="text" value="{$data['max_money']}" name="max_money">
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">使用的最低限额<span class="check-tips">（消费满多少可使用，为大于0,保存2位小数）</span></label>
+                            <div class="controls">
+                                <input class="text input-mini" type="text" value="{$data['min_use_money']}" name="min_use_money">
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">可使用天数<span class="check-tips">(最晚时间将从领取当日加设置的天数, 设置为0时表示不限制)</span></label>
+                            <div class="controls">
+                                <label><input type="text" class="input-2x text" name="last_day" value="<gt name="data.last_day" value="0">{$data['last_day']|default=0}</gt>" /></label>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">特殊抽取金额<span class="check-tips">（特殊限定的金额）</span></label>
+                            <div class="controls">
+                                <input class="text input-mini" type="text" value="{$data['sp_money']}" name="sp_money">
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">特殊优惠券的描述<span class="check-tips">（描述其他信息， 如 满100减20）</span></label>
+                            <div class="controls">
+                                <input class="text input-large" type="text" value="{$data['make_sp_description']}" name="make_sp_description" maxlength="80">
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">特殊优惠券最多抽取数量<span class="check-tips">（特殊的优惠券最多可以抽取的数量，不得大于最多可被抽取数量）</span></label>
+                            <div class="controls">
+                                <input class="text input-mini" type="text" value="{$data['sp_num']}" name="sp_num">
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">特殊优惠券使用的最低限额<span class="check-tips">（特殊优惠券消费满多少可使用，为大于0,保存2位小数）</span></label>
+                            <div class="controls">
+                                <input class="text input-mini" type="text" value="{$data['sp_min_use_money']}" name="sp_min_use_money">
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">规则说明<span class="check-tips">（用于描述当前配置的规则）</span></label>
+                            <div class="controls">
+                                <textarea name="rule_content" class="textarea input-large" style="height:200px;">{$data.rule_content}</textarea>
+                            </div>
+                        </div>
+                </div>
+                <div class="form-item cf">
+                    <button id="submit" class="btn submit-btn ajax-post hidden" target-form="form-horizontal" type="submit">确 定</button>
+                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                </div>
+            </form>
+        </div>
+</block>
+<block name="script">
+<link href="__STATIC__/datetimepicker/css/datetimepicker.css" rel="stylesheet" type="text/css">
+<link href="__STATIC__/datetimepicker/css/dropdown.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="__STATIC__/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+<script type="text/javascript" src="__STATIC__/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+	<script type="text/javascript">
+		$(function(){
+                    $('#submit').attr('disabled', false);
+                    highlight_subnav("{:addons_url('CashCoupon://CashCouponMakeAdmin:/index')}");
+                    //全选节点
+                    $('.check-all').on('change',function(){
+                        $('.ids').prop('checked',this.checked);
+                    });showTab();
+                    $('.time').datetimepicker({
+                        format: 'yyyy-mm-dd',
+                        language:"zh-CN",
+                        minView:2,
+                        autoclose:true
+                    });
+		})
+                
+	</script>
+</block>

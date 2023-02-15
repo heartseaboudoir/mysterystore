@@ -1,0 +1,145 @@
+<extend name="Public/base" />
+
+<block name="body">
+        <script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+	<!-- 标题栏 -->
+	<div class="main-title">
+		<h2>{$meta_title}</h2>
+	</div>
+        <ul class="tab-nav nav">
+            <li class="current" data-tab="tab1"><a href="javascript:void(0);">基础</a></li>
+        </ul>
+        <div class="tab-content">
+            <!-- 数据列表 -->
+            <form id="form" action="{:addons_url('Shop://ShopArticleAdmin:/apply_status')}" method="post" class="form-horizontal">
+                <div class="tab-pane in tab1">
+                        <div class="form-item cf">
+                            <label class="item-label">发表人</label>
+                            <div class="controls">
+                                <a href="{:U('Member/Show', array('id' => $data['uid']))}"><img src="{$data.uid|get_header_pic}" class="header_pic" /> {$data.uid|get_nickname}</a>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">标题<span class="check-tips"></span></label>
+                            <div class="controls">
+                                {$data.title}
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">内容<span class="check-tips"></span></label>
+                            <div class="controls">
+                                {$data.content}
+                            </div>
+                        </div>
+                        <style>
+                            .art_img .upload-img-box{display:inline-block; margin:5px;}
+                            .tag{margin:5px; background:#eee; padding:5px 10px;}
+                        </style>
+                        <div class="form-item cf">
+                            <label class="item-label">图片<span class="check-tips"></span></label>
+                            <div class="controls art_img">
+                                <php>
+                                    $pics = explode(',', $data['pics']);
+                                </php>
+                                <volist name="pics" id="lv">
+                                    <div class="upload-img-box">
+                                        <div class="upload-pre-item"><img src="{$lv|get_cover=path}"/></div>
+                                    </div>
+                                </volist>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">商品名<span class="check-tips"></span></label>
+                            <div class="controls">
+                                {$data.goods.title}
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">商品封面<span class="check-tips"></span></label>
+                            <div class="controls">
+                                <div class="upload-img-box">
+                                    <div class="upload-pre-item"><img src="{$data.goods.pic|get_cover=path}"/></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">价格<span class="check-tips"></span></label>
+                            <div class="controls">
+                                {$data.goods.price}
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">邮费<span class="check-tips"></span></label>
+                            <div class="controls">
+                                {$data.goods.express_money}
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">库存<span class="check-tips"></span></label>
+                            <div class="controls">
+                                {$data.goods.num}
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">位置<span class="check-tips"></span></label>
+                            <div class="controls">
+                                {$data.weizhi}
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">标签<span class="check-tips"></span></label>
+                            <div class="controls">
+                                <volist name="data.tags" id="lv">
+                                    <span class="tag">{$lv}</span>
+                                </volist>
+                            </div>
+                        </div>
+                        <eq name="data.status" value="0">
+                        <div class="form-item cf">
+                            <label class="item-label">审核<span class="check-tips"></span></label>
+                            <div class="controls">
+                                <label><input type="radio" name="status" value="1" /> 通过</label>
+                                <label><input type="radio" name="status" value="2" /> 不通过</label>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">不通过的原因<span class="check-tips"></span></label>
+                            <div class="controls">
+                                <textarea name="remark" class="textarea input-large"></textarea>
+                            </div>
+                        </div>
+                        <else/>
+                        <div class="form-item cf">
+                            <label class="item-label">审核<span class="check-tips"></span></label>
+                            <div class="controls">
+                                不通过
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">不通过的原因<span class="check-tips"></span></label>
+                            <div class="controls">
+                                {$data.remark}
+                            </div>
+                        </div>
+                        </eq>
+                </div>
+                <div class="form-item cf">
+                    <button id="submit" class="btn submit-btn ajax-post hidden" target-form="form-horizontal" type="submit">提 交</button>
+                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                    <input type="hidden" value="{$data.id}" name="id" />
+                </div>
+            </form>
+        </div>
+</block>
+<block name="script">
+	<script type="text/javascript">
+		$(function(){
+                    highlight_subnav("{:addons_url('Shop://ShopArticleAdmin:/apply_index')}");
+                    //全选节点
+                    $('.check-all').on('change',function(){
+                        $('.ids').prop('checked',this.checked);
+                    });showTab();
+		})
+                
+	</script>
+</block>

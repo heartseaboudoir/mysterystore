@@ -1,0 +1,93 @@
+<div id="subnav" class="subnav">
+    <notempty name="_extra_menu">
+        {// 动态扩展菜单 //}
+        {:extra_menu($_extra_menu,$__MENU__)}
+    </notempty>
+    <!--<volist name="__MENU__.child" id="sub_menu">
+        <notempty name="sub_menu">
+            <notempty name="key"><h3><i class="icon icon-unfold"></i>{$key}</h3></notempty>
+            <ul class="side-sub-menu">
+                <volist name="sub_menu" id="menu">
+                    <li>
+                        <a class="item" href="{$menu.url|U}">{$menu.title}</a>
+                    </li>
+                </volist>
+            </ul>
+        </notempty>
+    </volist>-->
+    <!--<div class="layui-side-scroll">
+        <block name="sidebar">
+            <ul class="layui-nav layui-nav-tree" lay-filter="test">
+                <volist name="__MENU__.child" id="sub_menu">
+                    <notempty name="sub_menu">
+                        <li class="layui-nav-item layui-nav-itemed">
+                            <a href="javascript:void(0);">{$key}</a>
+                            <dl class="layui-nav-child">
+                                <volist name="sub_menu" id="menu">
+                                    <dd><a href="{$menu.url|U}">{$menu.title}</a>
+                                </volist>
+                            </dl>
+                        </li>
+                    </notempty>
+                </volist>
+            </ul>
+        </block>
+    </div>-->
+    <ul class="layui-nav layui-nav-tree" lay-filter="test">
+        <li class="layui-nav-item layui-nav-itemed">
+            <a href="javascript:void(0);">个人中心</a>
+            <dl class="layui-nav-child">
+                <dd <eq name="Think.ACTION_NAME" value="mydocument">class="current"</eq>><a href="{:U('article/mydocument')}">我的文档</a></dd>
+                <eq name="show_draftbox" value="1">
+                <dd <eq name="Think.ACTION_NAME" value="draftbox">class="current"</eq>><a href="{:U('article/draftbox')}">草稿箱</a></dd>
+                </eq>
+            </dl>
+        </li>
+        <volist name="nodes" id="sub_menu">
+            <notempty name="sub_menu">
+                <li class="layui-nav-item layui-nav-itemed">
+                    <a href="{$sub_menu.url|U}">{$sub_menu.title}</a>
+                    <dl class="layui-nav-child">
+                        <volist name="sub_menu['_child']" id="menu">
+                            <dd <if condition="$menu['id'] eq $cate_id or $menu['current'] eq 1">class="current"</if>><a href="{$menu.url|U}">{$menu.title}</a>
+                            
+                                <present name="menu['_child']">
+                                    <dl style="padding-left: 20px;display: none;">
+                                        <foreach name="menu['_child']" item="three_menu">
+                                            <dd><a href="{$three_menu.url|U}">{$three_menu.title}</a>
+
+                                            <present name="three_menu['_child']">
+                                                <dl style="padding-left: 20px;">
+                                                    <foreach name="three_menu['_child']" item="four_menu">
+                                                        <dd><a href="{:U('index','cate_id='.$four_menu['id'])}">{$four_menu.title}</a>
+
+                                                        <present name="four_menu['_child']">
+                                                            <dl style="padding-left: 20px;">
+                                                                <volist name="four_menu['_child']" id="five_menu">
+                                                                    <dd><a href="{:U('index','cate_id='.$five_menu['id'])}">{$five_menu.title}</a>
+                                                                </volist>
+                                                            </dl>
+                                                        </present>
+
+                                                    </foreach>
+                                                </dl>
+                                            </present>
+
+                                        </foreach>
+                                    </dl>
+                                </present>
+
+                            </dd>
+                        </volist>
+                    </dl>
+                </li>
+            </notempty>
+        </volist>
+        <eq name="show_recycle" value="1">
+            <li class="layui-nav-item layui-nav-itemed">
+                <a href="{:U('article/recycle')}">回收站</a>
+                <dl class="layui-nav-child"></dl>
+            </li>
+        </eq>
+    </ul>
+</div>

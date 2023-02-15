@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <meta name="keywords" content="神秘商店" />
+    <meta name="description" content="神秘商店" />
+	<title>神秘商店</title>
+	<script type="text/javascript" src="/Public/res/Wap/base/js/rem.js?v=4"></script>
+	<link rel="stylesheet" href="/Public/res/Wap/base/css/base.css"/>
+	<link rel="stylesheet" href="/Public/res/Wap/worldcup/css/index.css?v=4"/>
+</head>
+<body class="site-login">
+<div class="site-container">
+    <form id="jq-form" class="wrap-form">
+		<label>
+			<input id="jq-phone" type="input" placeholder="请输入手机号码" maxlength="11" num/>
+			<span id="jq-send" class="wrap-captcha">发送验证码</span>
+		</label>
+		<label>
+			<input id="jq-code" type="input" placeholder="请输入验证码" maxlength="6" num/>
+		</label>
+		<input type="submit" class="wrap-submit" value="确认登录">
+	</form>
+</div>
+<script type="text/javascript">
+var data_ids = '<?php echo $ids; ?>';
+var data_type = '<?php echo $type; ?>';
+</script>
+<script type="text/javascript" src="/Public/res/Wap/base/js/zepto.min.js"></script>
+<script type="text/javascript" src="/Public/res/Wap/worldcup/js/login.js?v=13"></script>

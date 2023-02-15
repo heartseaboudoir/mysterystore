@@ -1,0 +1,49 @@
+<extend name="Public/base"/>
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+            <tr>
+                <th>库存快照</th>
+                <th>库存成本金额</th>
+                <th>生成时间</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td>{$lv.year}年{$lv.month}月库存快照</td>
+                    <td>{$lv.g_amounts}</td>
+                    <td>{$lv.create_time|time_format="Y-m-d H:i"}</td>
+                    <td>
+                        <a href="{:addons_url('Goods://GoodsStoreSnapshotAdmin:/ls', array('id' => $lv['id']))}">查看记录</a>
+                    </td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $(function () {
+            highlight_subnav('{:addons_url('
+            Goods://GoodsStoreSnapshotAdmin:/index')}');
+                //全选节点
+                $('.check-all').on('change', function () {
+                    $('.ids').prop('checked', this.checked);
+                });
+        })
+    </script>
+</block>

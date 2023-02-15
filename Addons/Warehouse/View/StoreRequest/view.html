@@ -1,0 +1,96 @@
+<extend name="Public/base" />
+<block name="body">
+    <div id="jq-content" class="site-content">
+        <div class="main-title">
+            <h2>发货申请单查看</h2>
+        </div>
+        <a id="jq-download" class="btn" href="javascript:void(0);">导出Excel</a>
+        <form action="{:addons_url('Warehouse://WarehouseOut:/updatewarehouse')}" method="post" class="form-horizontal">
+            <div id="jq-list" class="tab-pane in tab1"></div>
+            <div class="data-table table-striped">
+                <table>
+                    <thead>
+                        <tr>
+                        	<th>序号</th>
+                            <th>商品ID</th>
+                            <th>商品名称</th>
+                            <th>商品类别</th>
+                            <th>商品条码</th>
+                            <th>零售价</th>
+                            <th>申请数量</th>
+                            <th>申请结果</th>
+                        </tr>
+                    </thead>
+                    <tbody id="jq-child"></tbody>
+                </table>
+            </div>
+        </form>
+        <div class="page">
+            {$_page}
+        </div>
+    </div>
+    <script id="temp-list" type="text/html">
+        {{each items as list index}}
+        <div class="form-item cf">
+            <div class="controls goods_div">
+                <label>申请单号：{{list.s_r_sn}}</label>
+                <label>创建日期：{{list.ctime}}</label>
+                <label>商品种类：{{list.g_type}}种</label>
+                <label>商品数量：{{list.g_nums}}</label>
+                <label>售价金额：{{list.g_amounts}}</label>
+            </div>
+            <div class="controls goods_div1">
+                <label>申请人：{{list.nickname}}</label>
+                <label>申请来源：{{list.store_name}}</label>
+                <label>发货仓库：{{list.warehouse_name}}</label>
+            </div>
+            <div class="controls goods_div4">
+                <label>备注：{{list.remark}}</label>
+            </div>
+        </div>
+        {{/each}}
+    </script>
+    <script id="temp-child" type="text/html">
+        {{each items as list index}}
+        <tr class="data_list">
+        	<td>{{index+1}}</td>
+            <td>{{list.goods_id}}</td>
+            <td>{{list.goods_name}}</td>
+            <td>{{list.cate_name}}</td>
+            <td>{{list.bar_code}}</td>
+            <td>{{list.sell_price}}</td>
+            <td>{{list.g_num}}</td>
+            <td>{{list.status_name}}</td>
+        </tr>
+        {{/each}}
+    </script>
+</block>
+<block name="script">
+    <script type="text/javascript">
+    layui.use(['main'], function() {
+        var $ = layui.jquery,
+            layer = layui.layer;
+
+        var aId = window.location.pathname.match(/\/(\w+).html/)[1];
+        $.get('/Erp/StoreRequest/getSingleStoreRequestDetailInfo?s_r_id='+aId, function(res) {
+            if (res.code == 200) {
+
+                $('#jq-list').html(template('temp-list', { items: res.content.maindata }));
+                $('#jq-child').html(template('temp-child', { items: res.content.list }));
+
+                $('#jq-loading').fadeOut();
+                $('#jq-content').fadeIn();
+            } else {
+                layer.msg(res.content, {
+                    time: 1500
+                });
+            }
+        }, 'json');
+
+        $('#jq-download').downFile({
+             url: '/Erp/StoreRequest/exportSingleStoreRequestDetailExcel?s_r_id='+aId
+        });
+
+    });
+    </script>
+</block>

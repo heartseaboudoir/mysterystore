@@ -1,0 +1,52 @@
+<extend name="Public/base" />
+
+<block name="body">
+        <script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+	<!-- 标题栏 -->
+	<div class="main-title">
+		<h2>{$meta_title}</h2>
+	</div>
+        <ul class="tab-nav nav">
+            <li class="current" data-tab="tab1"><a href="javascript:void(0);">基础</a></li>
+        </ul>
+        <div class="tab-content">
+            <!-- 数据列表 -->
+            <form id="form" action="" method="post" class="form-horizontal">
+                <div class="tab-pane in tab1">
+                    <volist name="list" id="lv">
+                        <div class="form-item cf">
+                            <label class="item-label">{$lv.title}<span class="check-tips"><notempty name="lv.description">（{$lv.description}）</notempty></span></label>
+                            <div class="controls">
+                                <switch name="lv.type">
+                                <case value="int">
+                                <input type="text" class="text input-min" name="data[{$lv.name}]" value="{$lv.data}" />
+                                </case>
+                                <case value="text">
+                                <input type="text" class="text input-large" name="data[{$lv.name}]" value="{$lv.data}" />
+                                </case>
+                                <case value="textarea">
+                                    <textarea class="textarea input-large" name="data[{$lv.name}]">{$lv.data}</textarea>
+                                </case>
+                                </switch>
+                            </div>
+                        </div>
+                    </volist>
+                </div>
+                <div class="form-item cf">
+                    <button id="submit" class="btn submit-btn ajax-post hidden" target-form="form-horizontal" type="submit">确 定</button>
+                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                </div>
+            </form>
+        </div>
+</block>
+<block name="script">
+	<script type="text/javascript">
+		$(function(){
+                    //全选节点
+                    $('.check-all').on('change',function(){
+                        $('.ids').prop('checked',this.checked);
+                    });showTab();
+		})
+                
+	</script>
+</block>

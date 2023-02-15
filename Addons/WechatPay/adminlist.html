@@ -1,0 +1,63 @@
+<div style="margin-bottom:10px;">
+    <a class="btn" href="{:addons_url('WechatPay://WechatPayConfig:/save')}">管理支付配置</a>
+</div>
+<table>
+	<thead>
+		<tr>
+                        <th class="row-selected row-selected"><input class="check-all" type="checkbox"/></th>
+			<th>序号</th>
+			<volist name="listKey" id="vo">
+				<th>{$vo}</th>
+			</volist>
+			<th>操作</th>
+		</tr>
+	</thead>
+	<tbody>
+		<volist name="_list" id="lv" key="vo">
+		<tr>
+                        <td><input class="ids" type="checkbox" name="ids[]" value="{$lv.id}" /></td>
+			<td>{$lv.id}</td>
+                            <volist name="listKey" id="lk">
+                                    <td>{$lv.$key}</td>
+                            </volist>
+			<td>
+                            <a class="update" href="{:addons_url('WechatPay://WechatPay:/index?pid='.$lv['id'])}" data-id="{$lv.id}">查看子菜单</a>
+                            <a class="update" href="{:addons_url('WechatPay://WechatPay:/save?id='.$lv['id'])}" data-id="{$lv.id}">编辑</a>
+                            <a class="delete" href="{:addons_url('WechatPay://WechatPay:/delete?id='.$lv['id'])}" data-id="{$lv.id}">删除</a>
+			</td>
+		</tr>
+		</volist>
+	</tbody>
+</table>
+<script type="text/javascript">
+	$(function(){
+		$('.delete').click(function(){
+                    var id = $(this).attr('data-id');
+                    return confirm('确定要删除序号为['+id+']的数据吗？');
+                });
+                //搜索功能
+                $("#search").click(function(){
+                        var url = $(this).attr('url');
+                        var status = $("#sch-sort-txt").attr("data");
+                        var query  = $('.search-form').find('input').serialize();
+                        query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g,'');
+                        query = query.replace(/^&/g,'');
+                                if(status != ''){
+                                        query += 'status=' + status + "&" + query;
+                        }
+                        if( url.indexOf('?')>0 ){
+                            url += '&' + query;
+                        }else{
+                            url += '?' + query;
+                        }
+                        window.location.href = url;
+                });
+
+                /* 状态搜索子菜单 */
+                $(".search-form").find(".drop-down").hover(function(){
+                        $("#sub-sch-menu").removeClass("hidden");
+                },function(){
+                        $("#sub-sch-menu").addClass("hidden");
+                });
+	})
+</script>

@@ -1,0 +1,260 @@
+<extend name="Public/base"/>
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <!-- 高级搜索 -->
+    <div class="search-form fr cf">
+        <form id="search-form" onsubmit="return false;">
+            <div class="search-form fr cf">
+                <label id="msg" name="msg"></label>
+                <div class="sleft">
+                    <input type="text" name="s_date" class="text input-text search-input time" value="{$s_date}" placeholder="请选择开始日期"/>
+                    <input type="text" name="e_date" class="text input-text search-input time" value="{$e_date}" placeholder="请选择结束日期"/>
+                    <a class="sch-btn" href="javascript:;" id="search" url="{:addons_url('Warehouse://AssignmentApplicationHandle:/index')}?is_auto={$is_auto}">
+                        <i class="btn-search"></i>
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+    <switch name="list_type">
+        <case value="1">
+            【自动分单】
+            <a class="btn" href="{:addons_url('Warehouse://AssignmentApplicationHandle:/index')}?list_type=2&s_date={$s_date}&e_date={$e_date}">全部申请</a>
+        </case>
+        <case value="2">
+            <a class="btn" href="{:addons_url('Warehouse://AssignmentApplicationHandle:/index')}?list_type=1&s_date={$s_date}&e_date={$e_date}">自动分单</a>
+            【全部申请】
+        </case>
+    </switch>
+    <a class="btn" href="{:addons_url('Warehouse://AssignmentApplicationHandle:/index')}?list_type={$list_type}&isprint=1&s_date={$s_date}&e_date={$e_date}">导出Excel</a>
+
+    <!-- 数据列表
+        <?php print_r($list); ?>-->
+    <?php if($list_type==1){?>
+    <!---------------------------------------------------------- 自动分单 ---------------------------------------------------------------->
+    <?php $ilist = 0; ?>
+    <?php if(empty($list)){
+      echo "<div style='margin-top:30px;margin-left:20px;' >暂无申请</div>";
+    }else{ ?>
+    <volist name="list" id="lv0" key="vo">
+        <form id="form{$ilist}" action="{:addons_url('Warehouse://AssignmentApplicationHandle:/generateWarehouseOutOrder')}" 
+        method="post" class="form-horizontal">
+            <!-- 数据列表 -->
+            <div class="data-table table-striped">
+                <table>
+                    <thead>
+                    <tr>
+                        <th class="row-selected row-selected" width="30">
+                            <input class="selectall" type="checkbox" name="selectallgoods[]" value="">
+                        </th>
+                        <th>商品ID</th>
+                        <th style="width:300px;">商品名称</th>
+                        <th>商品属性</th>
+                        <th style="width:100px;">商品条码</th>
+                        <th>申请单号</th>
+                        <th>申请数量</th>
+                        <th>库存数量</th>
+                        <th>申请时间</th>
+                        <th>申请来源</th>
+                        <th>申请人</th>
+                        <th>备注</th>
+                        <th>历史供应商</th>
+                        <th>历史采购价</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <volist name="lv0.detail" id="lv">
+                        <tr>
+                            <td><input class="selectthis" type="checkbox" name="selectprdid[]" value="{$lv.w_r_d_id}"/>
+                            </td>
+                            <td>{$lv.goods_id}</td>
+                            <td><a href="{:addons_url('Goods://GoodsInfo:/index?id='.$lv['goods_id'])}" target="_blank">{$lv.goods_name}</a></td>
+                            <td>{$lv.value_name}</td>
+                            <td title="{$lv.bar_code}">{$lv.bar_code|subtext=13}</td>
+                            <td>{$lv.w_r_sn}</td>
+                            <td>{$lv.g_num}</td>
+                            <td>{$lv.stock_num}</td>
+                            <td>{$lv.ctime}</td>
+                            <td>{$lv.w_name}</td>
+                            <td>{$lv.nickname}</td>
+                            <td><div title="{$lv.remark}">{$lv.remark|mb_substr=0,5,'utf-8'}</div></td>
+                            <td>{$lv.s_name}</td>
+                            <td>{$lv.g_price}</td>
+                            <td>
+                                <a class="jq-confirm" href="{:addons_url('Warehouse://AssignmentApplicationHandle:/reject?id='.$lv['w_r_d_id'])}" data-id="{$lv.w_r_d_id}">
+                                    拒绝
+                                </a>
+                            </td>
+                        </tr>
+                    </volist>
+                    </tbody>
+                    <tr>
+                        <td colspan="12">
+                            <label>备注：<input type="text" class="text input-min remark" style="width: 200px;" name="remark"/></label>
+                            <button id="submit" class="jq-submit-auto btn submit-btn hidden" target-form="form-horizontal" name="submit{$ilist}" type="submit">
+                            提交→验货→出库
+                            </button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </form>
+        <?php $ilist++; ?>
+    </volist>
+    <?php
+    } ?>
+
+
+    <?php }elseif($list_type==2){ ?>
+    <!---------------------------------------------------------- 全部申请 ---------------------------------------------------------------->
+    <?php if(empty($list)){
+      echo "<div style='margin-top:30px;margin-left:20px;' >暂无申请</div>";
+    }else{ ?>
+    <form id="formAll" action="{:addons_url('Warehouse://AssignmentApplicationHandle:/generateWarehouseOutOrder')}"
+          method="post" class="form-horizontal">
+        <div class="data-table table-striped">
+            <table>
+                <thead>
+                <tr>
+                    <th class="row-selected row-selected" width="30">
+                        <input class="selectall" type="checkbox" name="selectallgoods[]" value="">
+                    </th>
+                    <th>商品ID</th>
+                    <th style="width:300px;">商品名称</th>
+                    <th>商品属性</th>
+                    <th style="width:100px;">商品条码</th>
+                    <th>申请单号</th>
+                    <th>申请数量</th>
+                    <th>库存数量</th>
+                    <th>申请时间</th>
+                    <th>申请来源</th>
+                    <th>申请人</th>
+                    <th>备注</th>
+                    <th>历史供应商</th>
+                    <th>历史采购价</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <volist name="list" id="lv" key="vo">
+                    <!-- 数据列表 -->
+                    <tr>
+                        <td><input class="selectthis" type="checkbox" name="selectprdid[]" value="{$lv.w_r_d_id}"/></td>
+                        <td>{$lv.goods_id}</td>
+                        <td>{$lv.goods_name}</td>
+                        <td>{$lv.value_name}</td>
+                        <td title="{$lv.bar_code}">{$lv.bar_code|subtext=13}</td>
+                        <td>{$lv.w_r_sn}</td>
+                        <td>{$lv.g_num}</td>
+                        <td>{$lv.stock_num}</td>
+                        <td>{$lv.ctime}</td>
+                        <td>{$lv.w_name}</td>
+                        <td>{$lv.nickname}</td>
+                        <td><div title="{$lv.remark}">{$lv.remark|mb_substr=0,5,'utf-8'}</div></td>
+                        <td>{$lv.s_name}</td>
+                        <td>{$lv.g_price}</td>
+                        <td>
+                            <a class="jq-confirm" href="{:addons_url('Warehouse://AssignmentApplicationHandle:/reject?id='.$lv['w_r_d_id'])}" data-id="{$lv.w_r_d_id}">
+                            拒绝
+                            </a>
+                        </td>
+                    </tr>
+                    <?php $ilist++; ?>
+                </volist>
+                </tbody>
+                <tr>
+                    <td colspan="12">
+                        <label>备注：<input type="text" class="text input-min remark" style="width: 200px;" name="remark"/></label>
+                        <button id="submit" class="jq-submit-auto btn submit-btn hidden" target-form="form-horizontal" name="submit{$ilist}" type="submit">
+                        提交→验货→出库
+                        </button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </form>
+    <?php
+    } ?>
+
+    <?php } ?>
+
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <link href="__STATIC__/datetimepicker/css/datetimepicker.css" rel="stylesheet" type="text/css">
+    <link href="__STATIC__/datetimepicker/css/dropdown.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"
+            charset="UTF-8"></script>
+    <script type="text/javascript">
+        /*var highlightUrl = '{:addons_url('Warehouse://AssignmentApplicationHandle:/index')}';
+            highlight_subnav(highlightUrl);*/
+        //搜索功能
+        $('.search-form input').focus(function () {
+            $(document).keypress(function (e) {
+                // 回车键事件
+                if (e.which == 13) {
+                    $("#search").click();
+                }
+            });
+        });
+
+        //全选节点
+        /*$('.selectall').on('change', function () {
+            $(this).closest('table').find('tr').find('td').find('input').prop('checked', this.checked);
+        });*/
+        $("#search").click(function () {
+            var url = $(this).attr('url');
+            var query = $('.search-form').find('input').serialize();
+            query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g, '');
+            query = query.replace(/^&/g, '');
+            if (url.indexOf('?') > 0) {
+                url += '&' + query;
+            } else {
+                url += '?' + query;
+            }
+            var query2 = $('#select-form').serialize();
+            if (url.indexOf('?') > 0) {
+                url += '&' + query2;
+            } else {
+                url += '?' + query2;
+            }
+            window.location.href = url;
+        });
+
+        // 状态搜索子菜单
+        $(".search-form").find(".drop-down").hover(function () {
+            $("#sub-sch-menu").removeClass("hidden");
+        }, function () {
+            $("#sub-sch-menu").addClass("hidden");
+        });
+        $("#sub-sch-menu li").find("a").each(function () {
+            $(this).click(function () {
+                var text = $(this).text();
+                $("#sch-sort-txt").text(text).attr("data", $(this).attr("value"));
+                $("#sub-sch-menu").addClass("hidden");
+            })
+        });
+        var _T;
+        $('#select-form input').change(function () {
+            clearTimeout(_T);
+            _T = setTimeout(function () {
+                $("#search").click();
+            }, 1000);
+        });
+        $('.time').datetimepicker({
+            format: 'yyyy-mm-dd',
+            language: "zh-CN",
+            minView: 2,
+            autoclose: true
+        });
+    </script>
+</block>

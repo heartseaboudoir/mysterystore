@@ -1,0 +1,93 @@
+<extend name="Base/common"/>
+
+<block name="body">
+    <div class="weui_tab">
+    <div class="weui_tab_bd">
+        <div class="weui_cells mt0">
+            <div class="weui_cell">
+                <div class="weui_cell_bd">
+                    <div class="weui_cell_marketname">{$info.store_title}</div>
+                </div>
+            </div>
+            <ul class="olist">
+                <volist name="info.detail" id="lv">
+                <li class="olist_li">
+                    <div class="olist_li_hd">{$lv.title}</div>
+                    <div class="olist_li_bd">×{$lv.num}</div>
+                    <div class="olist_li_fd">￥{$lv.price}</div>
+                </li>
+                </volist>
+            </ul>
+            
+            <!--
+            <a class="weui_cell weui_cell_preferential" href="<empty name='info.cash_code'>{:U('CashCoupon/lists', array('callback' => $info['order_sn']))}<else/>javascript:;</empty>">
+                <div class="weui_cell_bd weui_cell_primary">
+                    <p class="weui_cell_preferential_icon">{$info.cash.title|default="请选择优惠券"}</p>
+                </div>
+                <div class="weui_cell_ft weui_cell_price">－￥{$info.cash.cash_money|default=0}</div>
+            </a>-->
+            <div class="weui_cell weui_cell_preferential">
+                <div class="weui_cell_bd weui_cell_primary">
+                    <p>总价￥{$info.money} 优惠￥{$info.discount_money}</p>
+                </div> 
+                <div class="weui_cell_ft weui_cell_price">实付<strong>￥{$info.pay_money}</strong></div>
+            </div>
+        </div>
+        <div class="weui_cells_title weui_cells_title_pay">请选择支付方式</div>
+        <div class="weui_cells weui_cells_radio weui_cells_pay">
+            <label class="weui_cell weui_check_label" for="x11">
+            <label class="weui_cell weui_check_label" for="x12">
+
+                <div class="weui_cell_bd weui_cell_primary">
+                    <p>微信支付</p>
+                </div>
+                <div class="weui_cell_ft">
+                    <input type="radio" name="radio1" class="weui_check" id="x12" checked="checked">
+                    <span class="weui_icon_checked"></span>
+                </div>
+            </label>
+        </div>
+    </div>
+</div>
+<a href="javascript:;" id="pay_btn" class="weui_btn weui_btn_warn weui_btn_pay">立即结算</a>
+<div id="pay_js"></div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $('body').addClass('has_pay_button');
+        $('#pay_btn').click(function(){
+            var url = "{:U('Order/pay', array('order_sn' => $info['order_sn']))}";
+            var cash_code = "{$info.cash.code}";
+            Loading.show({
+                msg: '正在结算',
+                isLoading: true
+            });
+            $.ajax({
+                type : 'post',
+                url  : url,
+                data :{cash_code:cash_code},
+                dataType:'json',
+                success:function(data){
+                    Loading.hide();
+                    if(data.status == 1){
+                        $('#pay_js').html(data.info);
+                    }else{
+                        ConfirmFactory({
+                            msg: data.info,
+                            close: function () {
+                                if(data.url != ''){
+                                    window.location.href=data.url;
+                                }
+                            },
+                            confirm: function () {
+                                if(data.url != ''){
+                                    window.location.href=data.url;
+                                }
+                            }
+                        }, 'body');
+                    }
+                }
+            });
+        });
+    </script>
+</block>

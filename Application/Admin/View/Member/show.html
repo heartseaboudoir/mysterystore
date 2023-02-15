@@ -1,0 +1,235 @@
+<extend name="Public/base"/>
+
+<block name="body">
+    <div class="main-title">
+        <h2>用户信息</h2>
+    </div>
+    <ul class="tab-nav nav">
+        <li class="current" data-tab="tab1"><a href="javascript:void(0);">基本信息</a></li>
+        <li class="" data-tab="tab4"><a href="javascript:void(0);">认证信息</a></li>
+        <li class="" data-tab="tab2"><a href="javascript:void(0);">绑定信息</a></li>
+        <li class="" data-tab=""><a href="{:U('Member/receipt_lists', array('uid' => $info['uid']))}">收货地址</a></li>
+        <li class=""><a href="{:addons_url('CashCoupon://CashCouponAdmin:/user_lists', array('uid' => $info['uid']))}">拥有的优惠券</a></li>
+        <li class=""><a href="{:addons_url('Scorebox://ScoreboxLogAdmin:/index', array('uid' => $info['uid']))}">蜜糖/经验详细</a></li>
+        <li class=""><a href="{:U('Member/order_lists', array('uid' => $info['uid']))}">用户订单</a></li>
+    </ul>
+    <div class="tab-content">
+        <form action="{:U()}" method="post" class="form-horizontal">
+        <div class="tab-pane in tab1">
+                <div class="form-item">
+                    <label class="item-label">用户名</label>
+                    <div class="controls">
+                        {$info.username}
+                    </div>
+                </div>
+                <div class="form-item">
+                    <label class="item-label">昵称<span class="check-tips"></span></label>
+                    <div class="controls">
+                        {$info.nickname}
+                    </div>
+                </div>
+                <div class="form-item">
+                    <label class="item-label">头像<span class="check-tips"></span></label>
+                    <div class="controls">
+                        <img src="{$info.uid|get_header_pic}" style="max-height:100px;" />
+                    </div>
+                </div>
+                <div class="form-item">
+                    <label class="item-label">手机号码<span class="check-tips"></span></label>
+                    <div class="controls">
+                        {$info.mobile|default='空'}
+                    </div>
+                </div>
+                <div class="form-item">
+                    <label class="item-label">关注<span class="check-tips"></span></label>
+                    <div class="controls">
+                        <a href="{:U('follow_lists', array('type' => 1, 'uid' => $info['uid']))}">关注( {$info.follow_num} )</a> |
+                        <a href="{:U('follow_lists', array('type' => 2, 'uid' => $info['uid']))}">粉丝( {$info.be_follow_num} )</a> 
+                    </div>
+                </div>
+                <div class="form-item">
+                    <label class="item-label">等级<span class="check-tips"></span></label>
+                    <div class="controls">
+                        <gt name="info.score_data.level_icon" value="0"><img src="{$info.score_data.level_icon|get_cover_url}" style="height:24px; vertical-align: middle; margin-right:5px;" /> </gt>{$info.score_data.level_title}
+                    </div>
+                </div>
+                <div class="form-item">
+                    <label class="item-label">经验值<span class="check-tips"></span></label>
+                    <div class="controls">
+                        {$info.score_data.exper}
+                    </div>
+                </div>
+                <div class="form-item">
+                    <label class="item-label">当前拥有的蜜糖<span class="check-tips"></span></label>
+                    <div class="controls">
+                        {$info.score_data.score}
+                    </div>
+                </div>
+                <div class="form-item">
+                    <label class="item-label">账户余额<span class="check-tips"></span></label>
+                    <div class="controls">
+                        不可提现金额：<?php echo number_format($wallet_info['recharge_money'], 2, '.', '') ?>元   
+                        可提现金额：<?php echo number_format($wallet_info['money'], 2, '.', '') ?> 元  
+                        <a target="_blank" href="{:addons_url('Wallet://Admin:/index', array('uid' => $info['uid']))}">查看更多</a>
+                    </div>
+                </div>                
+                <div class="form-item">
+                    <label class="item-label">注册时间<span class="check-tips"></span></label>
+                    <div class="controls">
+                        {$info.reg_time|time_format="Y-m-d H:i:s"}
+                    </div>
+                </div>
+                <div class="form-item">
+                    <label class="item-label">注册IP<span class="check-tips"></span></label>
+                    <div class="controls">
+                        {$info.reg_ip|long2ip}
+                    </div>
+                </div>
+                <div class="form-item">
+                    <label class="item-label">登录次数<span class="check-tips"></span></label>
+                    <div class="controls">
+                        {$info.login}
+                    </div>
+                </div>
+                <div class="form-item">
+                    <label class="item-label">最后登录时间<span class="check-tips"></span></label>
+                    <div class="controls">
+                        <notempty name="info.last_login_time">
+                        {$info.last_login_time|time_format="Y-m-d H:i:s"}
+                        <else/>
+                        从未登录
+                        </notempty>
+                    </div>
+                </div>
+                <div class="form-item">
+                    <label class="item-label">最后登录IP<span class="check-tips"></span></label>
+                    <div class="controls">
+                        {$info.last_login_ip|long2ip}
+                    </div>
+                </div>
+        </div>
+        <div class="tab-pane tab2">
+            <div class="form-item">
+                <label class="item-label">微信</label>
+                <div class="controls">
+                <empty name="info[wechat]">
+                    <span>还未绑定微信</span>
+                <else/>
+                    <div class="form-item">
+                        <label class="item-label">openid<span class="check-tips"></span></label>
+                        <div class="controls">
+                            {$info.wechat.openid}
+                        </div>
+                    </div>
+                    <div class="form-item">
+                        <label class="item-label">昵称<span class="check-tips"></span></label>
+                        <div class="controls">
+                            {$info.wechat.nickname}
+                        </div>
+                    </div>
+                    <div class="form-item">
+                        <label class="item-label">头像<span class="check-tips"></span></label>
+                        <div class="controls">
+                            <notempty name="info.wechat.headimgurl">
+                            <img src="{$info.wechat.headimgurl}" style="height:100px;" />
+                            </notempty>
+                        </div>
+                    </div>
+                </empty>
+                </div>
+            </div>
+            <div class="form-item">
+                <label class="item-label">支付宝</label>
+                <div class="controls">
+                <empty name="info[alipay]">
+                    <span>还未绑支付宝</span>
+                <else/>
+                    <div class="form-item">
+                        <label class="item-label">支付宝id<span class="check-tips"></span></label>
+                        <div class="controls">
+                            {$info.alipay.user_id}
+                        </div>
+                    </div>
+                    <div class="form-item">
+                        <label class="item-label">昵称<span class="check-tips"></span></label>
+                        <div class="controls">
+                            {$info.alipay.nick_name}
+                        </div>
+                    </div>
+                    <div class="form-item">
+                        <label class="item-label">头像<span class="check-tips"></span></label>
+                        <div class="controls">
+                            <notempty name="info.alipay.avatar">
+                            <img src="{$info.alipay.avatar}" style="height:100px;" />
+                            </notempty>
+                        </div>
+                    </div>
+                </empty>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane tab4">
+            <empty name="info[auth_data]">
+                <div class="form-item">
+                    <label class="item-label">还未认证</label>
+                    <div class="controls">
+                    </div>
+                </div>
+            <else/>
+                <div class="form-item">
+                    <label class="item-label">真实姓名<span class="check-tips"></span></label>
+                    <div class="controls">
+                        {$info.auth_data.real_name}
+                    </div>
+                </div>
+                <div class="form-item">
+                    <label class="item-label">身份证号<span class="check-tips"></span></label>
+                    <div class="controls">
+                        {$info.auth_data.cert_no}
+                    </div>
+                </div>
+                <div class="form-item">
+                    <label class="item-label">身份证正面照<span class="check-tips"></span></label>
+                    <div class="controls">
+                        <div class="upload-img-box" data-nodel="1">
+                            <div class="upload-pre-item"><img src="{$info.auth_data.cert_pic1|get_cover=path}"/></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-item">
+                    <label class="item-label">身份证反面照<span class="check-tips"></span></label>
+                    <div class="controls">
+                        <div class="upload-img-box" data-nodel="1">
+                            <div class="upload-pre-item"><img src="{$info.auth_data.cert_pic2|get_cover=path}"/></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-item">
+                    <label class="item-label">手持身份证照<span class="check-tips"></span></label>
+                    <div class="controls">
+                        <div class="upload-img-box" data-nodel="1">
+                            <div class="upload-pre-item"><img src="{$info.auth_data.cert_pic3|get_cover=path}"/></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-item">
+                    <label class="item-label">认证时间<span class="check-tips"></span></label>
+                    <div class="controls">
+                        {$info.auth_data.create_time|time_format="Y-m-d H:i"}
+                    </div>
+                </div>
+            </empty>
+        </div>
+        <div class="form-item">
+            <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+        </div>
+        </form>
+    </div>
+</block>
+
+<block name="script">
+    <script type="text/javascript">
+        //导航高亮
+        highlight_subnav('{:U('Member/index')}');showTab();
+    </script>
+</block>

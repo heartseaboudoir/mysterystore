@@ -1,0 +1,169 @@
+<extend name="Public/base" />
+<block name="body">
+    <div id="jq-content" class="site-content">
+        <div class="main-title">
+            <h2>采购报表</h2>
+        </div>
+        <div class="search-form fr cf">
+            <form id="jq-search-form">
+                <div class="sleft" style="position: relative;">
+                    <select id="jq-select" name="Shequ" style="position: absolute;left:-100px;">
+                        <option value="0">全部社区</option>
+                    </select>
+                    <input type="text" name="s_date" class="text input-text search-input time" placeholder="请选择开始日期" />
+                    <input type="text" name="e_date" class="text input-text search-input time" placeholder="请选择结束日期" />
+                    <a id="jq-search-btn" class="sch-btn" href="javascript:void(0);"><i class="btn-search"></i></a>
+                </div>
+            </form>
+        </div>
+        <a id="jq-download" class="btn" href="javascript:void(0);">导出Excel</a>
+        <div class="data-table table-striped">
+            <table>
+                <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>创建日期</th>
+                        <th>商品数量</th>
+                        <th>商品箱数</th>
+                        <th>总售价额</th>
+                        <th>实收数量</th>
+                        <th>实收金额</th>
+                        <th>门店实收数量</th>
+                        <th>门店实收金额</th>
+                        <th>退货数量</th>
+                        <th>退货金额</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="jq-list"></tbody>
+            </table>
+        </div>
+        <div id="jq-page" class="page"></div>
+    </div>
+    <script id="temp-select" type="text/html">
+        {{each items as list index}}
+        <option value="{{list.shequ_id}}">{{list.shequ_name}}</option>
+        {{/each}}
+    </script>
+    <script id="temp-list" type="text/html">
+        {{each items as list index}}
+        <tr data-id="{{list.s_t_s_id}}">
+            <td class="temp-id">{{index+1}}</td>
+            <td>{{list.ctime}}</td>
+            <td>{{list.g_nums}}</td>
+            <td>{{list.b_nums}}</td>
+            <td>{{list.sell_amounts}}</td>
+            <td>{{list.in_stock_nums}}</td>
+            <td>{{list.in_stock_amounts}}</td>
+            <td>{{list.s_out_amounts}}</td>
+            <td>{{list.s_in_stock_nums}}</td>
+            <td>{{list.back_nums}}</td>
+            <td>{{list.back_amounts}}</td>
+            <td>
+                <a class="temp-view" href="javascript:void(0);">查看</a>
+                <a class="temp-request" href="javascript:void(0);">再次申请</a>
+            </td>
+        </tr>
+        {{/each}}
+    </script>
+</block>
+<block name="script">
+    <script type="text/javascript">
+    layui.use(['main'], function() {
+        var $ = layui.jquery,
+            layer = layui.layer;
+
+        var Global = {
+            listUrl: '/Erp/PurchaseReport/index',
+            tempUrl: '/Erp/WarehouseInventory/pass',
+            jump: window.location.pathname.match(/(\D*)index/)[1],
+            passId: 'i_id'
+        }
+        $("a[href$='" + Global.jump + "index.html']").parent().addClass('layui-this');
+
+        var passData = $.dataJson(); 
+        var data = $.parseJson( passData );
+
+        $.postData({
+             url: Global.listUrl,
+            data: data,
+            load: true
+        }, function(res){
+            dataShow(res);
+        });
+        function dataShow(res,callback){
+            var oDownload = $('#jq-download'),
+                    oList = $('#jq-list'),
+                    oPage = $('#jq-page');
+
+            oDownload.attr('href','javascript:void(0);').unbind();
+            $('#jq-select').append(template('temp-select', { items: res.content.Shequ }));
+
+            if( res.content.list == null || res.content.list.length == 0 ){
+                oList.html('<tr><td class="wrap-empty">暂无内容！</td></tr>');
+                oDownload.css('cursor','default');
+            }else{
+                oList.html(template('temp-list', { items: res.content.list }));
+                $.each( res.content.list,function(i,items){
+                    var url = Global.jump + 'view/id/'+items[Global.passId]+'.html',
+                        oId = $('[data-id='+items[Global.passId]+']');
+                    oId.find('.temp-view').attr('href',url);
+
+                    if( passData.p > 1 && callback == undefined ){
+                        var id = parseInt( oId.find('.temp-id').html() ),
+                           sum = passData.p * passData.pageSize -  passData.pageSize;
+                        oId.find('.temp-id').html( id + sum );
+                    }else{
+                        oId.find('.temp-id').html( id );
+                    }
+
+                });
+
+                var data = $('#jq-search-form').find('input').serialize() + '&isprint=1';
+                oDownload.fileDown({
+                    post: true,
+                     url: Global.listUrl,
+                    data: data
+                }).removeAttr('style');
+
+                $('.temp-verify').tempConfirm({
+                    url: Global.tempUrl
+                },function(self){
+                    var aId = parseInt( self.parents('tr').attr('data-id') );
+                    return {
+                         id: aId,
+                       pass: 1
+                    }
+                },function(options){
+                    window.location.reload();
+                });
+            }
+
+            if( res.content.recordCount > res.content.pageSize ){
+                var total = '<span class="rows">共'+res.content.recordCount+'条记录</span>';
+                oPage.html( res.content.pager.replace( new RegExp(Global.listUrl,'g'),Global.jump+'index' ) + total );
+            }else{
+                oPage.html( res.content.pager );
+            }
+        }
+
+        $('#jq-search-btn').off().on({
+            click: function() {
+                var data = $('#jq-search-form').find('input,select').serialize() + '&pageSize='+passData.pageSize;
+                $.postData({
+                     url: Global.listUrl,
+                    data: data,
+                }, function(res){
+                    dataShow(res,true);
+                    window.history.pushState( {},'',Global.jump+'index.html' );
+                });
+            }
+        });
+        $(document).keydown(function(e) {
+            if (e.which == 13) {
+                $('#jq-search-btn').click();
+            }
+        });
+    });
+    </script>
+</block>

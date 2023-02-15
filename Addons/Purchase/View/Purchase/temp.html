@@ -1,0 +1,399 @@
+<extend name="Public/base" />
+
+<block name="body">
+<div class="site-search">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <a id="jq-clear" class="btn" href="{:addons_url('Purchase://Purchase:/cleantemp')}">清空临时采购单</a>
+    <form id="jq-form-add" class="wrap-form-add" action="{:addons_url('Purchase://Purchase:/update')}" method="post">
+        <input type="hidden" class="text input-min admin_id" name="admin_id" value="<?php echo(UID); ?>" />
+        <input type="hidden" class="text input-min temp_type" name="temp_type" value="5" />
+        <input type="hidden" class="text input-min ctime" name="ctime" value="<?php echo(time()); ?>" />
+        <ul>
+            <li><a id="select_product" href="javascript:void(0);" class="btn" data-url="">选择绑定的商品</a></li>
+            <li id="jq-select-options" class="wrap-label">
+                <label><span>条形码：</span>
+                    <input type="text" name="bar_code" class="text">
+                </label>
+                <label><span>商品ID：</span>
+                    <input type="text" name="goods_id" class="text wrap-data" num>
+                </label>
+                <label><span>商品名：</span>
+                    <input type="text" name="goods_name" class="text wrap-data" disabled="">
+                </label>
+                <label><span>箱规(个)：</span>
+                    <input type="text" name="b_n_num" class="text wrap-data" num>
+                </label>
+                <label><span>箱数：</span>
+                    <input type="text" name="b_num" class="text wrap-data" num>
+                </label>
+                <label><span>每箱价格：</span>
+                    <input type="text" name="b_price" class="text wrap-data" decimal>
+                </label>
+                <label><span>总数量：</span>
+                    <input type="text" name="g_num" class="text wrap-data" readonly>
+                </label>
+                <label><span>单价：</span>
+                    <input type="text" name="g_price" class="text wrap-data" readonly>
+                </label>
+                <label><span>备注：</span>
+                    <input type="text" name="remark_add" class="text remark_add">
+                </label>
+                <input type="hidden" name="temp_id">
+            </li>
+            <li>
+                <button id="jq-submit-verify" class="btn submit-btn hidden" target-form="form-horizontal" type="submit">
+                    加入临时申请表
+                </button>
+            </li>
+        </ul>
+    </form>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+            <tr>
+                <th>商品id</th>
+                <th>商品名称</th>
+                <th>商品类别</th>
+                <th>商品属性</th>
+                <th>商品条码</th>
+                <th>售价</th>
+                <th>库存数量</th>
+                <th>历史价格</th>
+                <th>箱规</th>
+                <th>采购箱数</th>
+                <th>每箱价格</th>
+                <th>采购数量</th>
+                <th>采购价格</th>
+                <th>添加时间</th>
+                <th>备注</th>
+                <th>编辑</th>
+                <th>删除</th>
+            </tr>
+            </thead>
+            <tbody id="jq-list">
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td class="temp-id">{$lv.goods_id}</td>
+                    <td class="temp-name"><a href="{:addons_url('Goods://GoodsInfo:/index')}?id={$lv.goods_id}" target="_blank">{$lv.goods_name}</a></td>
+                    <td>{$lv.cate_name}</td>
+                    <td>{$lv.value_name}</td>
+                    <td title="{$lv.bar_code}">{$lv.bar_code|subtext=14}</td>
+                    <td>{$lv.sell_price}</td>
+                    <td>{$lv.stock_num}</td>
+                    <td>{$lv.last_price}</td>
+                    <td class="temp-num">{$lv.b_n_num}</td>
+                    <td class="temp-box">{$lv.b_num}</td>
+                    <td class="temp-price">{$lv.b_price}</td>
+                    <td class="temp-amount">{$lv.g_num}</td>
+                    <td class="temp-cost">{$lv.g_price}</td>
+                    <td>{$lv.ctime}</td>
+                    <td class="temp-remark" title="{$lv.remark}">{$lv.remark|subtext=10}</td>
+                    <td>
+                        <a class="jq-edit" id="purchase" href="javascript:void(0);"  data-id="{$lv.id}">编辑</a></td>
+                    <td>
+                        <a class="jq-confirm" href="{:addons_url('Purchase://Purchase:/delete?id='.$lv['id'])}" data-id="{$lv.id}">删除</a>
+                    </td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <form id="form1" action="{:addons_url('Purchase://Purchase:/send_request_temp')}" method="post" class="form-horizontal">
+        <div class="tab-pane in tab1">
+            <div class="form-item cf">
+                <div class="controls goods_div layui-form">
+                    <div class="layui-input-inline">
+                        <select name="warehouse_id" lay-filter="aihao" lay-search>
+                            <option value="">请选择仓库</option>
+                            <volist name="warehouse" id="l1">
+                                <option value="{$l1.w_id}" <?php if($lv0['warehouse_id'] == $l1['w_id']){ echo('selected'); } ?>>{$l1.w_name}</option>
+                            </volist>
+                        </select>
+                    </div>
+                    <div class="layui-input-inline">
+                        <select name="store_id" lay-filter="aihao" lay-search>
+                            <option value="">请选择门店</option>
+                            <volist name="store" id="l2">
+                                <option value="{$l2.id}" <?php if($lv0['store_id'] == $l2['id']){ echo('selected'); } ?>>{$l2.title}</option>
+                            </volist>
+                        </select>
+                    </div>
+                    <div class="layui-input-inline">
+                        <select name="supply_id" lay-filter="aihao" lay-search>
+                            <?php if($lv0['supply_id'] == ''){ echo('<option value="" selected>请选择供应商</option>'); } ?>
+                            <volist name="supply" id="l2">
+                                <option value="{$l2.s_id}" <?php if($lv0['supply_id'] == $l2['s_id']){ echo('selected'); } ?>>{$l2.s_name}</option>
+                            </volist>
+                        </select>
+                    </div>
+                    <label>备注：<input type="text" class="text input-min remark" style="width: 200px;" name="remark"/></label>
+                    <button id="jq-submit-btn" class="btn submit-btn confirm" target-form="form-horizontal" type="submit">提交采购单</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+    <script id="temp-select-value" type="text/html">
+        <label><span>商品属性：</span>
+            <select id="jq-select-value" name="value_id">
+                {{each items as list index}}
+                <option value="{{list.value_id}}">{{list.value_name}}</option>
+                {{/each}}
+            </select>
+        </label>
+    </script>
+    <input type="hidden" id="temp_type" value="5">
+</div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        layui.use(['main','form'], function () {
+            var $ = layui.jquery,
+            layer = layui.layer,
+             form = layui.form;           
+            
+            $('#jq-form-add').verifyForm();
+        });
+    </script>
+    <script type="text/javascript" src="__STATIC__/artDialog/lib/sea.js"></script>
+    <script type="text/javascript">
+    seajs.config({
+        alias: {
+            "jquery": "jquery-1.10.2.js"
+        }
+    });
+    seajs.use(['__STATIC__/artDialog/src/dialog-plus'], function(dialog) {
+        window.dialog = dialog;
+        $('#select_product').on('click', function() {
+            var url = "{:addons_url('Purchase://Purchase:/get_goods_lists')}";
+            top.dialog({
+                id: 'product_lists',
+                title: '可绑定商品列表',
+                url: url,
+                width: 500,
+                height: 430,
+                onclose: function() {
+                    if( this.returnValue != '' ){
+                        var data = this.returnValue;
+                        $('[name="goods_id"]').val(data.id);
+                        $('[name="goods_name"]').val(data.data[0].title);
+                        productShow( data.id );
+                        $('#jq-select-value').parents('label').remove();
+                        if( data.data[0].select.length > 0 ){
+                            $('#jq-select-options').find('label').eq(2).after( template('temp-select-value', { items: data.data[0].select }) );
+                        }
+                    }
+                },
+            }).showModal();
+        });
+    });
+    </script>
+</block>
+<!--<a href="javascript:;" id="select_product" class="btn" data-url="">选择绑定的商品</a>
+<form id="form" action="{:addons_url('Purchase://Purchase:/update')}" method="post" class="form-horizontal">
+    <div class="tab-pane in tab1">
+            <div class="form-item cf">
+                <div class="data-table table-striped controls goods_div">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>条形码</th>
+                            <th>商品ID</th>
+                            <th>商品名</th>
+                            <th>箱规</th>
+                            <th>采购箱数</th>
+                            <th>每箱价格</th>
+                            <th>备注</th>
+                            <th>采购数量</th>
+                            <th>采购价格</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr id="jq-verify">
+                            <td><input type="text" class="text input-min bar_code" style="width: 100px;" name="goods[1][bar_code]" num/></td>
+                            <td><input type="text" class="text input-min id_code" style="width: 100px;" name="goods[1][id_code]" num/></td>
+                            <td><input type="text" class="text input-min goods_title" style="width: 100px;" disabled=""/></td>
+                            <td><input type="text" class="text input-mini b_n_num" style="width: 100px;" name="b_n_num" num/>个/箱</td>
+                            <td><input type="text" class="text input-mini b_num" style="width: 100px;" name="b_num" num/></td>
+                            <td><input type="text" class="text input-mini b_price" style="width: 100px;" name="b_price" decimal/></td>
+                            <td><input type="text" class="text input-min remark_add" style="width: 100px;" name="remark_add"/></td>
+                            <td><input type="text" class="text input-min g_num_show" style="width: 100px;" name="g_num_show" disabled=""/><input type="hidden" class="text input-min g_num" name="g_num" /></td>
+                            <td><input type="text" class="text input-min g_price_show" style="width: 100px;" name="g_price_show" disabled=""/><input type="hidden" class="text input-min g_price" name="g_price" /></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <input type="hidden" class="text input-min goods_id" name="goods_id" value="0" />
+                    <input type="hidden" class="text input-min admin_id" name="admin_id" value="<?php echo(UID); ?>" />
+                    <input type="hidden" class="text input-min temp_type" name="temp_type" value="5" />
+                    <input type="hidden" class="text input-min ctime" name="ctime" value="<?php echo(time()); ?>" />
+                    <button id="submit" class="btn submit-btn ajax-post hidden" target-form="form-horizontal" type="submit">加入临时采购单</button>
+                    <div class="controls goods_message"></div>
+                </div>
+            </div>
+    </div>
+</form>-->
+<!--<script type="text/javascript">
+    highlight_subnav('{:addons_url('Purchase://Purchase:/temp')}');
+    function get_goods(obj){
+        var bar_code = $(obj).val();
+        var goods_title = $(obj).parents('.goods_div').find('.goods_title');
+        var goods_id = $(obj).parents('.goods_div').find('.goods_id');
+        var id_code = $(obj).parents('.goods_div').find('.id_code');
+        var goods_message = $(obj).parents('.goods_div').find('.goods_message');
+        var b_n_num = $(obj).parents('.goods_div').find('.b_n_num');
+        var b_num = $(obj).parents('.goods_div').find('.b_num');
+        var b_price = $(obj).parents('.goods_div').find('.b_price');
+        var g_num = $(obj).parents('.goods_div').find('.g_num');
+        var g_price = $(obj).parents('.goods_div').find('.g_price');
+        var g_num_show = $(obj).parents('.goods_div').find('.g_num_show');
+        var g_price_show = $(obj).parents('.goods_div').find('.g_price_show');
+        var remark = $(obj).parents('.goods_div').find('.remark');
+        if(bar_code != ''){
+            $.ajax({
+                type:'get',
+                url : "{:addons_url('Purchase://Purchase:/get_one')}",
+                data:{bar_code: bar_code, get_store:1},
+                dataType:'json',
+                success:function(data){
+                    if(data.status == 1){
+                        var l = '<option> - 请先选择分类 - </option>';
+                        $.each(data, function(x, y){
+                            l += '<option value="'+y.id+'">'+y.title+'</option>';
+                        });
+                        $('[name="goods_id"]').html(l);
+                        goods_title.css('color', '#635c73');
+                        goods_title.val(data.data.title);
+                        goods_id.val(data.data.id);
+                        id_code.val('');
+                    }else{
+                        if(data.status == 2){
+                            goods_message.css('color', 'red');
+                            goods_message.html('商品已存在,将编辑商品数量');
+                            goods_title.css('color', '#635c73');
+                            goods_title.val(data.data.title);
+                            goods_id.val(data.data.id);
+                            b_n_num.val(data.data1.b_n_num);
+                            b_num.val(data.data1.b_num);
+                            b_price.val(data.data1.b_price);
+                            g_num.val(data.data1.g_num);
+                            g_price.val(data.data1.g_price);
+                            g_num_show.val(data.data1.g_num);
+                            g_price_show.val(data.data1.g_price);
+                            remark.val(data.data1.remark);
+                            //goods_id.val(0);
+                        }else {
+                            goods_message.css('color', 'red');
+                            goods_message.html('商品不存在');
+                            goods_id.val(0);
+                        }
+                    }
+                }
+            });
+        }else{
+            goods_title.val('');
+            goods_id.val(0);
+        }
+    }
+    $('.tab1').delegate('.bar_code', 'change', function(){
+        get_goods(this);
+    });
+
+    $('.tab1').delegate('.b_n_num', 'change', function(){
+        get_box(this);
+    });
+    $('.tab1').delegate('.b_num', 'change', function(){
+        get_box(this);
+    });
+    $('.tab1').delegate('.b_price', 'change', function(){
+        get_box(this);
+    });
+
+    function get_box(obj) {
+        var b_n_num = $(obj).parents('.goods_div').find('.b_n_num').val();
+        var b_num = $(obj).parents('.goods_div').find('.b_num').val();
+        var b_price = $(obj).parents('.goods_div').find('.b_price').val();
+        var g_num = $(obj).parents('.goods_div').find('.g_num');
+        var g_price = $(obj).parents('.goods_div').find('.g_price');
+        var g_num_show = $(obj).parents('.goods_div').find('.g_num_show');
+        var g_price_show = $(obj).parents('.goods_div').find('.g_price_show');
+        var siglenum = parseInt(b_n_num * b_num);
+        var sigleprice = parseFloat(parseFloat(b_num * b_price)/siglenum).toFixed(2);
+        g_num.val(siglenum);
+        g_num_show.val(siglenum);
+        if(sigleprice != 'NaN'){
+            g_price.val(sigleprice);
+            g_price_show.val(sigleprice);
+        }
+    }
+    function get_goods_id(obj){
+        var id_code = $(obj).val();
+        var goods_title = $(obj).parents('.goods_div').find('.goods_title');
+        var goods_id = $(obj).parents('.goods_div').find('.goods_id');
+        var bar_code = $(obj).parents('.goods_div').find('.bar_code');
+        var goods_message = $(obj).parents('.goods_div').find('.goods_message');
+        var b_n_num = $(obj).parents('.goods_div').find('.b_n_num');
+        var b_num = $(obj).parents('.goods_div').find('.b_num');
+        var b_price = $(obj).parents('.goods_div').find('.b_price');
+        var g_num = $(obj).parents('.goods_div').find('.g_num');
+        var g_price = $(obj).parents('.goods_div').find('.g_price');
+        var g_num_show = $(obj).parents('.goods_div').find('.g_num_show');
+        var g_price_show = $(obj).parents('.goods_div').find('.g_price_show');
+        var remark = $(obj).parents('.goods_div').find('.remark');
+        if(id_code != ''){
+            $.ajax({
+                type:'get',
+                url : "{:addons_url('Purchase://Purchase:/get_one_id')}",
+                data:{id_code: id_code, bar_code: bar_code.val(), get_store:1},
+                dataType:'json',
+                success:function(data){
+                    if(data.status == 1){
+                        var l = '<option> - 请先选择分类 - </option>';
+                        $.each(data, function(x, y){
+                            l += '<option value="'+y.id+'">'+y.title+'</option>';
+                        });
+                        $('[name="goods_id"]').html(l);
+                        goods_title.css('color', '#635c73');
+                        goods_title.val(data.data.title);
+                        goods_id.val(data.data.id);
+                        bar_code.val('');
+                        goods_message.html('');
+                    }else{
+                        if(data.status == 2){
+                            goods_message.css('color', 'red');
+                            goods_message.html('商品已存在,将编辑商品数量');
+                            goods_title.css('color', '#635c73');
+                            goods_title.val(data.data.title);
+                            goods_id.val(data.data.id);
+                            b_n_num.val(data.data1.b_n_num);
+                            b_num.val(data.data1.b_num);
+                            b_price.val(data.data1.b_price);
+                            g_num.val(data.data1.g_num);
+                            g_price.val(data.data1.g_price);
+                            g_num_show.val(data.data1.g_num);
+                            g_price_show.val(data.data1.g_price);
+                            remark.val(data.data1.remark);
+                            //goods_id.val(0);
+                        }else {
+                            goods_message.css('color', 'red');
+                            goods_message.html('商品不存在');
+                            goods_id.val(0);
+                        }
+                    }
+                }
+            });
+        }else{
+            goods_title.val('');
+            goods_id.val(0);
+        }
+    }
+    $('.tab1').delegate('.id_code', 'change', function(){
+        get_goods_id(this);
+    });
+</script>-->

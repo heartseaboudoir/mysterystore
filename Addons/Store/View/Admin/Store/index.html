@@ -1,0 +1,110 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <!-- 高级搜索 -->
+    <div class="cf">
+        <a class="btn" href="{:addons_url('Store://StoreAdmin:/save')}">添加</a> 
+        <div class="search-form fr cf">
+        
+            <div class="sleft">
+                <input type="text" name="keyword" id="skeyword" class="text input-text search-input" style="" value="{$_GET['keyword']}" placeholder="请输入门店名" />
+                <a class="sch-btn" href="javascript:;" id="search" url="{:addons_url('Store://StoreAdmin:/index')}"><i class="btn-search"></i></a>
+            </div>
+        </div>
+        <div class="search-form fr cf">
+            <span>所在区域: </span>
+            <select id="sselect">
+                <option value="0">请选择所在区域</option>
+                <?php foreach ($shequ_ls as $skey => $sval) { ?>
+                <option value="<?php echo $skey;?>" <?php if ($skey == $_GET['sid']) {echo 'selected';}?>><?php echo $sval;?></option>
+                <?php } ?>
+            </select>   
+            &nbsp;&nbsp;
+        </div>        
+    </div>
+    <div style="clear:both;"></div>    
+    
+    
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead> 
+                <tr>
+                    <th>ID</th>
+                    <th>所在区域</th>
+                    <th>门店名</th>
+                    <th>状态</th>
+                    <th>创建时间</th>
+                    <th>更新时间</th>
+                    <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td>{$lv.id}</td>
+                    <td>{$shequ_ls[$lv[shequ_id]]}</td>
+                    <td>{$lv.title}<eq name="lv.sell_type" value="2">（线上）</eq></td>
+                    <td>{$lv.status_text}</td>
+                    <td>{$lv.create_time_text}</td>
+                    <td>{$lv.update_time_text}</td>
+                    <td>
+                        <a class="update" href="{:addons_url('Store://StoreAdmin:/save?id='.$lv['id'])}" data-id="{$lv.id}">编辑</a>
+                        <a class="confirm ajax-get" href="{:addons_url('Store://StoreAdmin:/delete?id='.$lv['id'])}" data-id="{$lv.id}">删除</a>
+                    </td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $(function() {
+            //全选节点
+            $('.check-all').on('change', function() {
+                $('.ids').prop('checked', this.checked);
+            });
+            $('.listorder').on('change', function(){
+                var id = $(this).attr('item_id'),
+                    value = $(this).val();
+                $.ajax({
+                    type: 'get',
+                    url : "{:addons_url('Store://StoreAdmin:/listorder')}",
+                    data: {listorder:value, id:id},
+                    success:function(msg){
+                        if(msg.status == 1){
+                            window.location.reload();
+                        }
+                    }
+                });
+            });
+        })
+        
+        
+        
+        $('#search').click(function(){
+            var url = $(this).attr('url');
+            var skeyword = $('#skeyword').val();
+            var sselect = $('#sselect').val();
+            
+            url += '?keyword=' + skeyword + '&sid=' + sselect;
+            
+            window.location.href = url;
+            
+            //console.log(skeyword);
+            
+            //console.log(sselect);
+        
+        
+        })
+    </script>
+</block>

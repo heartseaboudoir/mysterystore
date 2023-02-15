@@ -1,0 +1,52 @@
+<extend name="Public/base"/>
+
+<block name="body">
+    <div class="main-title">
+        <h2>个人收货地址</h2>
+    </div>
+    <a class="btn" href="{:U('Member/show', array('id' => $_GET['uid']))}"> < 返回个人信息</a>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table class="">
+            <thead>
+                <tr>
+                    <th class="" style="width:100px;">收货人</th>
+                    <th class="" style="width:100px;">联系电话</th>
+                    <th class="">收货地址</th>
+                    <th class="" style="width:60px;">邮编</th>
+                    <th class="" style="width:120px;">最后修改时间</th>
+                </tr>
+            </thead>
+            <tbody>
+            <notempty name="_list">
+                <volist name="_list" id="vo">
+                    <tr>
+                        <td>{$vo.name}</td>
+                        <td>{$vo.mobile}</td>
+                        <td>
+                            <eq name="vo.is_default" value="1">
+                            [默认地址]
+                            <br>
+                            </eq>
+                            {$vo.sheng_title} {$vo.shi_title}
+                            <br>
+                            {$vo.address}
+                        </td>
+                        <td>{$vo.zip_code}</td>
+                        <td>{$vo.update_time|time_format="Y-m-d H:i"}</td>
+                    </tr>
+                </volist>
+                <else/>
+                <td colspan="9" class="text-center"> aOh! 暂时还没有内容! </td>
+            </notempty>
+            </tbody>
+        </table>
+    </div>
+</block>
+
+<block name="script">
+    <script type="text/javascript">
+        //导航高亮
+        highlight_subnav('{:U('Member/index')}');showTab();
+    </script>
+</block>

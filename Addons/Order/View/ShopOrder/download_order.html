@@ -1,0 +1,54 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <ul class="tab-nav nav">
+    </ul>
+    <div class="tab-content">
+        <!-- 数据列表 -->
+        <form id="form" action="" method="get" class="form-horizontal">
+            <div class="tab-pane in tab1">
+                注意：日期以订单创建时间为准
+                <div class="form-item cf">
+                    <label class="item-label">开始日期</label>
+                    <div class="controls">
+                        <input type="text" class="date text input-min" name="s_date" />
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">结束日期<span class="check-tips">（当结束日期小于开始日期时，则结束日期将等于开始日期）</span></label>
+                    <div class="controls">
+                        <input type="text" class="date text input-min" name="e_date" />
+                    </div>
+                </div>
+            </div>
+            <button id="submit" class="btn submit-btn hidden" target-form="form-horizontal" type="submit">确 定</button>
+            <a class="btn btn-return" onclick="history.go(-1)">返 回</a>
+        </form>
+    </div>
+</block>
+<block name="script">
+        <link href="__STATIC__/datetimepicker/css/datetimepicker.css" rel="stylesheet" type="text/css">
+        <php>if(C('COLOR_STYLE')=='blue_color') echo '<link href="__STATIC__/datetimepicker/css/datetimepicker_blue.css" rel="stylesheet" type="text/css">';</php>
+        <link href="__STATIC__/datetimepicker/css/dropdown.css" rel="stylesheet" type="text/css">
+        <script type="text/javascript" src="__STATIC__/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+        <script type="text/javascript" src="__STATIC__/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+        <script type="text/javascript">
+        $(function() {
+            highlight_subnav('{:addons_url('Order://Order:/index')}');
+            showTab();
+            
+            $('.date').datetimepicker({
+                format: 'yyyy-mm-dd',
+                language:"zh-CN",
+                minView:2,
+                autoclose:true
+            });
+        });
+
+    </script>
+</block>

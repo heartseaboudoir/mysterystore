@@ -1,0 +1,63 @@
+<extend name="Public/base" />
+
+<block name="body">
+	<!-- 标题栏 -->
+	<div class="main-title">
+		<h2>{$data['id'] ? '编辑' : '添加'}</h2>
+	</div>
+        <ul class="tab-nav nav">
+            <li class="current" data-tab="tab1"><a href="javascript:void(0);">基础</a></li>
+        </ul>
+        <div class="tab-content">
+            <div>
+                注意：目前自定义菜单最多包括3个一级菜单，每个一级菜单最多包含5个二级菜单。一级菜单最多4个汉字，二级菜单最多7个汉字，多出来的部分将会以“...”代替。请注意，创建自定义菜单生成成功后，由于微信客户端缓存，需要24小时微信客户端才会展现出来。 
+            </div>
+            <!-- 数据列表 -->
+            <form id="form" action="{:addons_url('WechatMenu://WechatMenu:/update')}" method="post" class="form-horizontal">
+                <div class="tab-pane in tab1">
+                    <div class="form-item cf">
+                        <label class="item-label">所属级别</label>
+                        <div class="controls">
+                            <select name="pid">
+                                <option value="0">作为一级菜单</option>
+                                <foreach name="parent" item="p">
+                                    <option value="{$p.id}" <if condition="$pid == $p['id']">selected=""</if>>{$p.title}</option>
+                                </foreach>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-item cf">
+                        <label class="item-label">菜单名</label>
+                        <div class="controls">
+                            <input class="text input-large" type="text" value="{$data['title']}" name="title">
+                        </div>
+                    </div>
+                    <div class="form-item cf">
+                        <label class="item-label">关键词</label>
+                        <div class="controls">
+                            <input class="text input-medium" type="text" value="{$data['keyword']}" name="keyword">
+                        </div>
+                    </div>
+                    <div class="form-item cf">
+                        <label class="item-label">URL</label>
+                        <div class="controls">
+                            <input class="text input-large" type="text" value="{$data['url']}" name="url">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <button id="submit" class="btn submit-btn ajax-post hidden" target-form="form-horizontal" type="submit">确 定</button>
+                    <a class="btn btn-return" href="javascript:history.go(-1);">返 回</a>
+                    <input type="hidden" value="{$data.id}" name="id" />
+                </div>
+            </form>
+        </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+            $(function(){
+                showTab();
+                highlight_subnav('{:addons_url('WechatMenu://WechatMenu:/index')}');
+            });
+    </script>
+</block>

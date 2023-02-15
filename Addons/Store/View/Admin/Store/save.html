@@ -1,0 +1,525 @@
+<extend name="Public/base" />
+<style type="text/css">
+    body, html,#map {width: 450px;height: 310px;margin:0;font-family:"微软雅黑";}
+</style>
+<block name="body">
+        <script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+	<!-- 标题栏 -->
+	<div class="main-title">
+		<h2>{$meta_title}</h2>
+	</div>
+        <ul class="tab-nav nav">
+            <li class="current" data-tab="tab1"><a href="javascript:void(0);">基础</a></li>
+            <li data-tab="tab5"><a href="javascript:void(0);">支付配置</a></li>
+            <notempty name="data[id]">
+                <li data-tab="tab2"><a href="javascript:void(0);">门店管理员</a></li>
+                <li data-tab="tab3"><a href="javascript:void(0);">门店财务管理员</a></li>
+                <li data-tab="tab4"><a href="javascript:void(0);">设备管理员</a></li>
+                <li data-tab="tab6"><a href="javascript:void(0);">合作载体管理员</a></li>
+                <li data-tab="tab7"><a href="javascript:void(0);">采购管理员</a></li>
+                <li data-tab="tab8"><a href="javascript:void(0);">加盟商</a></li>
+            </notempty>
+        </ul>
+        <div class="tab-content">
+            <!-- 数据列表 -->
+            <form id="form" action="{:addons_url('Store://StoreAdmin:/update')}" method="post" class="form-horizontal">
+                <div class="tab-pane in tab1">
+                        <div class="form-item cf">
+                            <label class="item-label">所在区域</label>
+                            <div class="controls">
+                                <select name="shequ_id">
+                                    <option value="0"> - 请选择所在区域 - </option>
+                                    <volist name="shequ_ls" id="lv">
+                                        <option value="{$key}" <eq name="key" value="$data[shequ_id]">selected</eq>>{$lv}</option>
+                                    </volist>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">门店名</label>
+                            <div class="controls">
+                                <input type="text" class="text input-min" name="title" value="{$data.title}" />
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">门店地址</label>
+                            <div class="controls">
+                                <input type="text" class="text input-large" name="address" id="address" value="{$data.address}" />
+                            </div>
+                            <div id="searchResultPanel" style="border:1px solid #C0C0C0;width:150px;height:auto; display:none;"></div>
+                        </div>
+                        <notempty name="data.sell_type">
+                        <div class="form-item cf">
+                            <label class="item-label">门店类型</label>
+                            <div class="controls">
+                                <eq name="data.sell_type" value="2">
+                                    线上虚拟门店
+                                <else/>
+                                    线下实体门店
+                                </eq>
+                            </div>
+                        </div>
+                        </notempty>
+                        <div class="form-item cf">
+                            <label class="item-label">门店位置</label>
+                            <div class="controls">地址搜索：<input type="text" class="text input-large" name="searchAddress" id="searchAddress" value="{$data.address}" /></div>
+                            <div id="map" style="width: 450px;height: 310px;">
+
+                            </div>
+                            <div class="controls">
+                                经度：<input type="text" class="text input-min" name="longitude" id="longitude" value="{$data.longitude}" />
+                                纬度：<input type="text" class="text input-min" name="latitude" id="latitude" value="{$data.latitude}" />
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">是否锦江门店(<span style="color:red;">非锦江门店切勿选择是</span>)</label>
+                            <div class="controls">
+                                <label><input type="radio" name="is_jj" value="0" <eq name="data[is_jj]" value="0">checked=""</eq>checked="" /> 否</label>
+                                <label><input type="radio" name="is_jj" value="1" <eq name="data[is_jj]" value="1">checked=""</eq> /> 是</label>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">是否折扣(<span>在该门店所下订单是否有折扣</span>)</label>
+                            <div class="controls">
+                                <label><input type="radio" name="is_rate" value="0" <eq name="data[is_rate]" value="0">checked=""</eq>checked="" /> 否</label>
+                                <label><input type="radio" name="is_rate" value="1" <eq name="data[is_rate]" value="1">checked=""</eq> /> 是</label>
+                            </div>
+                        </div>     
+                        <div class="form-item cf">
+                            <label class="item-label">折扣比例(<span style="color:red;">订单的折扣值(0~100),例：八五折，即优惠15%，则填15，默认0</span>)</label>
+                            <div class="controls">
+                                <input type="text" class="text input-min" name="rate_val" value="{$data.rate_val}" />
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">房间数</label>
+                            <div class="controls">
+                                <input type="text" class="text input-min" name="room_amount" value="{$data.room_amount}" />
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">入住率(<span style="color:red;">房间的入住率(0~100),例：15%，则填15，默认0</span>)</label>
+                            <div class="controls">
+                                <input type="text" class="text input-min" name="occupancy_rate" value="{$data.occupancy_rate}" />
+                            </div>
+                        </div>
+                    <div class="form-item cf">
+                            <label class="item-label">状态</label>
+                            <div class="controls">
+                                <label><input type="radio" name="status" value="1" checked="" /> 正常</label>
+                                <label><input type="radio" name="status" value="2" <eq name="data[status]" value="2">checked=""</eq> /> 禁用</label>
+                            </div>
+                        </div>                        
+                        <div class="form-item cf">
+                            <button id="submit" class="btn submit-btn ajax-post hidden" target-form="form-horizontal" type="submit">确 定</button>
+                            <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                            <input type="hidden" value="{$data.id}" name="id" />
+                        </div>
+                </div>
+                <notempty name="data[id]">
+                <div class="tab-pane tab2">
+                    <a class="btn" href="{:addons_url('Store://MemberAdmin:/save', array('group' => 2, 'store_id' => $data['id']))}">添加</a> 
+                    <!-- 数据列表 -->
+                    <div class="data-table table-striped">
+                        <table>
+                            <thead> 
+                                <tr>
+                                    <th>登录名</th>
+                                    <th>昵称</th>
+                                    <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <notempty name="member_ls[2]">
+                            <volist name="member_ls[2]" id="lv" key="vo">
+                                <tr>
+                                    <td>{$lv.uid|get_username}</td>
+                                    <td>{$lv.uid|get_nickname}</td>
+                                    <td>
+                                        <a class="confirm ajax-get" href="{:addons_url('Store://MemberAdmin:/delete', array('id' => $lv['uid'], 'type' => 1, 'group' => 2, 'store_id' => $data['id']))}" data-id="{$lv.uid}">删除</a>
+                                    </td>
+                                </tr>
+                            </volist>
+                            <else/>
+                                <tr><td colspan="3">暂无数据~</td></tr>
+                            </notempty>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="form-item cf">
+                        <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                    </div>
+                </div>
+                <div class="tab-pane tab3">
+                    <a class="btn" href="{:addons_url('Store://MemberAdmin:/save', array('group' => 3, 'store_id' => $data['id']))}">添加</a> 
+                    <!-- 数据列表 -->
+                    <div class="data-table table-striped">
+                        <table>
+                            <thead> 
+                                <tr>
+                                    <th>登录名</th>
+                                    <th>昵称</th>
+                                    <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <notempty name="member_ls[3]">
+                            <volist name="member_ls[3]" id="lv" key="vo">
+                                <tr>
+                                    <td>{$lv.uid|get_username}</td>
+                                    <td>{$lv.uid|get_nickname}</td>
+                                    <td>
+                                        <a class="update" href="{:addons_url('Store://MemberAdmin:/save?id='.$lv['uid'])}" data-id="{$lv.uid}">编辑</a>
+                                        <a class="confirm ajax-get" href="{:addons_url('Store://MemberAdmin:/delete', array('id' => $lv['uid'], 'type' => 1, 'group' => 3, 'store_id' => $data['id']))}" data-id="{$lv.uid}">删除</a>
+                                    </td>
+                                </tr>
+                            </volist>
+                            <else/>
+                                <tr><td colspan="3">暂无数据~</td></tr>
+                            </notempty>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="form-item cf">
+                        <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                    </div>
+                </div>
+                <div class="tab-pane tab6">
+                    <a class="btn" href="{:addons_url('Store://MemberAdmin:/save', array('group' => 10, 'store_id' => $data['id']))}">添加</a> 
+                    <!-- 数据列表 -->
+                    <div class="data-table table-striped">
+                        <table>
+                            <thead> 
+                                <tr>
+                                    <th>登录名</th>
+                                    <th>昵称</th>
+                                    <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <notempty name="member_ls[10]">
+                            <volist name="member_ls[10]" id="lv" key="vo">
+                                <tr>
+                                    <td>{$lv.uid|get_username}</td>
+                                    <td>{$lv.uid|get_nickname}</td>
+                                    <td>
+                                        <a class="update" href="{:addons_url('Store://MemberAdmin:/save?id='.$lv['uid'])}" data-id="{$lv.uid}">编辑</a>
+                                        <a class="confirm ajax-get" href="{:addons_url('Store://MemberAdmin:/delete', array('id' => $lv['uid'], 'type' => 1, 'group' => 10, 'store_id' => $data['id']))}" data-id="{$lv.uid}">删除</a>
+                                    </td>
+                                </tr>
+                            </volist>
+                            <else/>
+                                <tr><td colspan="3">暂无数据~</td></tr>
+                            </notempty>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="form-item cf">
+                        <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                    </div>
+                </div>
+                <div class="tab-pane tab4">
+                    <a class="btn" href="{:addons_url('Store://MemberAdmin:/save', array('group' => 4, 'store_id' => $data['id']))}">添加</a> 
+                    <!-- 数据列表 -->
+                    <div class="data-table table-striped">
+                        <table>
+                            <thead> 
+                                <tr>
+                                    <th>登录名</th>
+                                    <th>昵称</th>
+                                    <th>绑定设备标识</th>
+                                    <th>正在登录的设备标识</th>
+                                    <th>正在登录的设备名</th>
+                                    <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <notempty name="member_ls[4]">
+                            <volist name="member_ls[4]" id="lv" key="vo">
+                                <tr>
+                                    <td>{$lv.uid|get_username}</td>
+                                    <td>{$lv.nickname}</td>
+                                    <td>{$lv.bind_pos}</td>
+                                    <td>{$lv.pos_id}</td>
+                                    <td>{$lv.pos_title}</td>
+                                    <td>
+                                        <a class="update" href="{:addons_url('Store://MemberAdmin:/log_index?id='.$lv['uid'])}" data-id="{$lv.uid}">查看记录</a>
+                                        <a class="update" href="{:addons_url('Store://MemberAdmin:/bind?id='.$lv['uid'])}" data-id="{$lv.uid}">绑定设置</a>
+                                        <a class="confirm ajax-get" href="{:addons_url('Store://MemberAdmin:/delete', array('id' => $lv['uid'], 'type' => 1, 'group' => 4, 'store_id' => $data['id']))}" data-id="{$lv.uid}">删除</a>
+                                    </td>
+                                </tr>
+                            </volist>
+                            <else/>
+                                <tr><td colspan="6">暂无数据~</td></tr>
+                            </notempty>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="form-item cf">
+                        <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                    </div>
+                </div>
+                
+                <div class="tab-pane tab7">
+                    <a class="btn" href="{:addons_url('Store://MemberAdmin:/save', array('group' => 15, 'store_id' => $data['id']))}">添加</a> 
+                    <!-- 数据列表 -->
+                    <div class="data-table table-striped">
+                        <table>
+                            <thead> 
+                                <tr>
+                                    <th>登录名</th>
+                                    <th>昵称</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <notempty name="member_ls[15]">
+                                <volist name="member_ls[15]" id="lv" key="vo">
+                                    <tr>
+                                        <td>{$lv.uid|get_username}</td>
+                                        <td>{$lv.uid|get_nickname}</td>
+                                        <td>
+                                            <a class="update" href="{:addons_url('Store://MemberAdmin:/save?id='.$lv['uid'])}" data-id="{$lv.uid}">编辑</a>
+                                            <a class="confirm ajax-get" href="{:addons_url('Store://MemberAdmin:/delete', array('id' => $lv['uid'], 'type' => 1, 'group' => 15, 'store_id' => $data['id']))}" data-id="{$lv.uid}">删除</a>
+                                        </td>
+                                    </tr>
+                                </volist>
+                            <else/>
+                                <tr><td colspan="3">暂无数据~</td></tr>
+                            </notempty>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="form-item cf">
+                        <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                    </div>
+                </div>    
+                <div class="tab-pane tab8">
+                    <a class="btn" href="{:addons_url('Store://MemberAdmin:/save', array('group' => 17, 'store_id' => $data['id']))}">添加</a> 
+                    <!-- 数据列表 -->
+                    <div class="data-table table-striped">
+                        <table>
+                            <thead> 
+                                <tr>
+                                    <th>登录名</th>
+                                    <th>昵称</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <notempty name="member_ls[17]">
+                                <volist name="member_ls[17]" id="lv" key="vo">
+                                    <tr>
+                                        <td>{$lv.uid|get_username}</td>
+                                        <td>{$lv.uid|get_nickname}</td>
+                                        <td>
+                                            <a class="update" href="{:addons_url('Store://MemberAdmin:/save?id='.$lv['uid'])}" data-id="{$lv.uid}">编辑</a>
+                                            <a class="confirm ajax-get" href="{:addons_url('Store://MemberAdmin:/delete', array('id' => $lv['uid'], 'type' => 1, 'group' => 17, 'store_id' => $data['id']))}" data-id="{$lv.uid}">删除</a>
+                                        </td>
+                                    </tr>
+                                </volist>
+                            <else/>
+                                <tr><td colspan="3">暂无数据~</td></tr>
+                            </notempty>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="form-item cf">
+                        <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                    </div>
+                </div>                
+                </notempty>
+                <div class="tab-pane tab5">
+                        <div class="form-item cf">
+                            <button id="getPayParams" class="btn" target-form="form-horizontal" type="button">获取默认支付配置</button>
+                        </div>                
+                        <div class="form-item cf">
+                            <div class="controls">
+                                <label class="item-label" style="background:#dfdfdf; font-size:16px; padding-left:5px;">微信配置<span class="check-tips"><span class="check-tips">（必埴，为空时则不能进行微信支付）</span></span></label>
+                                <div class="form-item cf">
+                                    <label class="item-label">APPID<span class="check-tips">（微信APPID，可以微信公众平台开发者获得）</span></label>
+                                    <div class="controls">
+                                        <input type="text" class="text input-large" name="pay[wx][appid]" value="{$data.pay.wx.appid}" />
+                                    </div>
+                                </div>
+                                <div class="form-item cf">
+                                    <label class="item-label">APPSECRET<span class="check-tips">（微信APPSECRET，可以微信公众平台开发者获得）</span></label>
+                                    <div class="controls">
+                                        <input type="text" class="text input-large" name="pay[wx][appsecret]" value="{$data.pay.wx.appsecret}" />
+                                    </div>
+                                </div>
+                                <div class="form-item cf">
+                                    <label class="item-label">MCHID<span class="check-tips">（商户号）</span></label>
+                                    <div class="controls">
+                                        <input type="text" class="text input-large" name="pay[wx][mchid]" value="{$data.pay.wx.mchid}" />
+                                    </div>
+                                </div>
+                                <div class="form-item cf">
+                                    <label class="item-label">KEY<span class="check-tips">（商户支付密钥，参考开户邮件设置）</span></label>
+                                    <div class="controls">
+                                        <input type="text" class="text input-large" name="pay[wx][key]" value="{$data.pay.wx.key}" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div><div class="form-item cf">
+                            <div class="controls">
+                                <label class="item-label" style="background:#dfdfdf; font-size:16px; padding-left:5px;">支付宝配置<span class="check-tips">（必埴，为空时则不能进行支付宝支付）</span></label>
+                                <div class="form-item cf">
+                                    <label class="item-label">APPID<span class="check-tips">（支付宝APPID，可以在支付宝开放平台-》管理中心-》我的应用中获得）</span></label>
+                                    <div class="controls">
+                                        <input type="text" class="text input-large" name="pay[ali][appid]" value="{$data.pay.ali.appid}" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-item cf">
+                            <button id="submit" class="btn submit-btn ajax-post hidden" target-form="form-horizontal" type="submit">确 定</button>
+                            <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                            <input type="hidden" value="{$data.id}" name="id" />
+                        </div>
+                </div>
+            </form>
+        </div>
+</block>
+<block name="script">
+    <!--引入百度地图-->
+    <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=GbhEyShLG4lqTjB0rlcCC8kcoIq1SVmc"></script>
+	<script type="text/javascript">
+		$(function(){
+                    highlight_subnav('{:addons_url('Store://StoreAdmin:/index')}');
+                    //全选节点
+                    $('.check-all').on('change',function(){
+                        $('.ids').prop('checked',this.checked);
+                    });showTab();
+		});
+
+
+        function G(id) {
+            return document.getElementById(id);
+        }
+
+        $('#getPayParams').click(function(){
+            $.ajax({
+                url: '{:addons_url('Store://StoreAdmin:/get_pay_params')}',
+                type: 'POST',
+                dataType: 'json',
+                success: function(data) {
+                    //console.log(data);
+                    
+                    payinfo = data.data;
+                    
+                    $('input[name="pay[wx][appid]"]').val(payinfo.wx.appid);
+                    $('input[name="pay[wx][appsecret]"]').val(payinfo.wx.appsecret);
+                    $('input[name="pay[wx][mchid]"]').val(payinfo.wx.mchid);
+                    $('input[name="pay[wx][key]"]').val(payinfo.wx.key);
+                    $('input[name="pay[ali][appid]"]').val(payinfo.ali.appid);
+                    
+                    
+                }
+            })
+        })
+        //百度地图
+        var map = new BMap.Map("map");          // 创建地图实例
+        var point = new BMap.Point(116.404, 39.915);  // 创建点坐标
+        map.centerAndZoom(point, 11);
+
+
+        var lat = <?php echo empty($data['latitude']) ? 0 : $data['latitude'];?>;//地理纬度
+        var lng = <?php echo empty($data['longitude']) ? 0 : $data['longitude'];?>;//地理经度
+        if(lat >0 || lng > 0) {
+            var new_point = new BMap.Point(lng, lat);  // 创建点坐标
+            var marker = new BMap.Marker(new_point);  // 创建标注
+            map.addOverlay(marker);              // 将标注添加到地图中
+            map.panTo(new_point);
+        }
+
+        //添加地图类型控件
+        var navigationControl = new BMap.NavigationControl({
+            // 靠左上角位置
+            anchor: BMAP_ANCHOR_TOP_LEFT,
+            // LARGE类型
+            type: BMAP_NAVIGATION_CONTROL_LARGE,
+            // 启用显示定位
+            enableGeolocation: true
+        });
+        map.addControl(navigationControl);
+        map.setCurrentCity("北京");          // 设置地图显示的城市 此项是必须设置的
+        map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+
+        // 添加定位控件
+        var geolocationControl = new BMap.GeolocationControl();
+        geolocationControl.addEventListener("locationSuccess", function(e){
+            // 定位成功事件
+            var address = '';
+            address += e.addressComponent.province;
+            address += e.addressComponent.city;
+            address += e.addressComponent.district;
+            address += e.addressComponent.street;
+            address += e.addressComponent.streetNumber;
+            alert("当前定位地址为：" + address);
+        });
+        geolocationControl.addEventListener("locationError",function(e){
+            // 定位失败事件
+            alert(e.message);
+        });
+        map.addControl(geolocationControl);
+
+        //构建搜索
+        var ac = new BMap.Autocomplete(    //建立一个自动完成的对象
+                {"input" : "searchAddress"
+                    ,"location" : map
+                });
+
+        ac.addEventListener("onhighlight", function(e) {  //鼠标放在下拉列表上的事件
+            var str = "";
+            var _value = e.fromitem.value;
+            var value = "";
+            if (e.fromitem.index > -1) {
+                value = _value.province +  _value.city +  _value.district +  _value.street +  _value.business;
+            }
+            str = "FromItem<br />index = " + e.fromitem.index + "<br />value = " + value;
+
+            value = "";
+            if (e.toitem.index > -1) {
+                _value = e.toitem.value;
+                value = _value.province +  _value.city +  _value.district +  _value.street +  _value.business;
+            }
+            str += "<br />ToItem<br />index = " + e.toitem.index + "<br />value = " + value;
+            G("searchResultPanel").innerHTML = str;
+            //渲染address内容
+            $('#address').val(value);
+        });
+
+        var myValue;
+        ac.addEventListener("onconfirm", function(e) {    //鼠标点击下拉列表后的事件
+            var _value = e.item.value;
+            myValue = _value.province +  _value.city +  _value.district +  _value.street +  _value.business;
+            G("searchResultPanel").innerHTML ="onconfirm<br />index = " + e.item.index + "<br />myValue = " + myValue;
+            setPlace();
+        });
+
+
+
+        //监听加载完成
+        map.addEventListener("tilesloaded",function(){
+            //添加层级
+            $('.tangram-suggestion-main').css('z-index' , '9999');
+        });
+        function setPlace(){
+            map.clearOverlays();    //清除地图上所有覆盖物
+            function myFun(){
+                var pp = local.getResults().getPoi(0).point;    //获取第一个智能搜索的结果
+                //渲染经纬度
+                $('#latitude').val(pp.lat);
+                $('#longitude').val(pp.lng);
+                map.centerAndZoom(pp, 18);
+                map.addOverlay(new BMap.Marker(pp));    //添加标注
+            }
+            var local = new BMap.LocalSearch(map, { //智能搜索
+                onSearchComplete: myFun
+            });
+            local.search(myValue);
+        }
+	</script>
+</block>

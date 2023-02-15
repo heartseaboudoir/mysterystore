@@ -1,0 +1,97 @@
+<extend name="Base/common"/>
+<block name="body">
+<div class="weui_tab">
+    <div class="weui_tab_bd pb55">
+        <div class="personHead" onclick="location.href='{:U('User/info')}'">
+            <div class="personHead-avator">
+                <div class="img-wrapper">
+                    <img src="{$member.header_pic}" alt="">
+                </div>
+                <div class="personHead-name">{$member.nickname}</div>
+                <div class="personHead-level">
+                    <div class="personHead-bage">
+                        <img src="{$member.score_data.level_icon|get_cover_url}" alt="">
+                    </div>
+                    {$member.score_data.level_title}
+                </div>
+            </div>
+        </div>
+
+        <div class="weui_cells weui_cells_access">
+            <a class="weui_cell" href="{:U('Order/lists')}">
+                <div class="weui_cell_bd weui_cell_primary">
+                    <p>我的订单</p>
+                </div>
+                <div class="weui_cell_ft"></div>
+            </a>
+        </div>
+
+        <div class="weui_cells weui_cells_access">
+            <a class="weui_cell" href="{:U('CashCoupon/lists')}">
+                <div class="weui_cell_bd weui_cell_primary">
+                    <p>我的优惠券</p>
+                </div>
+                <div class="weui_cell_ft"></div>
+            </a>
+        </div>
+        <div class="weui_cells weui_cells_access">
+            <a class="weui_cell" href="{:U('User/change_mobile')}">
+                <div class="weui_cell_bd weui_cell_primary">
+                    <p>我的手机</p>
+                </div>
+                <div class="weui_cell_ft"></div>
+            </a>
+        </div>
+
+        <div class="weui_cells weui_cells_access">
+            <a class="weui_cell" href="javascript:;" id="logout_btn">
+                <div class="weui_cell_bd weui_cell_primary">
+                    <p style="text-align: center;color: red;">退出登录</p>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+    <!--
+<div class="weui_tabbar">
+    <a href="javascript:;" class="weui_tabbar_item weui_bar_item_on">
+        <div class="bg"></div>
+        <p class="weui_tabbar_label">活动</p>
+    </a>
+    <a href="{:U('User/index')}" class="weui_tabbar_item">
+        <div class="bg"></div>
+        <p class="weui_tabbar_label">我的</p>
+    </a>
+    <a href="{:U('Document/show', array('name' => 'about'))}" class="weui_tabbar_item">
+        <div class="bg"></div>
+        <p class="weui_tabbar_label">关于我们</p>
+    </a>
+</div>-->
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $('#logout_btn').click(function(){
+            ConfirmFactory({
+                msg: '确定退出？',
+                close: function () {
+                },
+                confirm: function () {
+                    var url = "{:U('User/logout')}";
+                    Loading.show({
+                        msg: '正在退出登录',
+                        isLoading: true
+                    });
+                    $.get(url, function(data){
+                        Loading.hide();
+
+                        Loading.show({
+                            msg: data.info,
+                            isLoading: true
+                        });
+                        window.location.href=data.url;
+                    });
+                }
+            }, 'body');
+        });
+    </script>
+</block>

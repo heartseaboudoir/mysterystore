@@ -1,0 +1,153 @@
+x<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div> 
+    <a href="{:addons_url('Goods://GoodsStoreAdmin:/download_store_num', array('by_store' => $_GET['by_store']))}" id="download_num" class="btn" >导出商品库存</a>
+    <button href="{:addons_url('Goods://GoodsStoreAdmin:/push_update', array('type' => 'goods_by_id'))}" class="btn ajax-post confirm"  target-form="ids" style="margin-left:20px;">同步勾选商品数据</button>
+    <button href="{:addons_url('Goods://GoodsStoreAdmin:/push_update', array('type' => 'all'))}" class="btn ajax-get confirm" >同步商品数据（所有）</button>
+    
+    <!-- 高级搜索 -->
+    <div class="search-form fr cf">
+        <form id="search-form" onsubmit="return false;">
+        <div class="sleft">
+            <input type="text" name="title" class="search-input" value="{:I('title')}" placeholder="请输入关键字或商品条形码">
+            <a class="sch-btn" href="javascript:;" id="search" url="{:addons_url('Goods://GoodsStoreAdmin:/index')}"><i class="btn-search"></i></a>
+        </div>
+        <div class="btn-group-click adv-sch-pannel fl">
+            <button class="btn">高 级<i class="btn-arrowdown"></i></button>
+            <div class="dropdown cf">
+                <div class="row">
+                    <label>分类：</label>
+                    <select name="cate_id">
+                        <option value="0">不限</option>
+                        <volist name="cate_ls" id="lv">
+                            <option value="{$key}" <eq name="key" value="$_GET['cate_id']">selected</eq>>{$lv}</option>
+                        </volist>
+                    </select>
+                </div>
+            </div>
+        </div>
+        </form>
+    </div>
+    <div style="clear:both;"></div>
+    <p style="margin-top:5px;" id="select_p">
+        <form id="select-form" onsubmit="return false;">
+        筛选：
+        <label><input type="checkbox" name="by_store" value="1" <eq name="_GET[by_store]" value="1">checked</eq> /> 门店商品</label>
+        </form> 
+    </p>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead> 
+                <tr>
+                    <th class="row-selected row-selected" width="30"><input class="check-all" type="checkbox"  target-form="ids"/></th>
+                    <th width="80">ID</th>
+                    <th>商品名</th>
+                    <th width="80">分类</th>
+                    <th width="80">展示图</th>
+                    <th style="width:80px;">系统售价</th>
+                    <th style="width:80px;">区域售价</th>
+                    <th style="width:80px;">门店售价</th>
+                    <th style="width:80px;">库存</th>
+                    <th style="width:80px;">总销售量</th>
+                    <th style="width:80px;">更新时间</th>
+                    <th style="width:100px;">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td><input class="ids" type="checkbox" name="ids[]" value="{$lv.id}" /></td>
+                    <td>{$lv.id}</td>
+                    <td>{$lv.title}</td>
+                    <td>{$cate_title[$lv[cate_id]]}</td>
+                    <td>
+                        <div class="upload-img-box">
+                            <notempty name="lv[cover_id]">
+                                <div class="upload-pre-item"><img src="{$lv['cover_id']|get_cover='path'}" style="max-height: 60px; max-width: 80px;"/></div>
+                            </notempty>
+                        </div>
+                    </td>
+                    <td>{$lv.sell_price}</td>
+                     <td>{$lv.shequ_price|default="未设置"}</td>
+                    <td>{$lv.price|default="未设置"}</td>
+                    <td>{$lv.num|default="未设置"}</td>
+                    <td>{$lv.month_num|default="0"}</td>
+                    <td>{$lv.store_data.update_time|time_format="Y-m-d H:i:s"}</td>
+                    <td>
+                        <a class="update" href="{:addons_url('Goods://GoodsStoreAdmin:/show?id='.$lv['id'])}" data-id="{$lv.id}">基本信息</a>
+                        <a class="update" href="{:addons_url('Goods://GoodsStoreAdmin:/save?id='.$lv['id'])}#2" data-id="{$lv.id}">设置</a>
+                    </td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        highlight_subnav('{:addons_url('Goods://GoodsStoreAdmin:/index')}');
+        $(function() {
+            //全选节点
+            $('.check-all').on('change', function() {
+                $('.ids').prop('checked', this.checked);
+            });
+            //搜索功能
+            $('.search-form input').focus(function(){
+                $(document).keypress(function (e) {
+                    // 回车键事件 
+                    if (e.which == 13) {
+                        $("#search").click();
+                    }
+                });
+            });
+            $("#search").click(function () {
+                var url = $(this).attr('url');
+                var query = $('#search-form').serialize();
+                query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g, '');
+                query = query.replace(/^&/g, '');
+                if (url.indexOf('?') > 0) {
+                    url += '&' + query;
+                } else {
+                    url += '?' + query;
+                }
+                var query2 = $('#select-form').serialize();
+                if (url.indexOf('?') > 0) {
+                    url += '&' + query2;
+                } else {
+                    url += '?' + query2;
+                }
+                window.location.href = url;
+            });
+            var _T;
+            $('#select-form input').change(function(){
+                clearTimeout(_T);
+                _T = setTimeout(function(){
+                    $("#search").click();
+                }, 1000);
+            });
+            /* 状态搜索子菜单 */
+            $(".search-form").find(".drop-down").hover(function () {
+                $("#sub-sch-menu").removeClass("hidden");
+            }, function () {
+                $("#sub-sch-menu").addClass("hidden");
+            });
+            $("#sub-sch-menu li").find("a").each(function () {
+                $(this).click(function () {
+                    var text = $(this).text();
+                    $("#sch-sort-txt").text(text).attr("data", $(this).attr("value"));
+                    $("#sub-sch-menu").addClass("hidden");
+                })
+            });
+            
+        })
+    </script>
+</block>

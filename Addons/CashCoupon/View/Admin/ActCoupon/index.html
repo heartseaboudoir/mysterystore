@@ -1,0 +1,128 @@
+<extend name="Public/base" />
+
+<block name="body">
+	<!-- 标题栏 -->
+	<div class="main-title">
+		<h2>{$meta_title}</h2>
+	</div>
+        <div class="tab-content">
+            <!-- 数据列表 -->
+            <form id="form" action="{:addons_url('CashCoupon://ActCouponAdmin:/update')}" method="post" class="form-horizontal">
+                <div class="tab-pane in tab1">
+                    <div class="form-item cf">
+                        <label class="item-label">是否开启活动</label>
+                        <div class="controls">
+                            <select name="is_open" style="width:120px;">
+                                <option value="1" <?php if(!empty($data['is_open'])) { echo 'selected';}?>>是</option>
+                                <option value="0" <?php if(empty($data['is_open'])) { echo 'selected';}?>>否</option>
+                            </select>
+                        </div>
+                    </div>                        
+                    <div class="form-item cf">
+                        <label class="item-label">活动起止时间<span class="check-tips"></span></label>
+                        <div class="controls">
+                            <label><input type="text" class="input-2x time text" name="stime" value="<gt name="data.stime" value="0">{$data['stime']|time_format='Y-m-d'}</gt>" /></label>
+                            &nbsp;&nbsp;&nbsp;&nbsp;-
+                            <label><input type="text" class="input-2x time text" name="etime" value="<gt name="data.etime" value="0">{$data['etime']|time_format='Y-m-d'}</gt>" /></label>
+                        </div>
+                    </div>                        
+
+                    
+                    <div class="form-item cf">
+                        <label class="item-label">生成优惠券的标题<span class="check-tips"></span></label>
+                        <div class="controls">
+                            <input class="text input-min" type="text" value="{$data['title']}" name="title" maxlength="30">
+                        </div>
+                    </div>
+                    <div class="form-item cf">
+                        <label class="item-label">生成优惠券的描述<span class="check-tips"></span></label>
+                        <div class="controls">
+                            <input class="text input-large" type="text" value="{$data['info']}" name="info" maxlength="80">
+                        </div>
+                    </div>
+                    <div class="form-item cf">
+                        <label class="item-label">每张优惠券金额<span class="check-tips">（每张优惠券金额，为大于0,保存2位小数）</span></label>
+                        <div class="controls">
+                            <input class="text input-mini" type="text" value="{$data['money']}" name="money" >元
+                        </div>
+                    </div>
+                    <div class="form-item cf">
+                        <label class="item-label">使用的最低限额<span class="check-tips">（消费满多少可使用，为大于0,保存2位小数）</span></label>
+                        <div class="controls">
+                            <input class="text input-mini" type="text" value="{$data['min_use_money']}" name="min_use_money" >元
+                        </div>
+                    </div>                    
+                    <div class="form-item cf">
+                        <label class="item-label">奖池大小<span class="check-tips">（活动当天参与活动订单总额百分比,0-100间的整数）</span></label>
+                        <div class="controls">
+                            <input class="text input-mini" type="text" value="{$data['parcent']}" name="parcent">%
+                        </div>
+                    </div>
+                    <div class="form-item cf">
+                        <label class="item-label">初始奖池大小<span class="check-tips">（活动当天初始奖池大小）</span></label>
+                        <div class="controls">
+                            <input class="text input-mini" type="text" value="{$data['prize']}" name="prize">元
+                        </div>
+                    </div>
+                    <div class="form-item cf">
+                        <label class="item-label">初始奖池分享人次<span class="check-tips">（活动当天初始时已有多少人参与）</span></label>
+                        <div class="controls">
+                            <input class="text input-mini" type="text" value="{$data['num']}" name="num">次
+                        </div>
+                    </div>   
+                    <div class="form-item cf">
+                        <label class="item-label">最大获奖数<span class="check-tips">（设置为0即不限制）</span></label>
+                        <div class="controls">
+                            <input class="text input-mini" type="text" value="{$data['max_get']}" name="max_get">个
+                        </div>
+                    </div>                        
+                    <div class="form-item cf">
+                        <label class="item-label">可使用天数<span class="check-tips">(最晚时间将从领取当日加设置的天数, 设置为0时表示不限制)</span></label>
+                        <div class="controls">
+                            <label><input type="text" class="input-2x text" name="days" value="<?php echo (empty($data['days']) ? 0 : $data['days'])?>" /></label>天
+                        </div>
+                    </div>
+                    <div class="form-item cf">
+                        <label class="item-label">活动详情ID值<span class="check-tips"></span></label>
+                        <div class="controls">
+                            <label><input type="text" class="text input-mini" name="act_url" value="{$data['act_url']}" /></label>
+                        </div>
+                    </div>                    
+                    <div class="form-item cf">
+                        <label class="item-label">规则说明<span class="check-tips">（用于描述当前配置的规则）</span></label>
+                        <div class="controls">
+                            <textarea name="remark" class="textarea input-large" style="height:200px;">{$data.remark}</textarea>
+                        </div>
+                    </div>
+                    <input name="id" type="hidden" value=<?php echo (empty($data['id']) ? 0 : $data['id'])?>>
+                </div>                 
+                <div class="form-item cf">
+                    <button id="submit" class="btn submit-btn ajax-post hidden" target-form="form-horizontal" type="submit">确 定</button>
+                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                </div>
+            </form>
+        </div>
+</block>
+<block name="script">
+<link href="__STATIC__/datetimepicker/css/datetimepicker.css" rel="stylesheet" type="text/css">
+<link href="__STATIC__/datetimepicker/css/dropdown.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="__STATIC__/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+<script type="text/javascript" src="__STATIC__/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+	<script type="text/javascript">
+		$(function(){
+                    $('#submit').attr('disabled', false);
+                    highlight_subnav("{:addons_url('CashCoupon://ActCouponAdmin:/index')}");
+                    //全选节点
+                    $('.check-all').on('change',function(){
+                        $('.ids').prop('checked',this.checked);
+                    });showTab();
+                    $('.time').datetimepicker({
+                        format: 'yyyy-mm-dd',
+                        language:"zh-CN",
+                        minView:2,
+                        autoclose:true
+                    });
+		})
+                
+	</script>
+</block>

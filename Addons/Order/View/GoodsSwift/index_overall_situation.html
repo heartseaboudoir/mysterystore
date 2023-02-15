@@ -1,0 +1,92 @@
+<extend name="Public/base" />
+<block name="body">
+    <div id="jq-content" class="site-content">
+        <div class="main-title">
+            <h2>全局结款单</h2>
+        </div>
+        <div class="data-table table-striped">
+            <table>
+                <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>标题</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="jq-list"></tbody>
+            </table>
+        </div>
+        <div id="jq-page" class="page"></div>
+    </div>
+    <script id="temp-list" type="text/html">
+        {{each items as list index}}
+        <tr data-id="{{list.year}}{{list.month}}">
+            <td class="temp-id">{{index+1}}</td>
+            <td>{{list.year}}年{{list.month}}月结款单</td>
+            <td>{{list.ctime}}</td>
+            <td>
+                <a class="temp-view" href="javascript:void(0);">查看</a>
+            </td>
+        </tr>
+        {{/each}}
+    </script>
+</block>
+<block name="script">
+    <script type="text/javascript">
+    layui.use(['main'], function() {
+        var $ = layui.jquery,
+            layer = layui.layer;
+ 
+        var Global = {
+            listUrl: '/Erp/StoreGoodsSwift/index_overall_situation',
+            jump: window.location.pathname.match(/(\D*)index_overall_situation/)[1],
+            year: 'year',
+            month: 'month',
+        }
+        $("a[href$='" + Global.jump + "index_overall_situation.html']").parent().addClass('layui-this');
+
+        var passData = $.dataJson(); 
+        var data = $.parseJson( passData );
+        
+        $.getData({
+             url: Global.listUrl + '?' + data,
+            load: true
+        }, function(res){
+            dataShow(res);
+        });
+        function dataShow(res,callback){
+            var oList = $('#jq-list'),
+                oPage = $('#jq-page');
+
+            if( res.content.data == null || res.content.data.length == 0 ){
+                oList.html('<tr><td class="wrap-empty">暂无内容！</td></tr>');
+            }else{
+                oList.html(template('temp-list', { items: res.content.data }));
+                $.each( res.content.data,function(i,items){
+                    var url = Global.jump + 'ls_overall_situation/'+Global.year+'/'+items[Global.year]+'/'+Global.month+'/'+items[Global.month]+'.html',
+                        oId = $('[data-id='+items[Global.year]+items[Global.month]+']');
+                    //console.log(url);
+                    oId.find('.temp-view').attr('href',url);
+
+                    if( passData.p > 1 && callback == undefined ){
+                        var id = parseInt( oId.find('.temp-id').html() ),
+                           sum = passData.p * passData.pageSize -  passData.pageSize;
+                        oId.find('.temp-id').html( id + sum );
+                    }else{
+                        oId.find('.temp-id').html( id );
+                    }
+                });
+            }
+
+            if( res.content.recordCount > res.content.pageSize ){
+                var total = '<span class="rows">共'+res.content.recordCount+'条记录</span>';
+                oPage.html( res.content.pager.replace( new RegExp(Global.listUrl,'g'),Global.jump+'index_overall_situation' ) + total );
+            }else{
+                oPage.html( res.content.pager );
+            }
+        }
+
+    });
+    </script>
+</block>

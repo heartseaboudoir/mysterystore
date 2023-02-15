@@ -1,0 +1,32 @@
+<table>
+	<thead>
+		<tr>
+			<th>订单号</th>
+			<volist name="listKey" id="vo">
+				<th>{$vo}</th>
+			</volist>
+			<th>操作</th>
+		</tr>
+	</thead>
+	<tbody>
+		<volist name="_list" id="lv" key="vo">
+		<tr>
+			<td>{$lv.id}</td>
+                            <volist name="listKey" id="lk">
+                                    <td>{$lv.$key}</td>
+                            </volist>
+			<td>
+                            <a class="update" href="{:addons_url('Order://Order:/show?id='.$lv['id'])}" data-id="{$lv.id}">查看</a>
+			</td>
+		</tr>
+		</volist>
+	</tbody>
+</table>
+<script type="text/javascript">
+	$(function(){
+		$('.delete').click(function(){
+                    var id = $(this).attr('data-id');
+                    return confirm('确定要删除序号为['+id+']的数据吗？');
+                });
+	})
+</script>

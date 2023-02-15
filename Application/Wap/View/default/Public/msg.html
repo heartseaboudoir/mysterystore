@@ -1,0 +1,35 @@
+<extend name="Base/common" />
+<block name="header">
+    <header class="header">
+        <a class="logo" href="{:U('/')}"></a>
+    </header>
+</block>
+<block name="body">
+    <div style="width:60%; font-size:2em; text-align: center; border:0.5em solid #ccc; margin:0 auto; margin-top: 4em; padding:0.5em 4%;">
+        <p>{:$status==1 ? $message : $error}</p>
+        <p>将在<span id="num">3</span>秒后自动跳转</p>
+    </div>
+    <script type="text/javascript">
+        var msg = "{:$status==1 ? $message : $error}",
+                url = "{$jumpUrl}",
+                status = "{$status}";
+        setTimeout(function(){
+            if(url == 'close'){
+                WeixinJSBridge.invoke('closeWindow',{},function(res){});
+            }else if(url){
+                window.location.href=url;
+            }else{
+                window.history.go(-1);
+            }
+        }, 3000);
+        setInterval(function(){
+            var i = parseInt($('#num').html())-1;
+            if(i < 0){
+                i = 0;
+            }
+            $('#num').html(i);
+        }, 1000);
+    </script>
+</block>
+<block name="footer">
+</block>

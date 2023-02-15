@@ -1,0 +1,159 @@
+<extend name="Public/base" />
+
+<block name="body">
+	<!-- 标题栏 -->
+	<div class="main-title">
+		<h2>{$meta_title}</h2>
+	</div>
+    <div class="cf">
+        <a href="{:addons_url('CashCoupon://WorldCup:/index')}" class="btn">活动配置</a>        
+        <a href="{:addons_url('CashCoupon://WorldCup:/team')}" class="btn">球队配置</a>        
+        <a href="{:addons_url('CashCoupon://WorldCup:/win')}" class="btn">决赛结果</a>        
+        <!-- 高级搜索 -->
+        <div class="search-form fr cf">
+
+        </div>
+    </div>
+    <div style="padding:10px 0;">
+    <?php if ($is_open) { ?>
+        <table style="border:2px solid #f86442;text-align:center;">
+            <tr style="border:2px solid #f86442;text-align:center;">
+                <td style="height:25px;color:#fff;width:120px;background:#f86442;text-align:center;">当前奖池金额</td>
+                <td style="width:350px;"><?php echo $price;?></td>
+                <td style="color:#fff;width:120px;background:#f86442;text-align:center;">决赛球队</td>
+                <td style="width:350pxpx;"><?php echo $teams_info;?></td>
+                <td style="color:#fff;width:120px;background:#f86442;text-align:center;">投票情况</td>
+                <td style="width:350px;"><?php echo $vote_info;?></td>                
+            </tr>       
+            <tr style="border:2px solid #f86442;text-align:center;">
+                <td style="height:25px;color:#fff;width:120px;background:#f86442;text-align:center;">奖池累计起止时间</td>
+                <td style="width:350px;"><?php echo date('Y-m-d H:i:s', $config['stime']) . ' ~ ' . date('Y-m-d H:i:s', $config['etime']); ?></td>
+                <td style="color:#fff;width:120px;background:#f86442;text-align:center;">有效充值起止时间</td>
+                <td style="width:350px;"><?php echo date('Y-m-d H:i:s', $config['bstime0']) . ' ~ ' . date('Y-m-d H:i:s', $config['betime0']); ?></td>
+                <td style="color:#fff;width:120px;background:#f86442;text-align:center;">可投票起止时间</td>
+                <td style="width:350px;"><?php echo date('Y-m-d H:i:s', $config['bstime']) . ' ~ ' . date('Y-m-d H:i:s', $config['betime']); ?></td>                
+            </tr>               
+        </table>
+    <?php } else { ?>
+        世界杯活动未开启
+    <?php } ?>
+    </div>    
+    
+    <div style="clear:both;"></div>
+
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:100px;">用户</th>
+                    <th style="width:100px;">总计可投注数</th>
+                    <th style="width:100px;">剩余可投注数</th>
+                    <th style="width:150px;"><?php echo $wc_team_a;?>投注</th>
+                    <th style="width:100px;"><?php echo $wc_team_b;?>投注</th>
+                    <th style="width:300px;">中奖金额</th>
+
+                    <th style="">查看</th>
+                </tr>
+            </thead>
+            <tbody>
+                <empty name="list">
+                        <tr>
+                            <td colspan="6" class="text-center"> 没有数据~</td>
+                        </tr>
+                <else/>
+                    <volist name="list" id="lv" key="vo">
+                        <tr>
+                            <td>{$lv.uid|get_nickname}</td>
+                            <td>{$lv.alls}</td>
+                            <td>{$lv.can}</td>
+                            <td>{$lv.a}</td>
+                            <td>{$lv.b}</td>
+                            <td>{$lv.price}</td>
+                            <td>
+                            <a href="{:addons_url('CashCoupon://WorldCup:/blog?uid='.$lv['uid'])}">投票记录</a>
+                            </td>
+                        </tr>
+                    </volist>
+                </empty>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <link href="__STATIC__/datetimepicker/css/datetimepicker.css" rel="stylesheet" type="text/css">
+    <link href="__STATIC__/datetimepicker/css/dropdown.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+    <script type="text/javascript">
+        $(function() {
+            highlight_subnav("{:U('/Admin/Code')}");
+            //全选节点
+            $('.check-all').on('change', function() {
+                $('.ids').prop('checked', this.checked);
+            });//搜索功能
+            $("#search").click(function () {
+                var url = $(this).attr('url');
+                var status = $("#sch-sort-txt").attr("data");
+                var query = $('#search-form').serialize();
+                query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g, '');
+                query = query.replace(/^&/g, '');
+                if (status != '') {
+                    query = 'status=' + status + "&" + query;
+                }
+                if (url.indexOf('?') > 0) {
+                    url += '&' + query;
+                } else {
+                    url += '?' + query;
+                }
+                window.location.href = url;
+            });
+            
+            
+            $("#download").click(function(){
+                var url = $(this).attr('url');
+                var uid = $(':input[name=uid]').val();
+                var start_time = $(':input[name=start_time]').val();
+                var end_time = $(':input[name=end_time]').val();
+                url = url +'?uid=' + uid  + '&start_time=' + start_time + '&end_time=' + end_time;
+                window.location.href = url;
+            })            
+            
+            
+
+            /* 状态搜索子菜单 */
+            $(".search-form").find(".drop-down").hover(function () {
+                $("#sub-sch-menu").removeClass("hidden");
+            }, function () {
+                $("#sub-sch-menu").addClass("hidden");
+            });
+            $("#sub-sch-menu li").find("a").each(function () {
+                $(this).click(function () {
+                    var text = $(this).text();
+                    $("#sch-sort-txt").text(text).attr("data", $(this).attr("value"));
+                    $("#sub-sch-menu").addClass("hidden");
+                })
+            });
+            
+            var _T;
+            $('#select-form input').change(function(){
+                clearTimeout(_T);
+                _T = setTimeout(function(){
+                    $("#search").click();
+                }, 1000);
+            });
+            $('.time').datetimepicker({
+                format: 'yyyy-mm-dd',
+                language: "zh-CN",
+                minView: 2,
+                autoclose: true
+            });            
+            
+        })
+    </script>
+</block>    
+    

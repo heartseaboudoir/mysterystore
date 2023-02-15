@@ -1,0 +1,87 @@
+<extend name="Public/base" />
+
+<block name="body">
+        <script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+	<!-- 标题栏 -->
+	<div class="main-title">
+		<h2>{$meta_title}</h2>
+	</div>
+        <ul class="tab-nav nav">
+            <li class="current" data-tab="tab1"><a href="javascript:void(0);">基础</a></li>
+        </ul>
+        <div class="tab-content">
+            <!-- 数据列表 -->
+            <form id="form" action="{:addons_url('Store://WarehouseAdmin:/update')}" method="post" class="form-horizontal">
+                <div class="tab-pane in tab1">
+                        <div class="form-item cf">
+                            <label class="item-label">所属仓库</label>
+                            <div class="controls">
+                                <select name="warehouse_id">
+                                    <option value="0"> - 请选择仓库 - </option>
+                                    <volist name="warehouse_ls" id="lv">
+                                        <option value="{$key}" <eq name="_GET[warehouse_id]" value="$key">selected</eq>>{$lv}</option>
+                                    </volist>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">所属管理员类型 </label>
+                            <div class="controls">
+                                <select name="group">
+                                    <option value="0"> - 请选择类型 - </option>
+                                    <option value="13" <eq name="_GET[group]" value="13">selected</eq>>仓库管理员</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-item cf">
+                            <label class="item-label">管理员勾选</label>
+                            <div class="controls" id="user_div"></div>
+                        </div>
+                </div>
+                <div class="form-item cf">
+                    <button id="submit" class="btn submit-btn ajax-post hidden" target-form="form-horizontal" type="submit">确 定</button>
+                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                    <input type="hidden" value="{$_type}" name="type" />
+                </div>
+            </form>
+        </div>
+</block>
+<block name="script">
+	<script type="text/javascript">
+		$(function(){
+                    highlight_subnav('{:addons_url('Store://WarehouseList:/index')}');
+                    //全选节点
+                    $('.check-all').on('change',function(){
+                        $('.ids').prop('checked',this.checked);
+                    });showTab();
+		});
+                function get_u(){
+                    var obj = $('#user_div');
+                    var warehouse_id = $('[name="warehouse_id"]').val();
+                    var group = $('[name="group"]').val();
+                    var type = $('[name="type"]').val();
+                    obj.html('正在获取管理员...');
+                    $.ajax({
+                        type:'get',
+                        url : "{:addons_url('Store://WarehouseAdmin:/get_lists')}",
+                        data:{group:group, warehouse_id:warehouse_id, type:type},
+                        dataType:'json',
+                        success:function(data){
+                            var l = '';
+                            $.each(data, function(x, y){
+                                l += '<label style="display:inline-block;"><input type="checkbox" name="user[]" value="'+y.uid+'"/> '+y.nickname+'</label>';
+                            });
+                            if(l != ''){
+                                obj.html(l);
+                            }else{
+                                obj.html('无管理员可添加，请先在用户管理处添加新管理员');
+                            }
+                        }
+                    });
+                } 
+                get_u();
+                $('[name="warehouse_id"],[name="group"]').change(function(){
+                    get_u();
+                });
+	</script>
+</block>

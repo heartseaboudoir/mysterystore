@@ -1,0 +1,114 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <div class="cf">
+        <div class="search-form fr cf">
+            <div class="sleft">
+                <input type="text" name="keyword" class="text input-text search-input" style="" value="{$_GET['keyword']}" placeholder="标题或商品名关键词" />
+                <a class="sch-btn" href="javascript:;" id="search" url="{:addons_url('Shop://ShopArticleAdmin:/index')}"><i class="btn-search"></i></a>
+            </div>
+        </div>
+    </div>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:60px">ID</th>
+                    <th>标题</th>
+                    <th style="width:150px;">商品名</th>
+                    <th style="width:120px">发表用户</th>
+                    <th style="width:120px">发表时间</th>
+                    <th style="width:60px">库存</th>
+                    <th style="width:60px">销量</th>
+                    <th style="width:80px">上架状态</th>
+                    <th style="width:80px">状态</th>
+                    <th style="width:120px">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <notempty name="list">
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td>{$lv.id}</td>
+                    <td><span class="show_tips" data-tips="{$lv.title}">{$lv.title}</span></td>
+                    <td><span class="show_tips" data-tips="{$lv.goods_title}">{$lv.goods_title}</span></td>
+                    <td>{$lv.uid|get_nickname}</td>
+                    <td>{$lv.create_time|time_format}</td>
+                    <td>{$lv.num}</td>
+                    <td>{$lv.sell_num}</td>
+                    <td><switch name="lv.is_shelf"><case value="0">未上架</case><case value="1">上架中</case><case value="2">已下架</case></switch></td>
+                    <td><switch name="lv.status"><case value="1">正常</case><case value="2">禁止</case></switch></td>
+                    <td>
+                        <a class="update" href="{:addons_url('Shop://ShopArticleAdmin:/save?id='.$lv['id'])}" data-id="{$lv.id}">查看</a>
+                        <a class="update" href="{:addons_url('Shop://ShopCommentAdmin:/index?aid='.$lv['id'])}" data-id="{$lv.id}">评论列表</a>
+                    </td>
+                </tr>
+            </volist>
+            <else/>
+            <tr><td colspan="10">暂无数据~</td></tr>
+            </notempty>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $(function() {
+            highlight_subnav('{:addons_url('Shop://ShopArticleAdmin:/index')}');
+            //全选节点
+            $('.check-all').on('change', function() {
+                $('.ids').prop('checked', this.checked);
+            });
+            //搜索功能
+            $('.search-form input').focus(function(){
+                $(document).keypress(function (e) {
+                    // 回车键事件 
+                    if (e.which == 13) {
+                        $("#search").click();
+                    }
+                });
+            });
+            $("#search").click(function() {
+                var url = $(this).attr('url');
+                var query = $('.search-form').find('input').serialize();
+                query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g, '');
+                query = query.replace(/^&/g, '');
+                if (url.indexOf('?') > 0) {
+                    url += '&' + query;
+                } else {
+                    url += '?' + query;
+                }
+                var query2 = $('#select-form').serialize();
+                if (url.indexOf('?') > 0) {
+                    url += '&' + query2;
+                } else {
+                    url += '?' + query2;
+                }
+                window.location.href = url;
+            });
+
+            /* 状态搜索子菜单 */
+            $(".search-form").find(".drop-down").hover(function() {
+                $("#sub-sch-menu").removeClass("hidden");
+            }, function() {
+                $("#sub-sch-menu").addClass("hidden");
+            });
+            $("#sub-sch-menu li").find("a").each(function() {
+                $(this).click(function() {
+                    var text = $(this).text();
+                    $("#sch-sort-txt").text(text).attr("data", $(this).attr("value"));
+                    $("#sub-sch-menu").addClass("hidden");
+                })
+            });
+        })
+    </script>
+</block>

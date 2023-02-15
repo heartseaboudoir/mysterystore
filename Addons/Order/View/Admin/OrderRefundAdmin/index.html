@@ -1,0 +1,89 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <!-- 高级搜索 -->
+    <div class="cf">
+        <div class="search-form fr cf">
+            <div class="sleft">
+                <input type="text" name="keyword" class="text input-text search-input" style="" value="{$_GET['keyword']}" placeholder="订单号或用户ID" />
+                <a class="sch-btn" href="javascript:;" id="search" url="{:addons_url('Order://OrderRefundAdmin:/index')}"><i class="btn-search"></i></a>
+            </div>
+        </div>
+    </div>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+                <tr>
+                    <th>订单号</th>
+                    <th>申请用户</th>
+                    <th>申请金额</th>
+                    <th>申请时间</th>
+                    <th>状态</th>
+                    <th style="width:120px">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <notempty name="list">
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td><a href="{:addons_url('Order://ShopOrder:/show?', array('order_sn' => $lv['order_sn']))}" target="_blank">{$lv.order_sn}</a></td>
+                    <td><a href="{:U('Member/show', array('id' => $lv['uid']))}" target="_blank">{$lv.uid|get_nickname}</a> <eq name="lv.is_system" value="1">（系统退款）</eq></td>
+                    <td>{$lv.money}</td>
+                    <td>{$lv.create_time|time_format}</td>
+                    <td>
+                        <switch name="lv.status">
+                            <case value="1">新申请</case>
+                            <case value="2">已同意</case>
+                            <case value="3">已拒绝</case>
+                            <case value="4">已取消</case>
+                        </switch></td>
+                    <td>
+                        <a class="update" href="{:addons_url('Order://OrderRefundAdmin:/save?id='.$lv['id'])}" data-id="{$lv.id}">查看</a>
+                    </td>
+                </tr>
+            </volist>
+            <else/>
+            <tr><td colspan="6">暂无数据~</td></tr>
+            </notempty>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $(function() {
+            highlight_subnav('{:addons_url('Order://OrderRefundAdmin:/index')}');
+            //全选节点
+            $('.check-all').on('change', function() {
+                $('.ids').prop('checked', this.checked);
+            });
+            $("#search").click(function() {
+                var url = $(this).attr('url');
+                var query = $('.search-form').find('input').serialize();
+                query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g, '');
+                query = query.replace(/^&/g, '');
+                if (url.indexOf('?') > 0) {
+                    url += '&' + query;
+                } else {
+                    url += '?' + query;
+                }
+                var query2 = $('#select-form').serialize();
+                if (url.indexOf('?') > 0) {
+                    url += '&' + query2;
+                } else {
+                    url += '?' + query2;
+                }
+                window.location.href = url;
+            });
+        })
+    </script>
+</block>

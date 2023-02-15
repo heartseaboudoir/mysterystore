@@ -1,0 +1,134 @@
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="__CSS__/base.css" media="all">
+        <link rel="stylesheet" type="text/css" href="__CSS__/common.css" media="all">
+        <link rel="stylesheet" type="text/css" href="__CSS__/module.css">
+        <link rel="stylesheet" type="text/css" href="__CSS__/style.css" media="all">
+	<link rel="stylesheet" type="text/css" href="__CSS__/{$Think.config.COLOR_STYLE}.css" media="all">
+        <!--[if lt IE 9]>
+       <script type="text/javascript" src="__STATIC__/jquery-1.10.2.min.js"></script>
+       <![endif]--><!--[if gte IE 9]><!-->
+       <script type="text/javascript" src="__STATIC__/jquery-2.0.3.min.js"></script>
+       <script type="text/javascript" src="__JS__/jquery.mousewheel.js"></script>
+       <!--<![endif]-->
+        <script src="__JS__/common.js" type="text/javascript"></script>
+    </head>
+    <body style="padding:0;">
+        <div id="main-content">
+            <div class="data-table table-striped" style="margin: 0;">
+                <div id="main" class="main" style="min-height: 218px; padding:0;">
+                    <!--
+                    <p style="font-size:16px; margin: 0 0 10px 0; background: #468847; color:#FFF; padding:5px 0 5px 10px;"></p>
+                    -->
+                    <form class="search-form">
+                        <p style="margin:5px 0;">
+                            <input type="text" class="text input-large" style="height:auto;" name="keyword" placeholder="请填写关键字" value="{$_GET['keyword']}" />
+                            <button class="btn" type="button" id="search" url="{:addons_url('Order://OrderExpressAdmin:/get_form_lists', array('keyword' => $_GET['keyword'], 'act_id' => $_GET['act_id'], 'type' => $key))}">搜索</button>
+                        </p>
+                    </form>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="row-selected row-selected" width="20"></th>
+                                <th>快递公司</th>
+                            </tr>
+                        </thead>
+                    </table>
+                    
+                    <div style=" height: 400px; margin-bottom:7px; overflow-y: auto;">
+                    <table id="list_div">
+                        <volist name="list" id="lv" key="vo">
+                            <tr data-title="{$lv.title}" data-pic="{$lv.pic_url|default=''}">
+                                <td width="20"><input class="ids" type="radio" name="ids[]" value="{$lv.id}" <eq name="lv.is_active" value="1">checked</eq> /></td>
+                                <td>{$lv[title]}</td>
+                            </tr>
+                        </volist>
+                    </table>
+                    <div class="page" style="padding-left:1px;">
+                        {$_page}
+                    </div>
+                    <if condition="count($list) == 20">
+                    <p style="text-align: center; margin: 10px 0;"><a href="javascript:;" class="btn" id="get_more">点击加载更多...</a></p>
+                    </if>
+                    </div>
+                    <button type="button" class="btn submit-btn return_btn">提交</button>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript" src="__STATIC__/artDialog/lib/sea.js"></script>
+        <script type="text/javascript">
+            seajs.config({
+              alias: {
+                "jquery": "jquery-1.10.2.js"
+              }
+            });
+            seajs.use(['jquery'], function ($) {
+                    var dialog = top.dialog.get(window);
+                    $('.return_btn').on('click', function () {
+                            var ids = '', i = 0, top,title,result = [];
+                            $('input:checked').each(function(x, y){
+                                ids += (ids ?  ',' : '')+$(y).val();
+                                i++;
+                                top = $(y).parents('tr');
+                                title = top.data('title');
+                                result.push({title:top.data('title'),pic:top.data('pic'), id:$(y).val()});
+                                if(i == 10){
+                                    return false;
+                                }
+                            });
+                            dialog.close({id:ids, data:result});
+                            dialog.remove();
+                            return false;
+                    });
+            });
+            var p = 2, size = 20;
+            $('#get_more').click(function(){
+                var url = "{:addons_url('Order://OrderExpressAdmin:/get_form_lists', array('keyword' => $_GET['keyword'], 'act_id' => $_GET['act_id'], 'type' => $key))}";
+                $.ajax({
+                    type:'get',
+                    url : url,
+                    data:{p:p},
+                    dataType:'json',
+                    success:function(msg){
+                        if(msg.status == 1){
+                            var l = '', i=0;
+                            $.each(msg.data, function(x, y){
+                                l += '<tr data-title="'+y.title+'">';
+                                l += '    <td width="20"><input class="ids" type="radio" name="ids[]" value="'+y.id+'" '+(y.is_active == 1 ? 'checked' : '')+' /></td>';
+                                l += '    <td>'+y.title+'</td>';
+                                l += '</tr>';
+                                i++;
+                            });
+                            $('#list_div').append(l);
+                            if(i<size){
+                                $('#get_more').remove();
+                            }
+                            p++;
+                        }
+                    }
+                });
+            })
+            
+            $("#search").click(function(){
+                    var url = $(this).attr('url');
+                    var query  = $('.search-form').find('input').serialize();
+                    query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g,'');
+                    query = query.replace(/^&/g,'');
+                    if( url.indexOf('?')>0 ){
+                        url += '&' + query;
+                    }else{
+                        url += '?' + query;
+                    }
+                    window.location.href = url;
+            });
+            $('#list_div').delegate('tr', 'click', function(e){
+                var target  = $(e.target);
+                if(target.closest('input[type="checkbox"],input[type="radio"]').length == 1){
+                    return;
+                };
+                var c = $(this).find('input[type="checkbox"],input[type="radio"]');
+                c.prop('checked', c.prop('checked') ? false : true);
+            });
+        </script>
+    </body>
+</html>

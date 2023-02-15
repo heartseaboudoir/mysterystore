@@ -1,0 +1,189 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <script type="text/javascript">
+        document.getElementById('jq-nav-left').style.display = 'none';
+        document.getElementById('jq-main-box').style.left = '0';
+    </script>
+    <div class="main-title">
+        <h2>查看消息</h2>
+    </div>
+    <div class="tab-content">
+        <!-- 内容 -->
+        <form id="form" action = "#" class="form-horizontal">
+            <div class="">
+                <div class="form-item cf">
+                    <label class="item-label">标题</label>
+                    <div class="controls">
+                        {$message['message_title']}
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">发件人</label>
+                    <div class="controls">
+                        <?php
+                        if ($data['from_admin_id'] != 0) {
+                            echo get_nickname($message['from_admin_id']);
+                            echo '<a href="' . U('Member/show', array('id' => $message['from_admin_id'])) . '" class="btn">查看用户信息</a>';
+
+                        } else {
+                            echo '系统消息';
+                        }
+
+                        ?>
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">时 间</label>
+                    <div class="controls">
+                        <?php
+                           echo date('Y-m-d H:i:s' , $message['ctime']);
+                     ?>
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">收件人</label>
+                    <div class="controls">
+                        <?php
+                        if ($message['to_admin_id'] != 0) {
+                            echo get_nickname($message['to_admin_id']).' ';
+                            echo '<a href="' . U('Member/show', array('id' => $message['to_admin_id'])) . '" class="btn">查看用户信息</a>';
+
+                        }else {
+                            echo '未绑定';
+                        }
+
+                        ?>
+                    </div>
+                </div>
+                <div class="form-item cf">
+                    <label class="item-label">内 容</label>
+                    <div class="controls">
+                        <if condition="$message['m_type'] eq 0">
+                        <div class="data-table table-striped">
+                            <table>
+                                <thead>
+                                <tr>
+                                    <th>序号</th>
+                                    <th>商品名</th>
+                                    <th>数量</th>
+                                    <th>单位</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <volist name="message['message_content']['details']" id="lv" key="vo">
+                                    <tr data-id="{$vo}">
+                                        <td>{$vo}</td>
+                                        <td>{$lv.title}</td>
+                                        <td>{$lv.total_num}</td>
+                                        <td>{$lv.unit}</td>
+                                    </tr>
+                                </volist>
+                                </tbody>
+                            </table>
+                        </div>
+                        <elseif condition="$message['m_type'] eq 3"/>
+                                <if condition="$message['m_other_type'] eq 1">
+                                    <!--
+                                    入库详情
+                                    说明：0.仓库出库,1.门店调拨,2.盘盈入库,3.其它,4.采购,5.寄售
+                                    -->
+                                    <div style="padding-top: 8px;">门店入库：{$message['message_content']['stock_in']}件，总值：￥{$message['message_content']['stock_in_price']}</div>
+                                    <div style='padding-left:15px;'>
+                                        <?php
+                                         if ($message['message_content']['stock_in_details'] != '') {
+                                                    foreach($message['message_content']['stock_in_details'] as $key => $value){
+                                                            echo '<div>'.$inSource[$key].'总数：'.$value['total_num'].'，总值：￥'.$value['total_price'].'</div>';
+                                                    }
+                                         }
+                                        ?>
+                                    </div>
+                                    <!--
+                                    出库详情
+                                    说明:0.仓库调拨,1.门店申请,3.盘亏出库,4.其它,5.寄售出库
+                                    -->
+                                    <div style="padding-top: 8px;">门店出库：{$message['message_content']['stock_out']}件，总值：￥{$message['message_content']['stock_out_price']}</div>
+                                    <div style='padding-left:15px;'>
+                                        <?php
+                                         if ($message['message_content']['stock_out_details'] != '') {
+                                                    foreach($message['message_content']['stock_out_details'] as $key => $value){
+                                        echo '<div>'.$outSource[$key].'总数：'.$value['total_num'].'，总值：￥'.$value['total_price'].'</div>';
+                                        }
+                                        }
+                                        ?>
+                                    </div>
+                                    <div style="padding-top: 8px;">门店库存：{$message['message_content']['stock_total']}件，总值：￥{$message['message_content']['g_amounts']}</div>
+                                    <div style="padding-top: 8px;">门店订单交易总数：{$message['message_content']['order_total']}件，售出货物总数：￥{$message['message_content']['order_goods_total']}</div>
+                                <elseif condition="$message['m_other_type'] eq 2"/>
+                                    <div style="padding-top: 8px;">仓库入库：{$message['message_content']['stock_in']['num']}件，总值：￥{$message['message_content']['stock_in']['price']}</div>
+                                    <div style="padding-top: 8px;">仓库出库：{$message['message_content']['stock_out']['num']}件，总值：￥{$message['message_content']['stock_out']['price']}</div>
+                                    <div style="padding-top: 8px;">仓库库存：{$message['message_content']['stock']['num']}件，总值：￥{$message['message_content']['stock']['price']}</div>
+                                <elseif condition="$message['m_other_type'] eq 3"/>
+                                    <div style="padding-top: 8px;">未审核采购单数：{$message['message_content']['is_new']}</div>
+                                    <div style="padding-top: 8px;">已审核采购单数：{$message['message_content']['is_pass']}</div>
+                                    <div style="padding-top: 8px;">采购总数量：{$message['message_content']['g_num_total']}件，采购总值：￥{$message['message_content']['g_price_total']}</div>
+                                    <div style="padding-top: 8px;">验收总数量：{$message['message_content']['in_num_total']}件，验收总值：￥{$message['message_content']['in_price_total']}</div>
+                                    <div style="padding-top: 8px;">退货总数量：{$message['message_content']['out_num_total']}件，退货总值：￥{$message['message_content']['out_price_total']}</div>
+                                <else />
+                                </if>
+                        <else />
+                            <?php if(count($message['message_content'])>1){ ?>
+                            <div class="data-table table-striped">
+                                <table>
+                                    <thead>
+                                    <tr>
+                                    <?php
+                                 foreach($message['message_content'] as $key => $v){
+                                            if(strpos($key,'_sn') !== false){echo '<th>单号</th>';}
+                                            if(strpos($key,'s_in_sn') !== false){echo '<th>入库单号</th>';}
+                                            if(strpos($key,'s_r_sn') !== false){echo '<th>发货单号</th>';}
+                                            if(strpos($key,'warehouse_id') !== false){echo '<th>仓库</th>';}
+                                            if(strpos($key,'store_id') !== false){echo '<th>门店</th>';}
+                                            if(strpos($key,'store_id2') !== false){echo '<th>门店</th>';}
+                                            if(strpos($key,'ctime') !== false){echo '<th>时间</th>';}
+                                            if(strpos($key,'remark') !== false){echo '<th>备注</th>';}
+                                            if(strpos($key,'g_type') !== false){echo '<th>商品种类</th>';}
+                                            if(strpos($key,'g_nums') !== false){echo '<th>数量</th>';}
+                                            if(strpos($key,'goods_id') !== false){echo '<th>商品名</th>';}
+                                        }
+                                    ?>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                    <?php
+                                foreach($message['message_content'] as $key => $v){
+                                        if(strpos($key,'_sn') !== false){echo '<td>'. $v .'</td>';}
+                                        if(strpos($key,'s_in_sn') !== false){echo '<td>'. $v .'</td>';}
+                                        if(strpos($key,'s_r_sn') !== false){echo '<td>'. $v .'</td>';}
+                                        if(strpos($key,'warehouse_id') !== false){echo '<td>' .get_warehouse_name($v). '</td>';}
+                                        if(strpos($key,'store_id') !== false){echo '<td>' .get_store_name($v). '</td>';}
+                                        if(strpos($key,'store_id2') !== false){echo '<td>' .get_store_name($v). '</td>';}
+                                        if(strpos($key,'ctime') !== false){echo '<td>'. date("Y-m-d H:i:s", $v) .'</td>';}
+                                        if(strpos($key,'remark') !== false){echo '<td>'. $v .'</td>';}
+                                        if(strpos($key,'g_type') !== false){echo '<td>'. $v .'</td>';}
+                                        if(strpos($key,'g_nums') !== false){echo '<td>'. $v .'</td>';}
+                                        if(strpos($key,'goods_id') !== false){echo '<td>' .get_goods_name($v). '</td>';}
+                                        }
+                                    ?>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <?php }else{ ?>
+                            <div class="data-table table-striped">
+                                <?php print_r($message['message_content']); ?>
+                            </div>
+                            <?php } ?>
+                        </if>
+                    </div>
+                </div>
+
+                <div class="form-item cf">
+                    <a class="btn btn-download" href="{:addons_url('MessageWarn://MessageWarn:/downloadMessageViewById', array('m_id' => $message['m_id']))}">导出Excel</a>
+                    <a class="btn btn-return" href="{:addons_url('MessageWarn://MessageWarn:/index')}">返 回</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</block>

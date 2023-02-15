@@ -1,0 +1,100 @@
+
+print_r($datamain);die;
+//查询未处理采购申请单涉及几个仓库【去除重复】
+$sql = "select distinct warehouse_id,w_name";
+$sql .= " from  hii_purchase_request A";
+$sql .= " left join hii_purchase_request_detail A1 on A.p_r_id=A1.p_r_id";
+$sql .= " left join hii_warehouse w on A.warehouse_id=w.w_id";
+$sql .= " where  FROM_UNIXTIME(ctime,'%Y-%m-%d')  between '" .$s_date. "' and '" .$e_date. "' and A1.is_pass=0";
+$sql .= " order by A.p_r_id desc";
+$datawarehouse = $Model->query($sql);
+//查询未处理采购申请单有多少商品id【去除重复】
+$sql = "select distinct goods_id";
+$sql .= " from  hii_purchase_request A";
+$sql .= " left join hii_purchase_request_detail A1 on A.p_r_id=A1.p_r_id";
+$sql .= " where  FROM_UNIXTIME(ctime,'%Y-%m-%d')  between '" .$s_date. "' and '" .$e_date. "' and A1.is_pass=0";
+$sql .= " order by A.p_r_id desc";
+$datagoods = $Model->query($sql);
+$goods_id_list = array_column($datagoods,'goods_id');
+$gid_list = implode(",",$goods_id_list);
+//全部未处理采购申请单
+$sql = "select *,0 as is_select";
+$sql .= " from  hii_purchase_request A";
+$sql .= " left join hii_purchase_request_detail A1 on A.p_r_id=A1.p_r_id";
+$sql .= " where  FROM_UNIXTIME(ctime,'%Y-%m-%d')  between '" .$s_date. "' and '" .$e_date. "' and A1.is_pass=0";
+$sql .= " order by A.p_r_id desc";
+$dataall = $Model->query($sql);
+print_r($sql);die;
+
+//hii_goods_last_purchase_price_view视图
+//select a.goods_id,a.g_price,b.p_sn,b.p_id,b.warehouse_id,b.supply_id,c.s_name from hii_purchase_detail a left join hii_purchase b on a.p_id=b.p_id left join hii_supply c on b.supply_id=c.s_id
+// where not exists(select 1 from hii_purchase_detail where a.goods_id=goods_id and a.p_d_id<p_d_id)
+//查询未处理的采购申请商品的供应商【并去除重复】
+$sql = "select distinct supply_id,s_name from hii_goods_last_purchase_price_view where goods_id in (" .$gid_list. ")";
+$supply_list = $Model->query($sql);
+
+//查询未处理的采购申请商品的最后一次采购价【并去除重复】
+$sql = "select distinct  A1.goods_id,ifnull(c.supply_id,'') as supply_id,ifnull(s.s_name,'') as s_name,ifnull(c.g_price,'') as g_price";
+$sql .= " from  hii_purchase_request A";
+$sql .= " left join hii_purchase_request_detail A1 on A.p_r_id=A1.p_r_id";
+$sql .= " left join (select * from hii_goods_last_purchase_price_view where goods_id in (" .$gid_list. ") ) c on A1.goods_id=c.goods_id";
+$sql .= " left join hii_supply s on c.supply_id=s.s_id";
+$sql .= " where  FROM_UNIXTIME(ctime,'%Y-%m-%d')  between '" .$s_date. "' and '" .$e_date. "' and A1.is_pass=0";
+$datasupply = $Model->query($sql);
+
+print_r($datasupply);die;
+/*print_r($datasupply);die;
+$supply_id_list = hd_array_column($datasupply,array( 'supply_id', 's_name' ));
+print_r($supply_id_list);die;
+$supply_list = array_unique($supply_id_list);
+print_r($supply_list);die;
+$supply_list = array_values($supply_list);
+print_r($supply_list);die;
+$supply_id_list = array_column($datasupply,'supply_id');
+$supply_list = array_unique($supply_id_list);
+$supply_list = array_values($supply_list);*/
+
+$data = array();
+for($i = 0;$i < count($datawarehouse);$i++){
+for($j = 0;$j < count($supply_list);$j++){
+$dataout = array();
+$no_supply_data = array();
+$dataout['warehouse_id'] = $datawarehouse[$i]['warehouse_id'];
+$dataout['w_name'] = $datawarehouse[$i]['w_name'];
+$dataout['supply_id'] = $supply_list[$j]['supply_id'];
+$dataout['s_name'] = $supply_list[$j]['s_name'];
+$no_supply_data['warehouse_id'] = $datawarehouse[$i]['warehouse_id'];
+$no_supply_data['w_name'] = $datawarehouse[$i]['w_name'];
+$no_supply_data['supply_id'] = '';
+$no_supply_data['s_name'] = '';
+
+for($k = 0;$k < count($dataall);$k++){
+$havesupply = false;
+if($dataall[$k]['is_select'] == 0 && $dataall[$k]['warehouse_id'] == $datawarehouse[$i]['warehouse_id']){
+for($l = 0;$l < count($datasupply);$l++){
+if( $dataall[$k]['goods_id'] == $datasupply[$l]['goods_id'] && $datasupply[$l]['supply_id'] == $supply_list[$j]['supply_id']){
+$dataall[$k]['is_select'] = 1;
+$dataall[$k]['supply_id'] =  $supply_list[$j]['supply_id'];
+$dataall[$k]['g_price'] = $datasupply[$l]['g_price'];
+$dataout['data'][] = $dataall[$k];
+$havesupply = true;
+}
+}
+if($havesupply == false){
+$dataall[$k]['is_select'] = 1;
+$dataall[$k]['supply_id'] =  '';
+$dataall[$k]['g_price'] = '';
+$no_supply_data['data'][] = $dataall[$k];
+}
+}
+}
+if(is_array($no_supply_data['data']) && count($no_supply_data['data']) > 0){
+$data[] = $no_supply_data;
+}
+if(is_array($dataout['data']) && count($dataout['data']) > 0) {
+$data[] = $dataout;
+}
+}
+}
+
+print_r($data);die;

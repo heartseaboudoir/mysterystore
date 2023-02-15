@@ -1,0 +1,83 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <a class="btn" href="{:addons_url('Warehouse://AssignmentApplication:/view')}?id={$id}&isprint=1">导出Excel</a>
+    <!-- 数据列表 -->
+    <form id="form" class="form-horizontal">
+        <div class="tab-pane in tab1">
+            <div class="form-item cf">
+                <div class="controls goods_div">
+                    <label>申请单号：{$list.w_r_sn}</label>
+                    <label>创建日期：{$list.ctime}</label>
+                    <label>商品种类：{$list.g_type}种</label>
+                    <label>商品数量：{$list.g_nums}</label>
+                    <label>售价金额：{$list.g_amounts}</label>
+                </div>
+                <div class="controls goods_div1">
+                    <label>申请人：{$list.nickname}</label>
+                    <label>申请来源：{$list.w_name1}</label>
+                    <label>调拨仓库：{$list.w_name2}</label>
+                </div>
+                <div class="controls goods_div2">
+                    <label>备注：{$list.remark}</label>
+                </div>
+            </div>
+        </div>
+    </form>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+            <tr>
+                <th>商品id</th>
+                <th>商品名称</th>
+                <th>商品类别</th>
+                <th>商品属性</th>
+                <th>商品条码</th>
+                <th>系统售价</th>
+                <th>库存数量</th>
+                <th>申请数量</th>
+                <th>发货数量</th>
+                <th>备注</th>
+                <th>申请结果</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="data" id="lv" key="vo">
+                <tr>
+                    <td>{$lv.goods_id}</td>
+                    <td><a href="{:addons_url('Goods://GoodsInfo:/index?id='.$lv['goods_id'])}" target="_blank">{$lv.goods_name}</a></td>
+                    <td>{$lv.cate_name}</td>
+                    <td>{$lv.value_name}</td>
+                    <td><a title="{$lv.bar_code}" >{$lv.bar_code|subtext=18}</a></td>
+                    <td>{$lv.sell_price}</td>
+                    <td>{$lv.stock_num}</td>
+                    <td>{$lv.g_num}</td>
+                    <td>{$lv.pass_num}</td>
+                    <td>{$lv.remark}</td>
+                    <td>{$lv.is_pass_name}</td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+
+    <script type="text/javascript" src="__STATIC__/artDialog/lib/sea.js"></script>
+    <script type="text/javascript">
+        var Global = {
+            jump: window.location.pathname.match(/(\D*)view/)[1]
+        }
+        $("a[href$='" + Global.jump + "index.html']").parent().addClass('layui-this');
+    </script>
+
+</block>

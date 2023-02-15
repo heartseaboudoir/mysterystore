@@ -1,0 +1,114 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <style>
+        #do_action,#action_btn{
+            margin-right:0;
+        }
+        .show_action{
+            display:inline-block;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
+        .show_action #do_action{
+            margin-right:10px;
+        }
+        .action_time{
+            display:none;
+        }
+        .show_action .action_time{
+            display:inline-block;
+        }
+    </style>
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <div>
+        <button class="btn ajax-post confirm" url="{:addons_url('Goods://GoodsStoreAdmin:/change_price', array('type' => 1))}" target-form="ids">立即生效</button>
+        <div style="display: inline-block; background:#dddddd;">
+            <button class="btn" id="do_action">定时生效</button>
+            <div class="action_time">
+                <input type="text" name="action_time" class="text search-input time ids" style="width:150px;" value="{:date('Y-m-d 00:01', strtotime('+1 day'))}" placeholder="{:date('Y-m-d 00:01', strtotime('+1 day'))}" />
+                <button class="btn ajax-post confirm" url="{:addons_url('Goods://GoodsStoreAdmin:/change_price', array('type' => 2))}" target-form="ids" id="action_btn">确 定</button>
+            </div>
+        </div>
+    </div>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead> 
+                <tr>
+                    <th class="row-selected row-selected"><input class="check-all" type="checkbox"/></th>
+                    <th>单号</th>
+                    <th>操作管理员</th>
+                    <th>状态</th>
+                    <th>最后操作时间</th>
+                    <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td><input class="ids" type="checkbox" name="id[]" value="{$lv.id}" <neq name="lv.status" value="1">disabled</neq> /></td>
+                    <td>{$lv.sn}</td>
+                    <td>{$lv.uid|get_nickname}</td>
+                    <td><switch name="lv.status"><case value="1"><eq name="lv.do_action" value="2"><span style="width:100px;" class="show_tips" data-tips="设定时间：{$lv.timer_time|time_format='Y-m-d H:i'}">待生效【定时】</span><else/>未生效</eq></case><case value="2">已生效</case><case value="3">已拒绝</case></switch></td>
+                    <td>{$lv.create_time|time_format="Y-m-d H:i"}</td>
+                    <td>
+                        <a class="" href="{:addons_url('Goods://GoodsStoreAdmin:/apply_show', array('sn' => $lv['sn']))}" data-id="{$lv.id}">详细</a>
+                        <eq name="lv.status" value="1">
+                        <a class="update ajax-get confirm" href="{:addons_url('Goods://GoodsStoreAdmin:/set_apply', array('id' => $lv['id'], 'status' => 'n'))}" data-id="{$lv.id}">拒绝</a>
+                        </eq>
+                        
+                    </td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <link href="__STATIC__/datetimepicker/css/datetimepicker.css" rel="stylesheet" type="text/css">
+    <link href="__STATIC__/datetimepicker/css/dropdown.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+    <script type="text/javascript">
+        $(function() {
+            $('#do_action').click(function(){
+                $('#action_btn').attr('disabled', false);
+                var obj = $(this).parent();
+                if(obj.hasClass('show_action')){
+                    obj.removeClass('show_action');
+                }else{
+                    obj.addClass('show_action');
+                }
+            });
+            $('#action_btn').attr('url', $('#action_btn').data('url'));
+            
+            $('.time').datetimepicker({
+                format: 'yyyy-mm-dd hh:ii',
+                language: "zh-CN",
+                minView: 0,
+                autoclose: true
+            });
+            $('.listorder').on('change', function(){
+                var id = $(this).attr('item_id'),
+                    value = $(this).val();
+                $.ajax({
+                    type: 'get',
+                    url : "{:addons_url('Goods://GoodsStoreAdmin:/listorder')}",
+                    data: {listorder:value, id:id},
+                    success:function(msg){
+                        if(msg.status == 1){
+                            window.location.reload();
+                        }
+                    }
+                });
+            });
+        })
+    </script>
+</block>

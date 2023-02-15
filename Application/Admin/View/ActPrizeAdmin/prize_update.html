@@ -1,0 +1,41 @@
+<extend name="Public/base"/>
+
+<block name="body">
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <form action="{:U('ActPrizeAdmin/prize_update')}" method="post" class="form-horizontal">
+        <div class="form-item">
+            <label class="item-label">奖项编号<span class="check-tips"></span></label>
+            <div class="controls">
+                <span><?php echo $info['id']?></span>
+            </div>
+        </div>
+        <div class="form-item">
+            <label class="item-label">说明<span class="check-tips">（对该选项的描述说明）</span></label>
+            <div class="controls">
+                <span><?php echo $info['info']?></span>
+            </div>
+        </div>
+        <div class="form-item">
+            <label class="item-label">机率值<span class="check-tips">（大于0的整数值，值越大机率越大）</span></label>
+            <div class="controls">
+                <input type="text" class="text input-large" name="val" value="<?php echo $info['val']?>">
+            </div>
+        </div>
+        <input type="text" class="hidden input-large" name="id" value="<?php echo $info['id']?>">
+        <div class="form-item">
+            <button class="btn submit-btn ajax-post" id="submit" type="submit" target-form="form-horizontal">确 定</button>
+            <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+        </div>
+    </form>
+</block>
+
+<block name="script">
+    <script type="text/javascript">
+		$(function(){
+            //导航高亮
+            highlight_subnav("{:U('ActPrizeAdmin/save')}");     
+        })
+    </script>
+</block>

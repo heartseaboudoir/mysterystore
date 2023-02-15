@@ -1,0 +1,110 @@
+<extend name="Public/base" />
+<block name="body">
+    <div id="jq-content" class="site-content">
+        <div class="main-title">
+            <h2>门店库存</h2>
+        </div>
+        <div class="search-form fr cf">
+            <form id="jq-search-form">
+                <div class="sleft">
+                    <input type="text" name="goods_name" class="text input-text search-input" placeholder="请输入商品名查找" />
+	                <a id="jq-search-btn" class="sch-btn" href="javascript:void(0);"><i class="btn-search"></i></a>
+                </div>
+            </form>
+        </div>
+        <a id="jq-download" class="btn" href="javascript:void(0);">导出Excel</a>
+        <div class="data-table table-striped">
+            <table>
+                <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>商品种类</th>
+                        <th>门店名称</th>
+                        <th>库存数量</th>
+                        <th>售价金额</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="jq-list"></tbody>
+            </table>
+        </div>
+        <div id="jq-page" class="page"></div>
+    </div>
+    <script id="temp-list" type="text/html">
+        {{each items as list index}}
+        <tr data-id="{{list.cate_id}}">
+            <td class="temp-id">{{index+1}}</td>
+            <td>{{list.cate_name}}</td>
+            <td>{{list.store_name}}</td>
+            <td>{{list.stock_num}}</td>
+            <td>{{list.g_amounts}}</td>
+            <td>
+                <a class="temp-view" href="javascript:void(0);">查看</a>
+            </td>
+        </tr>
+        {{/each}}
+    </script>
+</block>
+<block name="script">
+    <script type="text/javascript">
+    layui.use(['main'], function() {
+        var $ = layui.jquery,
+            layer = layui.layer;
+
+        var Global = {
+            listUrl: '/Erp/StoreStock/index',
+            fileUrl: '/Erp/StoreStock/exportIndexExcel',
+            jump: window.location.pathname.match(/(\D*)index/)[1],
+            passId: 'cate_id'
+        }
+        $("a[href$='" + Global.jump + "index.html']").parent().addClass('layui-this');
+
+        var passData = $.dataJson(); 
+        
+        $.getData({
+             url: Global.listUrl,
+            load: true
+        }, function(res){
+            dataShow(res);
+        });
+        function dataShow(res){
+            var oDownload = $('#jq-download'),
+                    oList = $('#jq-list');
+
+            oDownload.attr('href','javascript:void(0);').unbind();
+
+            if( res.content == null || res.content.length == 0 ){
+                oList.html('<tr><td class="wrap-empty">暂无内容！</td></tr>');
+                oDownload.css('cursor','default');
+            }else{
+                oList.html(template('temp-list', { items: res.content }));
+                $.each( res.content,function(i,items){
+                    var url = Global.jump + 'indexgoods/'+Global.passId+'/'+items[Global.passId]+'.html',
+                        oId = $('[data-id='+items[Global.passId]+']');
+                    oId.find('.temp-view').attr('href',url);
+                });
+
+                var data = $('#jq-search-form').find('input').serialize();
+                oDownload.fileDown({
+                     url: Global.fileUrl + '?' + data
+                }).removeAttr('style');
+
+            }
+
+        }
+
+        $('#jq-search-btn').off().on({
+            click: function() {
+                var data = $('#jq-search-form').find('input').serialize().replace(/=/g,'/').replace(/&/g,'/'); 
+                window.location.href = Global.jump + 'indexgoods/'+data+'.html';
+            }
+        });
+        $(document).keydown(function(e) {
+            if (e.which == 13) {
+                $('#jq-search-btn').click();
+                return false;
+            }
+        });
+    });
+    </script>
+</block>

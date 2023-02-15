@@ -1,0 +1,256 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <?php
+        if($s_date != ''){
+            $strhref .= "&s_date=" .$s_date;
+        }
+        if($e_date != ''){
+            $strhref .= "&e_date=" .$e_date;
+        }
+        if($store_select != ''){
+            $strhref .= "&store=" .implode(',',$store_select);
+        }
+        if($pre != ''){
+            $strhref .= "&pre=" .$pre;
+        }
+        if($add_order != ''){
+            $strhref .= "&add_order=" .$add_order;
+        }
+        if($add_money != ''){
+            $strhref .= "&add_money=" .$add_money;
+        }
+    ?>
+<div class="site-allsale">
+    <!-- 高级搜索 -->
+    <form id="form" action="{:addons_url('Report://StoreOrderExcel:/index')}" method="post" class="form-horizontal">
+        <div class="cf">
+            <div class="search-form cf">
+                <div class="sleft">
+                <dl id="jq-check-box" class="checkmod">
+                    <dt class="hd">
+                        <label class="checkbox">选择区域门店</label>
+                    </dt>
+                    <volist name="shequ" id="lv">
+                        <notempty name="store[$lv[id]]">
+                            <dd class="bd">
+                                <div class="rule_check">
+                                    <div class="wrap-check-list">
+                                       <label class="checkbox">
+                                       <input class="auth_rules rules_row" type="checkbox" name="rules[]" value="{$lv.id}">{$lv.title}&nbsp;&nbsp;(门店数：<?php echo count($store[$lv[id]])?>)
+                                       </label>
+                                    </div>
+                                    <!--<span class="divsion">&nbsp;</span>-->
+                                    <div class="wrap-check-single child_row">
+                                        <volist name="store[$lv[id]]" id="lc">
+                                            <label class="checkbox" title="{$lc.title}">
+                                                <input class="auth_rules" type="checkbox" name="store[]"
+                                                <?php for($i=0;$i<count($store_select);$i++){
+                                                if( $lc['id'] == $store_select[$i] ){
+                                                	echo(' checked="checked"');
+                                                }
+                                                } ?>
+                                                 value="{$lc.id}">{$lc.title}
+                                            </label>
+                                        </volist>
+                                        <p class="wrap-more"></p>
+                                    </div>
+                                </div>
+                        	</dd>
+                        </notempty>
+                    </volist>
+                </dl>
+                <dl class="checkmod">
+                    <dt class="hd">
+                        <label class="checkbox">预增目标</label>
+                    </dt>
+                    <dd class="bd">
+                        <div class="rule_check">
+                            <div>
+                               <label class="checkbox">【填写预计增加的订单数】
+                                   <input type="text" name="add_order" class="text input-text search-input" style="" value="{$add_order}" placeholder="增加目标订单数" /></label>
+                                <label class="checkbox">【填写预计增加的金额】
+                                    <input type="text" name="add_money" class="text input-text search-input" style="" value="{$add_money}" placeholder="增加目标订单金额" /></label>
+
+                            </div>
+                        </div>
+                	</dd>
+                </dl>
+                <dl class="checkmod">
+                    <dt class="hd">
+                        <label class="checkbox">时间段</label>
+                    </dt>
+                    <dd class="bd">
+                        <div class="rule_check">
+                            <div>
+                                <label class="checkbox">
+                                    <select name="pre">
+                                        <option value="w" <?php if($pre == 'w'){echo selected;} ?>>上一周</option>
+                                        <option value="m" <?php if($pre == 'm'){echo selected;} ?>>上个月</option>
+                                        <option value="t" <?php if($pre == 't'){echo selected;} ?>>上一季度</option>
+                                        <option value="y" <?php if($pre == 'y'){echo selected;} ?>>上一年</option>
+                                    </select>
+                                </label>
+                            </div>
+                        </div>
+                    </dd>
+                </dl>
+                <dl class="checkmod">
+                    <dt class="hd">
+                        <label class="checkbox">时间区间</label>
+                    </dt>
+                    <dd class="bd">
+                        <div class="rule_check">
+                            <div>
+                               <label class="checkbox">
+                                    <input type="text" name="s_date" class="text input-text search-input time" value="{$s_date}" placeholder="请选择开始日期" />
+                                    <input type="text" name="e_date" class="text input-text search-input time" value="{$e_date}" placeholder="请选择结束日期" />
+                               </label>
+                            </div>
+                        </div>
+                	</dd>
+                </dl>
+                    <button id="submit" class="btn submit-btn ajax-post hidden" target-form="form-horizontal" type="submit">搜索</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+    <a href="{:addons_url('Report://StoreOrderExcel:/index')}?isprint=1{$strhref}" class="btn">导出Excel</a>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+            <tr>
+                <th rowspan="2">门店id</th>
+                <th rowspan="2">门店名称</th>
+                <th rowspan="2">门店管理员</th>
+                <th rowspan="2">预增订单数</th>
+                <th rowspan="2">预增订单金额</th>
+                <th colspan="4">上一期目标完成情况【{$pre_s_date_ymd1}~{$pre_e_date_ymd1}】-【{$s_date_ymd1}~{$e_date_ymd1}】</th>
+                <th colspan="4">本期目标完成情况【{$pre_s_date_ymd}~{$pre_e_date_ymd}】-【{$s_date_ymd}~{$e_date_ymd}】</th>
+            </tr>
+            <!--A表：今天，B表1：昨天，C表2：上个月今天，D表3：上个月昨天-->
+            <tr>
+                <th>上期订单数</th>
+                <th>当期订单数</th>
+                <th>上期销售额</th>
+                <th>当期销售额</th>
+                <th>上期订单数</th>
+                <th>目标订单数</th>
+                <th>上期销售额</th>
+                <th>目标销售额</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td>{$lv.id}</td>
+                    <td>{$lv.title}</td>
+                    <td>
+                        <volist name="lv['member']" id="lv1" key="v">
+                            {$lv1}<br>
+                        </volist>
+                    </td>
+                    <td>{$lv.s1}张</td>
+                    <td>{$lv.m1}元</td>
+                    <td>{$lv.sn_num3}</td>
+                    <td>{$lv.sn_num1}</td>
+                    <td>{$lv.money_amount3}</td>
+                    <td>{$lv.money_amount1}</td>
+                    <td>{$lv.sn_num2}</td>
+                    <td><?php echo $lv['sn_num2']+$lv['s1']; ?></td>
+                    <!--<td>{$lv.sn_num}</td>-->
+                    <td>{$lv.money_amount2}</td>
+                    <td><?php echo $lv['money_amount2']+$lv['m1']; ?></td>
+                    <!--<td>{$lv.money_amount}</td>-->
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+
+    <link href="__STATIC__/datetimepicker/css/datetimepicker.css" rel="stylesheet" type="text/css">
+    <link href="__STATIC__/datetimepicker/css/dropdown.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+
+    <script type="text/javascript" src="__STATIC__/artDialog/lib/sea.js"></script>
+    <script type="text/javascript">
+        highlight_subnav('{:addons_url('Report://StoreOrderExcel:/index')}');
+
+        //全选节点
+        $('.rules_all').on('change',function(){
+            $(this).closest('dl').find('dd').find('input').prop('checked',this.checked);
+        });
+        $('.rules_row').on('change',function(){
+            $(this).closest('.rule_check').find('.child_row').find('input').prop('checked',this.checked);
+        });
+
+
+        $('select[name=group]').change(function(){
+			location.href = this.value;
+        });
+		
+        //搜索功能
+        $(".submit-btn").click(function() {
+            var url = $(this).attr('url');
+            var query = $('.search-form').find('input').serialize();
+            query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g, '');
+            query = query.replace(/^&/g, '');
+            if (url.indexOf('?') > 0) {
+                url += '&' + query;
+            } else {
+                url += '?' + query;
+            }
+            var query2 = $('#select-form').serialize();
+            if (url.indexOf('?') > 0) {
+                url += '&' + query2;
+            } else {
+                url += '?' + query2;
+            }
+			console.log(url);
+			return false;
+            window.location.href = url;
+        });
+        // 状态搜索子菜单
+        $(".search-form").find(".drop-down").hover(function() {
+            $("#sub-sch-menu").removeClass("hidden");
+        }, function() {
+            $("#sub-sch-menu").addClass("hidden");
+        });
+        $("#sub-sch-menu li").find("a").each(function() {
+            $(this).click(function() {
+                var text = $(this).text();
+                $("#sch-sort-txt").text(text).attr("data", $(this).attr("value"));
+                $("#sub-sch-menu").addClass("hidden");
+            })
+        });
+        var _T;
+        $('.select-form input').change(function(){
+            clearTimeout(_T);
+            _T = setTimeout(function(){
+                $("#search").click();
+            }, 1000);
+        });
+        $('.time').datetimepicker({
+            format: 'yyyy-mm-dd',
+            language: "zh-CN",
+            minView: 2,
+            autoclose: true
+        });
+
+    </script>
+</block>

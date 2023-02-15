@@ -1,0 +1,57 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:200px">文章标题</th>
+                    <th style="width:120px">发表用户</th>
+                    <th style="width:120px">被回复的用户</th>
+                    <th style="min-width:100px">内容</th>
+                    <th style="width:120px">发表时间</th>
+                    <th style="width:120px">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <notempty name="list">
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td><a href="{:addons_url('Shop://ShopArticleAdmin:/save?id='.$lv['aid'])}">{$lv.art_title}</a></td>
+                    <td><a href="{:U('Member/show', array('id' => $lv['uid']))}"><img src="{$lv.uid|get_header_pic}" class="header_pic" />{$lv.uid|get_nickname}</a></td>
+                    <td><gt name="lv.puid" value="0"><a href="{:U('Member/show', array('id' => $lv['puid']))}"><img src="{$lv.puid|get_header_pic}" class="header_pic" />{$lv.puid|get_nickname}</a><else/>-</gt></td>
+                    <td><span class="show_tips" data-tips="{$lv.content}">{$lv.content}</span></td>
+                    <td>{$lv.create_time|time_format}</td>
+                    <td>
+                        <a class="update" href="{:addons_url('Shop://ShopCommentAdmin:/save?id='.$lv['id'])}" data-id="{$lv.id}">查看</a>
+                        <a class="update" href="{:addons_url('Shop://ShopCommentAdmin:/remove?id='.$lv['id'])}" data-id="{$lv.id}">删除</a>
+                    </td>
+                </tr>
+            </volist>
+             <else/>
+             <tr><td colspan="6">暂无数据~</td></tr>
+            </notempty>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $(function() {
+            highlight_subnav('{:addons_url('Shop://ShopCommentAdmin:/index')}');
+            //全选节点
+            $('.check-all').on('change', function() {
+                $('.ids').prop('checked', this.checked);
+            });
+        })
+    </script>
+</block>

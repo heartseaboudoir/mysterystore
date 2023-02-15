@@ -1,0 +1,256 @@
+<extend name="Public/base" />
+<block name="body">
+	<script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/Public/res/code/ueditor/ueditor.config.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/Public/res/code/ueditor/ueditor.all.min.js"> </script>
+    <script type="text/javascript" charset="utf-8" src="/Public/res/code/ueditor/lang/zh-cn/zh-cn.js"></script> 
+	<!-- 标题栏 -->
+	<div class="main-title">
+		<h2>{$meta_title}</h2>
+	</div>
+        <div class="tab-content site-lottery">
+            <!-- 数据列表 -->
+            <form id="form" action="{:addons_url('CashCoupon://WorldCup:/update')}" method="post" class="form-horizontal">
+                <script type="text/plain" id="upload_ue"></script>
+                <script type="text/plain" id="upload_ue2"></script>
+                <div class="tab-pane in tab1">
+                    <div class="form-item cf">
+                        <label class="item-label">是否开启活动</label>
+                        <div class="controls">
+                            <select name="is_open" style="width:120px;">
+                                <option value="1" <?php if(!empty($data['is_open'])) { echo 'selected';}?>>是</option>
+                                <option value="0" <?php if(empty($data['is_open'])) { echo 'selected';}?>>否</option>
+                            </select>
+                        </div>
+                    </div>   
+                    <!--
+                    <div class="form-item cf">
+                        <label class="item-label">活动起止时间<span class="check-tips"></span></label>
+                        <div class="controls">
+                            <label><input type="text" class="input-2x time text" name="stime" value="<gt name="data.stime" value="0">{$data['stime']|time_format='Y-m-d'}</gt>" /></label>
+                            &nbsp;&nbsp;&nbsp;&nbsp;-
+                            <label><input type="text" class="input-2x time text" name="etime" value="<gt name="data.etime" value="0">{$data['etime']|time_format='Y-m-d'}</gt>" /></label>
+                        </div>
+                    </div>   
+                    -->
+
+                    <div class="form-item cf">
+                        <label class="item-label">绑定商品<span class="check-tips">（商品总管理中已加入线上销售的商品）</span></label>
+                        <div class="controls">
+                            <a href="javascript:;" id="select_product" class="btn" data-url="">选择绑定的商品</a>
+                            <ul id="jq-product" class="wrap-product"></ul>
+                            <p id="jq-msg" style="<notempty name="bind_goods">display:none;</notempty>">未关联内容~</p>
+                        </div>
+                    </div>                    
+                    <div class="form-item cf">
+                        <label class="item-label">活动标题<span class="check-tips"></span></label>
+                        <div class="controls">
+                            <input class="text input-large" type="text" value="{$data['title']}" name="title" maxlength="30">
+                        </div>
+                    </div>
+                    <div class="form-item cf">
+                        <label class="item-label">活动描述<span class="check-tips"></span></label>
+                        <div class="controls">
+                            <input class="text input-large" type="text" value="{$data['info']}" name="info" maxlength="80">
+                        </div>
+                    </div> 
+                    <div class="form-item cf">
+                        <label class="item-label">分享图标<span class="check-tips"></span></label>
+                        <div class="controls">
+                            <input type="text" readonly="readonly" class="text input-large" id="cover" name="cover" value="{$data['cover']}"><a href="javascript:void(0);" onclick="upImage();">上传图标</a>
+                        </div>
+                        <div style="width:200px;">
+                            <img id="showimg" style="width:100%;" src="{$data['cover']}" />
+                        </div>
+                    </div>    
+                    <div class="form-item cf">
+                        <label class="item-label">轮播图片<span class="check-tips"></span></label>
+                        <div class="controls">
+                            <input type="text" readonly="readonly" class="text input-large" id="toppic" name="toppic" value="{$data['toppic']}"><a href="javascript:void(0);" onclick="upImage2();">上传轮播图片</a>
+                        </div>
+                        <div style="width:200px;">
+                            <img id="showimg_toppic" style="width:100%;" src="{$data['toppic']}" />
+                        </div>
+                    </div>                     
+                    <div class="form-item cf">
+                        <label class="item-label">规则说明<span class="check-tips">（用于描述当前配置的规则）</span></label>
+                        <div class="controls">
+                            <textarea name="remark" class="textarea input-large" style="height:200px;">{$data.remark}</textarea>
+                        </div>
+                    </div>
+                    <input id="jq-product-id" name="products" type="hidden" value="<?php echo (empty($data['products']) ? '' : $data['products'])?>">
+                    <input name="id" type="hidden" value="<?php echo (empty($data['id']) ? 0 : $data['id'])?>">
+                </div>                 
+                <div class="form-item cf">
+                    <button id="submit" class="btn submit-btn ajax-post hidden" target-form="form-horizontal" type="submit">确 定</button>
+                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                </div>
+            </form>
+        </div>
+<script id="temp-product" type="text/html">
+    {{each items as list index}}
+    <li><span data-id="{{list.id}}">X</span>
+        <a href="{{list.url}}" target="_blank" title="{{list.title}}">
+            <p><img src="{{list.pic_url}}"></p>
+            <div \>{{list.title}}</div>
+        </a>
+    </li>
+    {{/each}}
+</script>
+</block>
+<block name="script">
+<script type="text/javascript">
+layui.use(['main'], function() {
+    var $ = layui.jquery,
+    layer = layui.layer;
+
+    var select_pro = JSON.parse( '<?php echo $select_pro;?>' ),
+            oPdtId = $('#jq-product-id'),
+              oPdt = $('#jq-product'),
+              oMsg = $('#jq-msg');
+
+    if( select_pro.count > 0 ){
+        delshow({
+            data: select_pro.list,
+             arr: oPdtId.val().split(',')
+        });
+    }
+    function delshow(options,callback) {
+        oMsg.hide();
+        oPdt.html( template('temp-product', { items: options.data }) );
+        if( typeof callback == 'function' ){
+           callback(); 
+        }
+        oPdt.find('li').each(function(){
+            $(this).find('span').on({
+                click:function(){
+                    var aId = $(this).attr('data-id'),
+                        oLi = $(this).parents('li');
+                    for(var i=0;i<options.arr.length;i++){
+                        if(options.arr[i] == aId){
+                            options.arr.splice(i,1);
+                            oLi.remove();
+                            if( options.arr.length == 0 ){
+                                oMsg.show();
+                            }
+                        }
+                    }
+                    oPdtId.val( options.arr.join(',') );
+                }
+            });
+        });
+    }
+
+    var Global = {
+        jump: window.location.pathname.match(/(\D*)index/)[1]
+    }
+    $("a[href$='" + Global.jump + "logs.html']").parent().addClass('layui-this');
+
+    $('#select_product').on({
+        click:function(){
+            layer.open({
+                type: 2,
+                title: '可绑定商品列表',
+                shade: 0.5,
+                area: ['500px', '500px'],
+                content: ["{:addons_url('CashCoupon://WorldCup:/get_ol_lists')}", 'no'],
+                btn: ['提交'],
+                yes: function(index) {
+                    var oTable = layer.getChildFrame('body',index).find('#jq-list'),
+                          data = [],
+                           arr = [],
+                        value = oPdtId.val().split(',');
+                    oTable.find('tr').each(function(){
+                        var aId = $(this).attr('data-id');
+                        for( var i=0;i<value.length;i++ ) {
+                            if( aId == value[i] ){
+                                value.splice(i,1);
+                            }
+                        }
+                        if( $(this).find('[name="selectActive"]').prop('checked') ) {
+                            var aId = $(this).attr('data-id'),
+                             vTitle = $(this).find('.wrap-title').html(),
+                               aImg = $(this).find('img').attr('src'),
+                              aHref = $(this).find('a').attr('href'),
+                                off = true;
+                            arr.push( aId );
+                            data.push({
+                                   id: aId,
+                                  url: aHref,
+                              pic_url: aImg,
+                                title: vTitle
+                            });
+                        }
+                    });
+                    if( value[0] != '' ){
+                        var str = '';
+                        for(var i=0;i<value.length;i++) {
+                            str += $('[data-id="'+value[i]+'"]').parents('li').prop('outerHTML');
+                        }
+                        arr = arr.concat( value );
+                    }
+                    if( arr.length == 0 ) {
+                        layer.msg('还没勾选任何商品哦', {
+                            time: 1500
+                        });
+                        return false;
+                    }else{
+                        oPdtId.val( arr.join(',') );
+                        delshow({
+                            data: data,
+                             arr: oPdtId.val().split(',')
+                        }, function(){
+                            if( value[0] != '' ){
+                                oPdt.append( str );
+                            }
+                        });
+                        layer.close(index);
+                    }
+                }
+            });
+            $('.layui-layer-iframe').addClass('site-iframe');
+        }
+    });
+
+});
+
+
+</script>
+
+
+<script type="text/javascript">
+
+var _editor = UE.getEditor('upload_ue');
+_editor.ready(function () {
+    _editor.hide();
+    _editor.addListener('beforeInsertImage', function (t, arg) {
+        $("#cover").attr("value", arg[0].src);
+        $("#showimg").attr("src", arg[0].src);
+    })
+});
+
+
+var _editor2 = UE.getEditor('upload_ue2');
+_editor2.ready(function () {
+    _editor2.hide();
+    _editor2.addListener('beforeInsertImage', function (t, arg) {
+        $("#toppic").attr("value", arg[0].src);
+        $("#showimg_toppic").attr("src", arg[0].src);
+    })
+});
+
+//弹出图片上传的对话框
+function upImage() {
+    var myImage = _editor.getDialog("insertimage");
+    myImage.open();
+}
+
+function upImage2() {
+    var myImage = _editor2.getDialog("insertimage");
+    myImage.open();
+}
+
+</script>
+
+
+</block>

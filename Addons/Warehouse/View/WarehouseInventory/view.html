@@ -1,0 +1,545 @@
+<extend name="Public/base" />
+<block name="body">
+    <div id="jq-content" class="site-content site-view">
+        <div class="main-title">
+            <h2>盘点单查看</h2>
+        </div>
+        <a id="jq-download" class="btn" href="javascript:void(0);">导出Excel</a>
+        <div id="jq-form" class="form-horizontal">
+            <div id="jq-list" class="tab-pane in tab1"></div>
+            <form id="jq-form-layui" class="layui-form wrap-form-row">
+                <div id="jq-hide" class="layui-form-item">
+                    <label class="layui-form-label">是否显示0库存：</label>
+                    <div class="layui-input-block">
+                        <input id="jq-checkbox" type="checkbox" lay-skin="switch" lay-filter="toggle">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">类别选择：</label>
+                    <div class="layui-input-inline">
+                        <select id="jq-select-type" lay-filter="type" lay-search></select>
+                    </div>
+                </div>
+            </form>
+            <div class="data-table table-striped">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>商品ID</th>
+                            <th>商品名称</th>
+                            <th>商品类别</th>
+                            <th>商品属性</th>
+                            <th>商品条码</th>
+                            <th>零售价</th>
+                            <th class="wrap-title">库存数量</th>
+                            <!--<th>库存均价</th>-->
+                            <th>盘点数量<!--<span id="jq-btn-num" class="wrap-span">一键设置盘点数量</span>--></th>
+                            <!--<th>盘点价格<span id="jq-btn-price" class="wrap-span">一键设置盘点价格</span></th>-->
+                            <th>盈亏数量</th>
+                            <th>备注</th>
+                        </tr>
+                    </thead>
+                    <tbody id="jq-child"></tbody>
+                </table>
+            </div>
+            <button id="jq-submit-return" type="submit" class="btn submit-btn hidden">保存返回盘点单</button>
+            <button id="jq-submit" type="submit" class="btn submit-btn hidden">保存盘点单</button>
+        </div>
+    </div>
+    <script id="temp-select-type" type="text/html">
+        <option value="0">全部商品</option>
+        {{each items as list index}}
+        <option value="{{list.cate_id}}">{{list.cate_name}}</option>
+        {{/each}}
+    </script>
+    <script id="temp-list" type="text/html">
+        {{each items as list}}
+        <div class="form-item cf">
+            <div class="controls goods_div">
+				<input type="hidden" name="i_type" value="{{list.i_type}}">
+                <label>盘点单号：{{list.i_sn}}</label>
+                <label>创建日期：{{list.ctime}}</label>
+                <label>商品种类：{{list.g_type}}种</label>
+                <label>商品数量：{{list.g_nums}}</label>
+                <label>售价金额：{{list.g_amounts}}</label>
+            </div>
+            <div class="controls goods_div">
+                <label>管理员：{{list.nickname}}</label>
+                <label>盘点仓库：{{list.w_name}}</label>
+            </div>
+            {{if list.enickname != '' && list.enickname != null }} 
+            <div class="controls goods_div">
+                <label>审核人：{{list.enickname}}</label>
+                <label>审核日期：{{list.etime}}</label>
+            </div>
+            {{/if}}
+            <div class="controls goods_div3">
+                状态：
+                <span class="wrap-highlight">
+                {{if list.i_status == 0}} 
+                    新增
+                {{else if list.i_status == 1}}
+                    已审核
+                {{else}}
+                    已报废
+                {{/if}}
+                </span>
+            </div>
+            <div class="controls goods_div4">
+                <label>备注：
+                {{if list.i_status == 0}} 
+                    <input type="text" class="text input-min remark" style="width: 200px;" name="remark" value="{{list.remark}}" />
+                {{else}}
+                    {{list.remark}}
+                {{/if}}
+            </div>
+        </div>
+        {{/each}}
+    </script>
+    <script id="temp-child" type="text/html">
+        {{each items as list index}}
+        <tr class="data_list">
+            <input type="hidden" name="i_id" value="{{list.i_id}}"/>
+            <input type="hidden" name="i_d_id" value="{{list.i_d_id}}"/>
+            <input type="hidden" name="goods_id" value="{{list.goods_id}}"/>
+            <input type="hidden" name="stock_num" value="{{list.stock_num}}"/>
+            <input type="hidden" name="audit_mark" value="1"/>
+            <td>{{list.goods_id}}</td>
+            <td title="{{list.goods_name}}"><a href="{:addons_url('Goods://GoodsInfo:/index')}?id={{list.goods_id}}" target="_blank">
+                {{if list.goods_name.length > 19}}
+                    {{list.goods_name.slice(0,18) + '...'}}
+                {{else}}
+                    {{list.goods_name}}
+                {{/if}}</a>
+            </td>
+            <td>{{list.cate_name}}</td>
+			<td>{{list.value_name}}</td>
+            <td title="{{list.bar_code}}">
+                {{if list.bar_code.length > 14}}
+                    {{list.bar_code.slice(0,13) + '...'}}
+                {{else}}
+                    {{list.bar_code}}
+                {{/if}}
+            </td>
+            <td>{{list.sell_price}}</td>
+            <td class="temp-stock_num">{{list.stock_num}}</td>
+            <!--<td class="temp-stock_price">{{list.stock_price}}</td>-->
+            <td>
+                <input type="text" name="g_num" value="{{list.g_num}}" class="wrap-data" num>
+            </td>
+            <!--<td>
+                <input type="text" name="g_price" value="{{list.g_price}}" decimal>
+            </td>-->
+            <td class="temp-add_num">{{list.add_num}}</td>
+            <td>
+                <input type="text" name="remark" value="{{list.remark}}">
+            </td>
+        </tr>
+        {{/each}}
+    </script>
+</block>
+<block name="script">
+    <script type="text/javascript">
+    layui.use(['main','form'], function() {
+        var $ = layui.jquery,
+        layer = layui.layer,
+         form = layui.form;
+
+        var Global = {
+            listUrl: '/Erp/WarehouseInventory/view',
+            submitUrl: '/Erp/WarehouseInventory/save',
+            jump: window.location.pathname.match(/(\D*)view/)[1],
+            typeId: 0,
+            urlId: 0,
+            submitFlag: true,
+            returnFlag: true
+        }
+        var prevUrl = document.referrer.match(/\/(\w+).html/)[1];
+        $("a[href$='" + Global.jump + prevUrl + ".html']").parent().addClass('layui-this');
+        if( prevUrl == 'index' ){
+            $('[name="audit_mark"]').remove();
+            $('#jq-checkbox').prop('checked',true);
+            $('.layui-form-switch').addClass('layui-form-onswitch');
+        }
+
+        var passData = {
+            id: window.location.pathname.match(/\/(\w+).html/)[1],
+            is_disable: prevUrl == 'index' ? 1 : 0
+        }
+        var data = $.parseJson( passData );
+
+        $.postData({
+             url: Global.listUrl,
+            data: data,
+            load: true
+        }, function(res){
+            Global.urlId = res.content.main[0].i_type;
+            $('#jq-list').html(template('temp-list', { items: res.content.main }));
+            dataShow(res);
+        });
+        var i_type='';
+        function dataShow(res,callback){
+            var oSelect = $('#jq-select-type'),
+                 oChild = $('#jq-child');
+
+            if( !callback ){
+                oSelect.html(template('temp-select-type', { items: res.content.cate }));
+                form.render('select');
+            }
+
+            if( res.content.child == '[]' || res.content.child == null || res.content.child.length == 0 ){
+                oChild.html('<tr><td class="wrap-default wrap-empty">暂无内容！</td></tr>');
+            }else{
+                Global.typeId = $('.layui-anim').find('.layui-this').attr('lay-value');
+                if( res.content.main[0].i_status != 1 ){
+                    $.each( res.content.child,function(i,items){
+                        if( parseInt(items.audit_mark) == 0 ) {
+                            if(parseInt(items.stock_num) == 0 && parseInt(items.add_num) == 0 || parseInt(items.g_num) == 0){
+                                res.content.child[i].g_num = '';
+                            }
+                        }
+                        return res.content.child;
+                    })
+                }else{
+                    $.each( res.content.child,function(i,items){
+                        if( items.g_num == '' ){
+                            res.content.child[i].g_num = 0;
+                        }
+                        return res.content.child;
+                    });
+                }
+                oChild.html(template('temp-child', { items: res.content.child }));
+
+                $('#jq-child').find('tr').each(function(){
+                    var oGnum = $(this).find('[name="g_num"]'),
+                      //oGprice = $(this).find('[name="g_price"]'),
+                      oAddnum = $(this).find('.temp-add_num'),
+                    vStocknum = $(this).find('.temp-stock_num').html(),
+                  vStockprice = $(this).find('.temp-stock_price').html(),
+                       remark = $(this).find('[name="remark"]');
+
+                    if( res.content.main[0].i_status != 0 ){
+                        oGnum.parents('td').html( oGnum.val() );
+                        //oGprice.parents('td').html( oGprice.val() );
+                        //$('#jq-btn-num,#jq-btn-price,#jq-submit').hide();
+                        var context = remark.val().length > 10 ? remark.val().slice(0,9) + '...' : remark.val();
+                        remark.parents('td').html( context );
+                    }
+                    colorShow();
+
+                    $(this).verifyForm(); 
+                    i_type=$(':input[name="i_type"]').val();
+                    if(i_type == 0){
+                    	var beforeValue = oGnum.val();
+                        var beforeRemark = remark.val();
+                        if( beforeValue != '' || beforeRemark != '') {
+                            $(this).attr('default',true);
+                        }else{
+                            $(this).attr('default',true);
+                        }
+                    }
+                    /*var beforeValue = oGnum.val();
+                    var beforeRemark = remark.val();
+                    if( beforeValue != '' || beforeRemark != '') {
+                        $(this).attr('default',true);
+                    }else{
+                        $(this).attr('default',true);
+                    }*/
+
+                    var self = $(this),
+                         arr = ['',''];
+                    self.find('input').keyup(function(){
+                        /*if( $(this).context.name == 'g_num' ){
+                           arr[0] = $(this).val();
+                           oAddnum.html( $(this).val() - vStocknum );
+                           colorShow(); 
+                        }
+                        if( $(this).context.name == 'remark' ){
+                           arr[1] = $(this).val();
+                        }
+                        if( self.attr('default') == 'true' && arr[0] == '' && arr[1] == '' ) {
+                            self.removeAttr('update');
+                        }else{
+                            self.attr('update',true);
+                        }*/
+                        self.attr('update',true);
+                    }).blur(function(){
+                        if( $(this).context.name == 'g_num' ){
+                           oAddnum.html( $(this).val() - vStocknum );
+                           colorShow(); 
+                        }
+                    });
+
+                    function colorShow(){
+                        var vAddnum = oAddnum.html();
+                        if( vAddnum > 0 ){
+                            oAddnum.css('color','#f00');
+                        }else if( vAddnum < 0 ){
+                            oAddnum.css('color','#008000');
+                        }else{
+                            oAddnum.removeAttr('style');
+                        }
+                    }
+
+                    /*$('#jq-btn-num').on({
+                        click:function(){
+                            oGnum.val( vStocknum );
+                            oAddnum.html( 0 ).removeAttr('style');
+                        }
+                    });
+                    $('#jq-btn-price').on({
+                        click:function(){
+                            oGprice.val( vStockprice );
+                        }
+                    });*/
+                });
+
+                if( res.content.main[0].i_status == 1 ){
+                    $('#jq-form').find('.wrap-title').html('审核库存数量');
+                    $.each( res.content.child,function(i,items){
+                        var oList = $('#jq-child').find('tr').eq(i);
+                        oList.find('.temp-stock_num').html( items.b_num == undefined ? '' : items.b_num );
+                    });
+                }
+            }
+
+            if( res.content.main[0].i_status != 0 ){
+                $('#jq-btn-num,#jq-submit,#jq-hide').hide();
+            }
+
+        }
+
+        $('#jq-download').fileDown({
+            post: true,
+             url: Global.listUrl,
+            data: data + '&isprint=1'
+        });
+        
+        form.on( 'switch(toggle)', function(items){
+            var index = layer.load(2, {shade: [0.5,'#000']});
+            var oBox = $('#jq-checkbox');
+            oBox.attr('disabled',true);
+            var num =  items.elem.checked ? 1 : 0,
+                 id = $('.layui-anim').find('.layui-this').attr('lay-value');
+            passData.is_disable = num;
+            $.postData({
+                 url: Global.listUrl,
+                data: $.parseJson( passData ) + '&cate_id=' + id
+            }, function(res){
+                id == 0 ? dataShow(res) : dataShow(res,true);
+                oBox.attr('disabled',false);
+                layer.close(index);
+            });
+        });
+        form.on( 'select(type)', function(items){
+            if( !$('#jq-child').find('.wrap-default').length > 0 ){
+                if( !$('#jq-submit').is(':hidden') ){
+                    var oType = $('#jq-select-type option[value="'+Global.typeId+'"]'),
+                          arr = [];
+                    /*if( Global.urlId == 1 ){
+                        var verify = true;
+                        $('#jq-child').find('tr').each(function(){
+                            var oAmount = $(this).find('[name="g_num"]');
+                            if( oAmount.val() == '' ){
+                                oType.prop('selected',true);
+                                form.render('select');  
+                                layer.msg( '请输入盘点数量', {
+                                    time: 1500
+                                });
+                                oAmount.val('').focus();
+                                verify = false;
+                                return false;
+                            }
+                        });
+                        if( !verify ){
+                            return false;
+                        }
+                    }*/
+                    if(i_type == 0){
+                    	 $('#jq-child').find('[update="true"],[default="true"]').each(function(){
+                             var parameter = $(this).find('input').serialize(),
+                                 data = parameter.replace('remark','remark_detail').replace(/\=/g,"\"\:\"").replace(/\&/g,"\",\"");
+                                 data = JSON.parse( '{"' + decodeURIComponent(data,true) + '"}' );
+                                 if( data.g_num == '' ){
+                                     data.audit_mark = '0';
+                                     data.g_num = '0';
+                                 }
+                             arr.push( data );
+                         });
+                    }else{
+                    	 $('#jq-child').find('[update="true"]').each(function(){
+                             var parameter = $(this).find('input').serialize(),
+                                 data = parameter.replace('remark','remark_detail').replace(/\=/g,"\"\:\"").replace(/\&/g,"\",\"");
+                                 data = JSON.parse( '{"' + decodeURIComponent(data,true) + '"}' );
+                                 if( data.g_num == '' ){
+                                     data.audit_mark = '0';
+                                     data.g_num = '0';
+                                 }
+                             arr.push( data );
+                         });
+                    }
+                   
+                    if( arr.length > 0 ){
+                        layer.confirm( '是否保存 <span class="wrap-empty">' + oType.html() + '</span> ?',{
+                            btn: ['确定', '取消']
+                        }, function(index) {
+                            var data = {
+                                id: passData.id,
+                                goods_list: arr
+                            };
+                            $.postData({
+                                 url: Global.submitUrl,
+                                data: data
+                            }, function(res){
+                                layer.msg( oType.html() + ' 保存成功', {
+                                    time: 1500
+                                });
+                                getSelect();
+                            });
+                            layer.close(index);
+                        }, function(index){
+                            getSelect();
+                        });
+                        return false;
+                    }
+                }
+            }
+            getSelect();
+            function getSelect(){
+                var num = 0,
+                     id = items.value;
+                if( $('.layui-form-onswitch').length > 0 ){
+                    num = 1;
+                }
+                passData.is_disable = num;
+                $.postData({
+                     url: Global.listUrl,
+                    data: $.parseJson( passData ) + '&cate_id=' + id
+                }, function(res){
+                    dataShow(res,true);
+                });
+            }
+        });
+        $('#jq-submit,#jq-submit-return').on({
+            click: function() {
+                if ( $('#jq-child').find('.wrap-default').length > 0 ) {
+                    layer.msg('没有商品数据', {
+                        time: 1500
+                    });
+                    return false;
+                }
+                /*if( Global.urlId == 1 ){
+                    var verify = true;
+                    $('#jq-child').find('tr').each(function(){
+                        var oAmount = $(this).find('[name="g_num"]');
+                        if( oAmount.val() == '' ){
+                            layer.msg( '请输入盘点数量', {
+                                time: 1500
+                            });
+                            oAmount.val('').focus();
+                            verify = false;
+                            return false;
+                        }
+                    });
+                    if( !verify ){
+                        return false;
+                    }
+                }*/
+                var arr = [];
+                if(i_type == 0){
+                	$('#jq-child').find('[update="true"],[default="true"]').each(function(){
+                        /*var oUpdate = $(this);
+                        console.log( oUpdate );
+                        if( !oUpdate.length > 0 ){
+                            return false;
+                        }*/
+                        var parameter = $(this).find('input').serialize(),
+                            data = parameter.replace('remark','remark_detail').replace(/\=/g,"\"\:\"").replace(/\&/g,"\",\"");
+                            data = JSON.parse( '{"' + decodeURIComponent(data,true) + '"}' );
+                            if( data.g_num == '' ){
+                                data.audit_mark = '0';
+                                data.g_num = '0';
+                            }
+                        arr.push( data );
+                    });
+                }else{
+                	$('#jq-child').find('[update="true"]').each(function(){
+                        /*var oUpdate = $(this);
+                        console.log( oUpdate );
+                        if( !oUpdate.length > 0 ){
+                            return false;
+                        }*/
+                        var parameter = $(this).find('input').serialize(),
+                            data = parameter.replace('remark','remark_detail').replace(/\=/g,"\"\:\"").replace(/\&/g,"\",\"");
+                            data = JSON.parse( '{"' + decodeURIComponent(data,true) + '"}' );
+                            if( data.g_num == '' ){
+                                data.audit_mark = '0';
+                                data.g_num = '0';
+                            }
+                        arr.push( data );
+                    });
+                }
+                /*var updateArr = [];
+                $.each( arr,function(i,items){
+                    if( Global.beforeData[i][0] != items.g_num || Global.beforeData[i][1] != items.remark_detail ){
+                        updateArr.push({
+                            g_num: items.g_num,
+                            goods_id: items.goods_id,
+                            i_d_id: items.i_d_id,
+                            i_id: items.i_id,
+                            remark_detail: items.remark_detail,
+                            stock_num: items.stock_num
+                        });
+                        onOff = false;
+                    }
+                });*/
+                /*if( !arr.length > 0 ){
+                    layer.msg( '暂无修改！', {
+                        time: 1500
+                    });
+                    return false;
+                }*/
+                if( Global.submitFlag && $(this).attr('id') == 'jq-submit' ){
+                    Global.submitFlag = false;
+                    var data = {
+                            id: passData.id,
+                        remark: $('#jq-list').find('[name="remark"]').val(),
+                        goods_list: arr,
+                    };
+                    $.postData({
+                         url: Global.submitUrl,
+                        data: data
+                    }, function(res){
+                        layer.msg(res.content, {
+                            time: 1500
+                        });
+                        setTimeout(function(){
+                           Global.submitFlag = true; 
+                        },2000)
+                    });
+                }
+                if( Global.returnFlag && $(this).attr('id') == 'jq-submit-return' ){
+                    Global.returnFlag = false;
+                    var data = {
+                            id: passData.id,
+                        remark: $('#jq-list').find('[name="remark"]').val(),
+                        goods_list: arr,
+                    };
+                    $.postData({
+                         url: Global.submitUrl,
+                        data: data
+                    }, function(res){
+                        layer.msg(res.content, {
+                            time: 1500
+                        });
+                        window.location.href = Global.jump + prevUrl + '.html';
+                    },function(){
+                        Global.returnFlag = true;
+                    });
+                }
+                return false;
+            }
+        });
+    });
+    </script>
+</block>

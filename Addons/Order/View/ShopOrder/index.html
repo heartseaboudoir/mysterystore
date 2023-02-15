@@ -1,0 +1,151 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <!-- 高级搜索 -->
+    <div class="cf">
+        <!--
+        <a href="{:addons_url('Order://ShopOrder:/download_order')}" class="btn" >订单下载</a>
+        -->
+        <a href="javascript:;" id="download" url="{:addons_url('Order://ShopOrder:/download_order')}" class="btn" >订单下载</a>
+        <div class="search-form fr cf">
+            <div class="sleft">
+                <input type="text" name="keyword" class="text input-text search-input" style="" value="{$_GET['keyword']}" placeholder="完整的订单号" />
+                <input type="text" name="start_time" class="text search-input time" style="width:100px;" value="{$_GET['start_time']}" placeholder="起始时间" />
+                <input type="text" name="end_time" class="text search-input time" style="width:100px;" value="{$_GET['end_time']}" placeholder="结束时间" />
+                <a class="sch-btn" href="javascript:;" id="search" url="{:addons_url('Order://ShopOrder:/index')}"><i class="btn-search"></i></a>
+            </div>
+        </div>
+    </div>
+    <div style="clear:both;"></div>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+                <tr>
+                    <th>订单号</th>
+                    <th style="width:100px;">创建人</th>
+                    <th style="width:100px;">店铺用户</th>
+                    <th style="width:80px;">实付金额</th>
+                    <th style="width:80px;">状态</th>
+                    <th style="width:120px;">创建时间</th>
+                    <th style="width:120px;">更新时间</th>
+                    <th style="width:60px;">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="lv" key="vo">
+                <tr <eq name="lv.status" value="1">style="color:red;"</eq>>
+                    <td>{$lv.order_sn}</td>
+                    <td><a href="{:U('Member/show', array('id' => $lv['uid']))}" target="_blank">{$lv.uid|get_nickname}</a></td>
+                    <td><a href="{:U('Member/show', array('id' => $lv['store_id']))}" target="_blank">{$lv.store_id|get_nickname}</a></td>
+                    <td>{$lv.pay_money}</td>
+                    <td>
+                        {$lv.status_text}
+                        <gt name="lv.refund_status" value="0">
+                        <br><a href="{:addons_url('Order://OrderRefundAdmin:/index', array('keyword' => $lv['order_sn']))}" target="_blank">
+                            (<switch name="lv.refund_status"><case value="1">已申请退款</case><case value="2">退款中</case><case value="3">已拒绝</case><case value="4">退款成功</case></switch>)
+                        </a>
+                        </gt>
+                    </td>
+                    <td>{$lv.create_time|time_format="Y-m-d H:i"}</td>
+                    <td>{$lv.update_time|time_format="Y-m-d H:i"}</td>
+                    <td>
+                            <a class="update" href="{:addons_url('Order://ShopOrder:/show?id='.$lv['id'])}" data-id="{$lv.id}">查看</a>
+                    </td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <link href="__STATIC__/datetimepicker/css/datetimepicker.css" rel="stylesheet" type="text/css">
+    <link href="__STATIC__/datetimepicker/css/dropdown.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+    <script type="text/javascript">
+        $(function() {
+            highlight_subnav('{:addons_url('Order://ShopOrder:/index')}');
+            //全选节点
+            $('.check-all').on('change', function() {
+                $('.ids').prop('checked', this.checked);
+            });
+            //搜索功能
+            
+            $('.search-form input').focus(function(){
+                $(document).keypress(function (e) {
+                    // 回车键事件 
+                    if (e.which == 13) {
+                        $("#search").click();
+                    }
+                });
+            });
+            $("#search").click(function() {
+                var url = $(this).attr('url');
+                var query = $('.search-form').find('input').serialize();
+                query = query.replace(/(&|^)(\w*?\d*?\-*?_*?)*?=?((?=&)|(?=$))/g, '');
+                query = query.replace(/^&/g, '');
+                if (url.indexOf('?') > 0) {
+                    url += '&' + query;
+                } else {
+                    url += '?' + query;
+                }
+                var query2 = $('#select-form').serialize();
+                if (url.indexOf('?') > 0) {
+                    url += '&' + query2;
+                } else {
+                    url += '?' + query2;
+                }
+                window.location.href = url;
+            });
+            
+            
+            
+            $("#download").click(function(){
+                var url = $(this).attr('url');
+                var keyword = $(':input[name=keyword]').val();
+                var start_time = $(':input[name=start_time]').val();
+                var end_time = $(':input[name=end_time]').val();
+                url = url +'?keyword=' + keyword  + '&start_time=' + start_time + '&end_time=' + end_time;
+                window.location.href = url;
+            })
+            
+            
+
+            /* 状态搜索子菜单 */
+            $(".search-form").find(".drop-down").hover(function() {
+                $("#sub-sch-menu").removeClass("hidden");
+            }, function() {
+                $("#sub-sch-menu").addClass("hidden");
+            });
+            $("#sub-sch-menu li").find("a").each(function() {
+                $(this).click(function() {
+                    var text = $(this).text();
+                    $("#sch-sort-txt").text(text).attr("data", $(this).attr("value"));
+                    $("#sub-sch-menu").addClass("hidden");
+                })
+            });
+            var _T;
+            $('#select-form input').change(function(){
+                clearTimeout(_T);
+                _T = setTimeout(function(){
+                    $("#search").click();
+                }, 1000);
+            });
+            $('.time').datetimepicker({
+                format: 'yyyy-mm-dd',
+                language: "zh-CN",
+                minView: 2,
+                autoclose: true
+            });
+        })
+    </script>
+</block>

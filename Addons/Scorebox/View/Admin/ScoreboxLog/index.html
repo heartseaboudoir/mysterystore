@@ -1,0 +1,48 @@
+<extend name="Public/base" />
+
+<block name="body">
+    <!-- 标题栏 -->
+    <div class="main-title">
+        <h2>{$meta_title}</h2>
+    </div>
+    <!-- 数据列表 -->
+    <div class="data-table table-striped">
+        <table>
+            <thead>
+                <tr>
+                    <th>用户</th>
+                    <th>操作</th>
+                    <th>获得蜜糖</th>
+                    <th>获得经验</th>
+                    <th>操作时间</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="lv" key="vo">
+                <tr>
+                    <td>{$lv.uid|get_nickname}</td>
+                    <td>{$lv.name_title}</td>
+                    <td><switch name="lv.type"><case value="1"><span style="color:green;">+{$lv.score}</span></case><case value="2"><span style="color:red;">-{$lv.score}</span></case></switch></td>
+                    <td>{$lv.exper}</td>
+                    <td>{$lv.create_time|time_format="Y-m-d H:i"}</td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+        {$_page}
+    </div>
+</block>
+<block name="script">
+    <script type="text/javascript">
+        $(function() {
+            highlight_subnav('{:addons_url('Scorebox://ScoreboxLogAdmin:/index')}');
+            //全选节点
+            $('.check-all').on('change', function() {
+                $('.ids').prop('checked', this.checked);
+            });
+        })
+    </script>
+</block>
